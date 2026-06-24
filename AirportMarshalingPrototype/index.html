@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>공항 마샬링 프로토타입</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #222;
+    color: #eee;
+    font-family: sans-serif;
+    overflow: hidden;
+  }
+  #ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  #signal {
+    font-weight: bold;
+    font-size: 20px;
+    color: #ffd34d;
+  }
+  #success {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    font-weight: bold;
+    color: #4dff88;
+    text-shadow: 0 0 12px #000;
+    display: none;
+  }
+  #restart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  #help {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 14px;
+    color: #aaa;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div id="ui">
+  현재 수신호: <span id="signal">STOP</span>
+</div>
+<button id="restart">재시작</button>
+<div id="success">SUCCESS</div>
+<div id="help">W = 전진 / S = 정지 / A = 좌회전 / D = 우회전</div>
+
+<canvas id="game" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const signalLabel = document.getElementById('signal');
+const successLabel = document.getElementById('success');
+const restartBtn = document.getElementById('restart');
+
+const SIGNALS = {
+  FORWARD: 'FORWARD',
+  STOP: 'STOP',
+  TURN_LEFT: 'TURN_LEFT',
+  TURN_RIGHT: 'TURN_RIGHT'
+};
+
+const KEY_MAP = {
+  'w': SIGNALS.FORWARD,
+  's': SIGNALS.STOP,
+  'a': SIGNALS.TURN_LEFT,
+  'd': SIGNALS.TURN_RIGHT
+};
+
+const SPEED = 90;            // px/sec
+const TURN_RATE = Math.PI;   // rad/sec
+const PLANE_SIZE = 26;
+
+const PARKING = {
+  x: 560,
+  y: 150,
+  w: 140,
+  h: 100,
+  targetAngle: 0  // 동쪽(오른쪽)을 바라봐야 함
+};
+const ANGLE_TOLERANCE = (15 * Math.PI) / 180; // 15도
+
+let plane;
+let activeSignal = SIGNALS.STOP;
+let success = false;
+let lastTime = null;
+
+function initPlane() {
+  plane = {
+    x: 200,
+    y: 480,
+    angle: -Math.PI / 2 // 북쪽(위) 바라봄
+  };
+  activeSignal = SIGNALS.STOP;
+  success = false;
+  successLabel.style.display = 'none';
+  signalLabel.textContent = activeSignal;
+}
+
+function normalizeAngleDiff(a) {
+  let diff = a % (Math.PI * 2);
+  if (diff > Math.PI) diff -= Math.PI * 2;
+  if (diff < -Math.PI) diff += Math.PI * 2;
+  return diff;
+}
+
+function update(dt) {
+  if (success) return;
+
+  if (activeSignal === SIGNALS.STOP) {
+    // 정지: 이동도 회전도 없음
+  } else {
+    if (activeSignal === SIGNALS.TURN_LEFT) {
+      plane.angle -= TURN_RATE * dt;
+    } else if (activeSignal === SIGNALS.TURN_RIGHT) {
+      plane.angle += TURN_RATE * dt;
+    }
+    // FORWARD, TURN_LEFT, TURN_RIGHT 모두 현재 바라보는 방향으로 이동
+    plane.x += Math.cos(plane.angle) * SPEED * dt;
+    plane.y += Math.sin(plane.angle) * SPEED * dt;
+  }
+
+  // 화면 밖으로 나가지 않도록 고정
+  plane.x = Math.max(0, Math.min(canvas.width, plane.x));
+  plane.y = Math.max(0, Math.min(canvas.height, plane.y));
+
+  checkSuccess();
+}
+
+function checkSuccess() {
+  const inZone =
+    plane.x >= PARKING.x &&
+    plane.x <= PARKING.x + PARKING.w &&
+    plane.y >= PARKING.y &&
+    plane.y <= PARKING.y + PARKING.h;
+
+  const angleDiff = Math.abs(normalizeAngleDiff(plane.angle - PARKING.targetAngle));
+
+  if (inZone && angleDiff <= ANGLE_TOLERANCE) {
+    success = true;
+    successLabel.style.display = 'block';
+  }
+}
+
+function draw() {
+  ctx.fillStyle = '#555';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 주차 구역
+  ctx.fillStyle = '#2ecc71';
+  ctx.fillRect(PARKING.x, PARKING.y, PARKING.w, PARKING.h);
+
+  // 주차 구역 목표 방향 화살표
+  const cx = PARKING.x + PARKING.w / 2;
+  const cy = PARKING.y + PARKING.h / 2;
+  ctx.strokeStyle = '#145a32';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx - 30, cy);
+  ctx.lineTo(cx + 30, cy);
+  ctx.lineTo(cx + 18, cy - 10);
+  ctx.moveTo(cx + 30, cy);
+  ctx.lineTo(cx + 18, cy + 10);
+  ctx.stroke();
+
+  // 비행기 (삼각형)
+  ctx.save();
+  ctx.translate(plane.x, plane.y);
+  ctx.rotate(plane.angle);
+  ctx.fillStyle = success ? '#4dff88' : '#ecf0f1';
+  ctx.beginPath();
+  ctx.moveTo(PLANE_SIZE, 0);
+  ctx.lineTo(-PLANE_SIZE * 0.6, PLANE_SIZE * 0.6);
+  ctx.lineTo(-PLANE_SIZE * 0.6, -PLANE_SIZE * 0.6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function loop(timestamp) {
+  if (lastTime === null) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.05);
+  lastTime = timestamp;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('keydown', (e) => {
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key]) {
+    activeSignal = KEY_MAP[key];
+    signalLabel.textContent = activeSignal;
+  }
+});
+
+restartBtn.addEventListener('click', initPlane);
+
+initPlane();
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>
