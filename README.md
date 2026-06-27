@@ -28,9 +28,10 @@ Godot 4.7 / GDScript / 3D 탑다운 시뮬레이션 (카메라만 탑뷰, 노드
 
 ```text
 project.godot
-scenes/     .tscn 씬 파일
-scripts/    .gd 스크립트
-assets/     스프라이트, 사운드
+scenes/         .tscn 씬 파일
+scripts/        .gd 스크립트
+scripts/common/ 여러 노드가 공유하는 재사용 가능한 스크립트 (예: screen_bounds.gd)
+assets/         스프라이트, 사운드
 ```
 
 ### 주요 구성 (초안)
@@ -62,7 +63,10 @@ assets/     스프라이트, 사운드
 - [x] 비행기 70도 시야 원뿔 + 시야 안 판정
   - [x] AircraftVisionCone: 정면 기준 좌우 35도 + 반경 판정, bool만 반환
   - [x] 디버그 시각화로 확인 (부채꼴 초록/빨강)
-- [ ] 비행기 기본 이동 + 딜레이/관성
+- [x] 비행기 기본 이동 + 딜레이/관성
+  - [x] Aircraft: 명령 수신 후 딜레이(command_delay) 후 반영, 가속/감속으로 점진적 속도 변화
+  - [x] 화면 경계 클램프 (Marshaller와 동일한 ScreenBounds 유틸리티 공유)
+  - [x] 임시 디버그 자동조종(aircraft_debug_autopilot.gd)으로 확인 — AircraftFSM 구현 시 제거
 - [ ] 수신호 입력 시스템 (전진/정지/좌우회전), 시야 안에서만 인식
 - [ ] 비행기 FSM (신호 해석/오해/멈칫)
 - [ ] 충돌 -> 게임 오버 (비행기-장애물, 사람-비행기)

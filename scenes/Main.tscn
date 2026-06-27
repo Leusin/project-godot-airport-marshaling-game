@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://scripts/move_input.gd" id="2_move_input_script"]
 [ext_resource type="Script" path="res://scripts/aircraft_vision_cone.gd" id="3_vision_cone_script"]
 [ext_resource type="Script" path="res://scripts/vision_cone_debug_visual.gd" id="4_vision_cone_visual_script"]
+[ext_resource type="Script" path="res://scripts/aircraft.gd" id="5_aircraft_script"]
+[ext_resource type="Script" path="res://scripts/aircraft_debug_autopilot.gd" id="6_aircraft_autopilot_script"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
 radius = 0.3
@@ -47,6 +49,7 @@ script = ExtResource("2_move_input_script")
 
 [node name="Aircraft" type="Node3D" parent="." unique_id=467640201]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
+script = ExtResource("5_aircraft_script")
 
 [node name="AircraftMesh" type="MeshInstance3D" parent="Aircraft" unique_id=529314557]
 mesh = SubResource("BoxMesh_aircraft")
@@ -61,6 +64,9 @@ script = ExtResource("3_vision_cone_script")
 
 [node name="VisionConeVisual" type="MeshInstance3D" parent="Aircraft" unique_id=574849791]
 script = ExtResource("4_vision_cone_visual_script")
+
+[node name="DebugAutopilot" type="Node" parent="Aircraft" unique_id=1326067444]
+script = ExtResource("6_aircraft_autopilot_script")
 
 [node name="GameManager" type="Node" parent="." unique_id=1889238462]
 

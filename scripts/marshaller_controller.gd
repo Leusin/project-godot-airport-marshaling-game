@@ -3,6 +3,7 @@ extends Node3D
 ## 화면 경계 클램프는 탑다운 카메라의 실제 가시 범위(orthogonal size + 화면 비율)를 기준으로 계산한다.
 
 const MoveInputScript = preload("res://scripts/move_input.gd")
+const ScreenBoundsScript = preload("res://scripts/common/screen_bounds.gd")
 
 @export var speed: float = 5.0
 @export var edge_margin: float = 0.5
@@ -20,12 +21,9 @@ func _update_bounds() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
-	var viewport_size := get_viewport().get_visible_rect().size
-	var aspect := viewport_size.x / viewport_size.y
-	var half_height := camera.size / 2.0
-	var half_width := half_height * aspect
-	bounds_z = half_height - edge_margin
-	bounds_x = half_width - edge_margin
+	var half_extents := ScreenBoundsScript.compute_half_extents(camera, get_viewport())
+	bounds_x = half_extents.x - edge_margin
+	bounds_z = half_extents.y - edge_margin
 
 func _physics_process(delta: float) -> void:
 	var dir := move_input.get_move_direction()

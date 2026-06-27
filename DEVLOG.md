@@ -15,6 +15,12 @@
 
 ## Log
 
+- 2026-06-28 [세션] 비행기 기본 이동 + 딜레이/관성 구현 완료 (Aircraft).
+	- scripts/aircraft.gd: Command(STOP/ADVANCE/TURN_LEFT/TURN_RIGHT) 수신 -> command_delay(0.6s) 뒤에 반영, 가속/감속으로 속도 점진 변화. 회전도 turn_speed_degrees로 일정 각속도.
+	- scripts/screen_bounds.gd: 탑다운 카메라 가시 영역(half extents) 계산을 마샬러/비행기가 공유하는 유틸리티로 분리. marshaller_controller.gd도 이걸 쓰도록 리팩터링.
+	- Aircraft에도 화면 경계 클램프 적용 (사용자 확인: 화면 밖으로 안 나가는 것 확인).
+	- scripts/aircraft_debug_autopilot.gd: AircraftFSM/SignalInput 구현 전까지 Command를 순환시켜 딜레이+관성을 눈으로 확인하기 위한 임시 디버그 스크립트. FSM 만들면 제거.
+	- 다음: 수신호 입력 시스템 (전진/정지/좌우회전, 시야 안에서만 인식).
 - 2026-06-28 [세션] 비행기 시야 원뿔 구현 완료 (AircraftVisionCone).
 	- scripts/aircraft_vision_cone.gd: 정면(-Z) 기준 좌우 35도 + 반경(view_radius) 안에 점이 있는지 bool만 반환. 상태 없음.
 	- Aircraft를 Y 180도 회전시켜 기본 정면이 Marshaller 스폰 방향(+Z)을 향하도록 함. NoseMarker(파란 작은 박스)로 정면 표시.
