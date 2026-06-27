@@ -52,12 +52,16 @@ assets/     스프라이트, 사운드
 
 ### 로드맵
 
-- [ ] 프로젝트 토대
-  - [ ] 폴더 구조 확정
-  - [ ] 노드 이름 규칙 확정
-  - [ ] Godot 프로젝트 생성
-- [ ] 마샬러(플레이어) 직접 이동
-- [ ] 비행기 70도 시야 원뿔 + 시야 안 판정
+- [x] 프로젝트 토대
+  - [x] 폴더 구조 확정 (scenes/, scripts/, assets/)
+  - [x] 노드 이름 규칙 확정 (설계 섹션 명명 그대로: Marshaller, Aircraft, GameManager 등)
+  - [x] Godot 프로젝트 생성 (Main.tscn에 TopDownCamera/Marshaller/Aircraft/GameManager 뼈대)
+- [x] 마샬러(플레이어) 직접 이동
+  - [x] 맵 위 자유 이동 (WASD/방향키)
+  - [x] 화면 경계 클램프 (탑다운 카메라 orthogonal size + 화면 비율 기준 실측 계산)
+- [x] 비행기 70도 시야 원뿔 + 시야 안 판정
+  - [x] AircraftVisionCone: 정면 기준 좌우 35도 + 반경 판정, bool만 반환
+  - [x] 디버그 시각화로 확인 (부채꼴 초록/빨강)
 - [ ] 비행기 기본 이동 + 딜레이/관성
 - [ ] 수신호 입력 시스템 (전진/정지/좌우회전), 시야 안에서만 인식
 - [ ] 비행기 FSM (신호 해석/오해/멈칫)

@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/marshaller_controller.gd" id="1_marshaller_script"]
+[ext_resource type="Script" path="res://scripts/move_input.gd" id="2_move_input_script"]
+[ext_resource type="Script" path="res://scripts/aircraft_vision_cone.gd" id="3_vision_cone_script"]
+[ext_resource type="Script" path="res://scripts/vision_cone_debug_visual.gd" id="4_vision_cone_visual_script"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
+radius = 0.3
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marshaller"]
+albedo_color = Color(1, 0.8, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_aircraft"]
+size = Vector3(2, 0.6, 3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nose_marker"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nose_marker"]
+albedo_color = Color(0.1, 0.6, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(50, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.2, 0.22, 0.25, 1)
+
+[node name="root" type="Node3D" unique_id=1806649895]
+
+[node name="TopDownCamera" type="Camera3D" parent="." unique_id=1071090790]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 15, 0)
+projection = 1
+size = 20.0
+
+[node name="Marshaller" type="Node3D" parent="." unique_id=410725687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 5)
+script = ExtResource("1_marshaller_script")
+
+[node name="MarshallerMesh" type="MeshInstance3D" parent="Marshaller" unique_id=1764820461]
+mesh = SubResource("CapsuleMesh_marshaller")
+surface_material_override/0 = SubResource("StandardMaterial3D_marshaller")
+
+[node name="MoveInput" type="Node" parent="Marshaller" unique_id=1126973343]
+script = ExtResource("2_move_input_script")
+
+[node name="Aircraft" type="Node3D" parent="." unique_id=467640201]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
+
+[node name="AircraftMesh" type="MeshInstance3D" parent="Aircraft" unique_id=529314557]
+mesh = SubResource("BoxMesh_aircraft")
+
+[node name="NoseMarker" type="MeshInstance3D" parent="Aircraft" unique_id=542641758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+mesh = SubResource("BoxMesh_nose_marker")
+surface_material_override/0 = SubResource("StandardMaterial3D_nose_marker")
+
+[node name="VisionCone" type="Node" parent="Aircraft" unique_id=1628416762]
+script = ExtResource("3_vision_cone_script")
+
+[node name="VisionConeVisual" type="MeshInstance3D" parent="Aircraft" unique_id=574849791]
+script = ExtResource("4_vision_cone_visual_script")
+
+[node name="GameManager" type="Node" parent="." unique_id=1889238462]
+
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=2004317744]
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
