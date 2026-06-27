@@ -15,6 +15,17 @@
 
 ## Log
 
+- 2026-06-28 [세션] 수신호 입력 시스템 구현 완료 (SignalInput + AircraftSignalReceiver + SignalIndicatorHUD).
+	- scripts/signal_input.gd: 방향키 -> 신호 타입(NONE/ADVANCE/STOP/TURN_LEFT/TURN_RIGHT) 변환만, 판정은 안 함. 모두 hold-to-move (누르고 있는 동안만 유지).
+	- 마샬러 이동(WASD)과 수신호(방향키)를 분리해 두 입력이 충돌하지 않게 함. move_left/right/up/down에서 방향키 바인딩 제거.
+	- scripts/aircraft_signal_receiver.gd: 시야 원뿔 + SignalInput을 조합해 Aircraft에 명령 전달하는 임시 브릿지. 시야 밖/무신호/정지는 모두 정지로 처리하지만, NONE과 STOP은 SignalType에서 별개 값으로 유지 (AircraftFSM에서 무신호=모호함/멈칫, STOP=명확한 정지로 다르게 다룰 수 있도록).
+	- 기존 aircraft_debug_autopilot.gd(자동 순환 디버그)는 삭제하고 실제 입력 경로로 대체.
+	- scripts/signal_indicator_hud.gd: 현재 신호를 화면 좌상단에 아이콘(원+화살표/X)으로 표시. 텍스처 없이 Control._draw()로 직접 그림.
+	- Aircraft.turn_speed_degrees 50 -> 25로 감소 (회전이 너무 빨라 보임).
+	- 중간에 "더블탭=천천히(SLOW)" 신호를 시도했다가, hold 방식과 일관성이 안 맞아 제거하고 4종 신호(전진/정지/좌우회전) 모두 hold로 통일.
+	- 다음: 비행기 FSM (IDLE/INTERPRETING/MOVING/STOPPING, 모호한 신호 처리).
+- 2026-06-28 [결정] 수신호 NONE과 STOP을 같은 값으로 합치지 않기로 함.
+	- 실제 마샬링 수신호에서도 "신호 없음"과 "정지하라는 명확한 신호"는 다른 의미 (무신호=지시 없음/모호, 정지=명확한 정지 명령). 지금은 AircraftFSM이 없어서 둘 다 정지로 동작은 같지만, SignalType enum에서 값을 분리해둬야 나중에 FSM이 "모호한 신호는 멈칫"을 구현할 수 있음.
 - 2026-06-28 [세션] 비행기 기본 이동 + 딜레이/관성 구현 완료 (Aircraft).
 	- scripts/aircraft.gd: Command(STOP/ADVANCE/TURN_LEFT/TURN_RIGHT) 수신 -> command_delay(0.6s) 뒤에 반영, 가속/감속으로 속도 점진 변화. 회전도 turn_speed_degrees로 일정 각속도.
 	- scripts/screen_bounds.gd: 탑다운 카메라 가시 영역(half extents) 계산을 마샬러/비행기가 공유하는 유틸리티로 분리. marshaller_controller.gd도 이걸 쓰도록 리팩터링.

@@ -9,7 +9,7 @@ enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 @export var max_speed: float = 3.0
 @export var acceleration: float = 2.0
 @export var deceleration: float = 4.0
-@export var turn_speed_degrees: float = 50.0
+@export var turn_speed_degrees: float = 25.0
 @export var command_delay: float = 0.6
 @export var edge_margin: float = 1.0
 
