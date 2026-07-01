@@ -15,6 +15,12 @@
 
 ## Log
 
+- 2026-07-01 [세션] 충돌 → 게임 오버 구현 완료.
+	- scripts/aircraft_collision.gd: Aircraft 자식 Area3D. collision_marshaller / collision_obstacle 그룹에 속한 Area3D와 겹치면 GameManager.trigger_game_over() 호출.
+	- scripts/game_manager.gd: trigger_game_over() → 트리 일시정지 + GameOverHUD 표시. 엔터/ESC → reload_current_scene()으로 재시작. process_mode=ALWAYS로 일시정지 중에도 입력 수신.
+	- scripts/game_over_hud.gd: 전체화면 Control. show_game_over() 호출 시 _draw()로 어두운 오버레이 + "GAME OVER" 텍스트 표시. process_mode=ALWAYS.
+	- Main.tscn: Aircraft/AircraftHitbox(Area3D + BoxShape 2×0.6×3), Marshaller/MarshallerHitbox(Area3D + CapsuleShape, 그룹 collision_marshaller), Obstacle(주황 박스, ObstacleHitbox에 그룹 collision_obstacle), GameManager 스크립트 부착, HUD/GameOverHUD 추가.
+	- 다음: A->B 유도 성공/실패 판정.
 - 2026-07-01 [세션] 비행기 FSM 구현 완료 (AircraftFSM).
 	- scripts/aircraft_fsm.gd: IDLE/MOVING/HESITATING/STOPPING 4상태 FSM. aircraft_signal_receiver.gd(임시 브릿지)를 완전히 대체.
 	- NONE(무신호)와 STOP(명확한 정지)를 다르게 처리:

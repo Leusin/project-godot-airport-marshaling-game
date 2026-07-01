@@ -86,7 +86,12 @@ assets/         스프라이트, 사운드
   - [x] NONE(무신호): 이동 중 1초 멈칫 후 정지 (재지시 오면 MOVING 복귀)
   - [x] STOP(명확한 정지): 즉시 정지 시작, 멈칫 없음
   - [x] 시야 밖 = 무신호와 동일 처리
-- [ ] 충돌 -> 게임 오버 (비행기-장애물, 사람-비행기)
+- [x] 충돌 -> 게임 오버 (비행기-장애물, 사람-비행기)
+  - [x] AircraftHitbox: 비행기 충돌 감지 (Area3D)
+  - [x] MarshallerHitbox: 마샬러 피격 영역 (collision_marshaller 그룹)
+  - [x] Obstacle: 테스트용 장애물 배치 (collision_obstacle 그룹)
+  - [x] GameManager: 게임 오버 처리, 재시작 (엔터/ESC)
+  - [x] GameOverHUD: 전체화면 오버레이 표시
 - [ ] A->B 유도 목표 및 성공/실패 판정
 
 ## 관리 문서
