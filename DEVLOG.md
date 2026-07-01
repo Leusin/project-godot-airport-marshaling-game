@@ -15,6 +15,12 @@
 
 ## Log
 
+- 2026-07-01 [세션] A→B 유도 성공 판정 구현 완료.
+	- scenes/Main.tscn: ParkingSpot 노드 추가 (위치 (-3, 0, 3), 밝은 초록 납작 박스). Area3D에 collision_parking 그룹 부착. 충돌 감지용 BoxShape3D(3×2×3) — 높이 2로 y=0.3에 있는 비행기를 잡을 수 있게.
+	- scripts/aircraft_collision.gd: collision_parking 그룹 감지 시 trigger_success() 호출 (기존 collision_marshaller/collision_obstacle는 trigger_game_over() 유지). 주차 성공이 충돌보다 우선.
+	- scripts/game_manager.gd: trigger_success() 추가. _is_success 플래그로 중복 방지. 성공/실패 모두 엔터/ESC로 재시작.
+	- scripts/success_hud.gd: 초록 오버레이 + "유도 성공!" 텍스트. game_over_hud.gd와 동일한 구조.
+	- 다음: MVP 완성 — 플레이테스트 및 밸런스 조정.
 - 2026-07-01 [세션] 충돌 → 게임 오버 구현 완료.
 	- scripts/aircraft_collision.gd: Aircraft 자식 Area3D. collision_marshaller / collision_obstacle 그룹에 속한 Area3D와 겹치면 GameManager.trigger_game_over() 호출.
 	- scripts/game_manager.gd: trigger_game_over() → 트리 일시정지 + GameOverHUD 표시. 엔터/ESC → reload_current_scene()으로 재시작. process_mode=ALWAYS로 일시정지 중에도 입력 수신.
