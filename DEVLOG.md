@@ -15,6 +15,16 @@
 
 ## Log
 
+- 2026-07-01 [세션] 비행기 FSM 구현 완료 (AircraftFSM).
+	- scripts/aircraft_fsm.gd: IDLE/MOVING/HESITATING/STOPPING 4상태 FSM. aircraft_signal_receiver.gd(임시 브릿지)를 완전히 대체.
+	- NONE(무신호)와 STOP(명확한 정지)를 다르게 처리:
+	  - NONE: 이동 중이면 hesitate_duration(1.0s) 동안 멈칫(계속 이동)한 뒤 STOPPING으로 전이.
+	  - STOP: 즉시 STOPPING 전이 (멈칫 없음).
+	  - 시야 밖(out-of-view)은 NONE과 동일하게 처리.
+	- STOPPING → IDLE 전이는 aircraft.get_speed() < 0.05로 실제 정지 감지 (고정 타이머 아님).
+	- scripts/aircraft.gd에 get_speed() 추가 (FSM이 실제 속도를 확인하기 위해).
+	- Main.tscn: AircraftSignalReceiver 노드 이름 → AircraftFSM, 스크립트 교체.
+	- 다음: 충돌 → 게임 오버 (비행기-장애물, 사람-비행기).
 - 2026-06-28 [세션] 수신호 입력 시스템 구현 완료 (SignalInput + AircraftSignalReceiver + SignalIndicatorHUD).
 	- scripts/signal_input.gd: 방향키 -> 신호 타입(NONE/ADVANCE/STOP/TURN_LEFT/TURN_RIGHT) 변환만, 판정은 안 함. 모두 hold-to-move (누르고 있는 동안만 유지).
 	- 마샬러 이동(WASD)과 수신호(방향키)를 분리해 두 입력이 충돌하지 않게 함. move_left/right/up/down에서 방향키 바인딩 제거.
