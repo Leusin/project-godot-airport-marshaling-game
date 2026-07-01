@@ -147,17 +147,11 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 [node name="HUD" type="CanvasLayer" parent="." unique_id=60114881]
 
 [node name="SuccessHUD" type="Control" parent="HUD" unique_id=1147752909]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+visible = false
 script = ExtResource("12_success_hud_script")
 
 [node name="GameOverHUD" type="Control" parent="HUD" unique_id=1147752910]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+visible = false
 script = ExtResource("11_game_over_hud_script")
 
 [node name="SignalIndicator" type="Control" parent="HUD" unique_id=1147752916]

@@ -1,9 +1,20 @@
 extends Control
-## 게임 오버 시 전체화면 오버레이. 어두운 배경 + GAME OVER 텍스트 표시.
+## 게임 오버 시 전체화면 오버레이.
+## CanvasLayer는 자식 Control에 크기를 주지 않으므로 _ready에서 viewport 크기로 직접 설정.
 
 func _ready() -> void:
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_fit_to_viewport()
+	get_viewport().size_changed.connect(_fit_to_viewport)
+
+func _fit_to_viewport() -> void:
+	position = Vector2.ZERO
+	size = get_viewport().get_visible_rect().size
+
+func _process(_delta: float) -> void:
+	if visible:
+		queue_redraw()
 
 func show_game_over() -> void:
 	visible = true
