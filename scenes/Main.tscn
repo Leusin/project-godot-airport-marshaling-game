@@ -108,11 +108,8 @@ script = ExtResource("4_vision_cone_visual_script")
 [node name="AircraftFSM" type="Node" parent="Aircraft" unique_id=1876279175]
 script = ExtResource("7_aircraft_fsm_script")
 
-[node name="AircraftHitbox" type="Area3D" parent="Aircraft" unique_id=1876279176]
+[node name="AircraftHitbox" type="Node" parent="Aircraft" unique_id=1876279176]
 script = ExtResource("10_aircraft_collision_script")
-
-[node name="AircraftHitboxShape" type="CollisionShape3D" parent="Aircraft/AircraftHitbox" unique_id=1876279177]
-shape = SubResource("BoxShape3D_aircraft_hitbox")
 
 [node name="GameManager" type="Node" parent="." unique_id=1889238462]
 script = ExtResource("9_game_manager_script")
