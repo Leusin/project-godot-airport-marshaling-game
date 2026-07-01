@@ -92,7 +92,11 @@ assets/         스프라이트, 사운드
   - [x] Obstacle: 테스트용 장애물 배치 (collision_obstacle 그룹)
   - [x] GameManager: 게임 오버 처리, 재시작 (엔터/ESC)
   - [x] GameOverHUD: 전체화면 오버레이 표시
-- [ ] A->B 유도 목표 및 성공/실패 판정
+- [x] A->B 유도 목표 및 성공/실패 판정
+  - [x] ParkingSpot: 목표 주차 지점 (초록 박스, collision_parking 그룹)
+  - [x] 비행기가 ParkingSpot Area3D에 진입 → 유도 성공
+  - [x] SuccessHUD: 초록 오버레이 + "유도 성공!" 텍스트
+  - [x] 성공/실패 모두 엔터 / ESC 로 재시작
 
 ## 관리 문서
 
