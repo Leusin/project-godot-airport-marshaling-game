@@ -21,6 +21,9 @@ var _current_speed: float = 0.0
 var _bounds_x: float = 0.0
 var _bounds_z: float = 0.0
 
+func get_speed() -> float:
+	return _current_speed
+
 func issue_command(command: Command) -> void:
 	if command == _pending_command:
 		return

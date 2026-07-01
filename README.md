@@ -81,7 +81,11 @@ assets/         스프라이트, 사운드
   - [x] AircraftSignalReceiver(임시): 시야 판정 + SignalInput 조합 -> Aircraft 명령. 시야 밖/무신호/정지는 모두 정지
   - [x] SignalIndicatorHUD: 현재 신호를 화면 아이콘으로 표시
   - [x] 회전 속도 50→25°/s로 조정
-- [ ] 비행기 FSM (신호 해석/오해/멈칫)
+- [x] 비행기 FSM (신호 해석/오해/멈칫)
+  - [x] AircraftFSM: IDLE/MOVING/HESITATING/STOPPING 전이
+  - [x] NONE(무신호): 이동 중 1초 멈칫 후 정지 (재지시 오면 MOVING 복귀)
+  - [x] STOP(명확한 정지): 즉시 정지 시작, 멈칫 없음
+  - [x] 시야 밖 = 무신호와 동일 처리
 - [ ] 충돌 -> 게임 오버 (비행기-장애물, 사람-비행기)
 - [ ] A->B 유도 목표 및 성공/실패 판정
 

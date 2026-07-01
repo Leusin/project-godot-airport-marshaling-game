@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://scripts/vision_cone_debug_visual.gd" id="4_vision_cone_visual_script"]
 [ext_resource type="Script" path="res://scripts/aircraft.gd" id="5_aircraft_script"]
 [ext_resource type="Script" path="res://scripts/signal_input.gd" id="6_signal_input_script"]
-[ext_resource type="Script" path="res://scripts/aircraft_signal_receiver.gd" id="7_aircraft_signal_receiver_script"]
+[ext_resource type="Script" path="res://scripts/aircraft_fsm.gd" id="7_aircraft_fsm_script"]
 [ext_resource type="Script" path="res://scripts/signal_indicator_hud.gd" id="8_signal_indicator_hud_script"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
@@ -70,8 +70,8 @@ script = ExtResource("3_vision_cone_script")
 [node name="VisionConeVisual" type="MeshInstance3D" parent="Aircraft" unique_id=574849791]
 script = ExtResource("4_vision_cone_visual_script")
 
-[node name="AircraftSignalReceiver" type="Node" parent="Aircraft" unique_id=1876279175]
-script = ExtResource("7_aircraft_signal_receiver_script")
+[node name="AircraftFSM" type="Node" parent="Aircraft" unique_id=1876279175]
+script = ExtResource("7_aircraft_fsm_script")
 
 [node name="GameManager" type="Node" parent="." unique_id=1889238462]
 

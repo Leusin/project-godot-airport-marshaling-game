@@ -1,0 +1,100 @@
+extends Node
+## 비행기 신호 해석 FSM.
+## IDLE -> MOVING -> HESITATING -> STOPPING -> IDLE 전이.
+## NONE(무신호): 이동 중이면 hesitate_duration만큼 멈칫(계속 이동)하다가 정지.
+## STOP(명확한 정지): 즉시 정지 시작. NONE과 달리 멈칫 없음.
+## 시야 밖 신호는 NONE으로 처리 (마샬러가 보이지 않으면 무신호와 동일).
+
+const SignalInputScript = preload("res://scripts/signal_input.gd")
+const AircraftScript = preload("res://scripts/aircraft.gd")
+
+enum State { IDLE, MOVING, HESITATING, STOPPING }
+
+@export var hesitate_duration: float = 1.0
+
+@onready var aircraft: Node3D = get_parent()
+@onready var vision_cone: Node = get_parent().get_node("VisionCone")
+@onready var marshaller: Node3D = get_parent().get_parent().get_node("Marshaller")
+@onready var signal_input: SignalInputScript = marshaller.get_node("SignalInput")
+
+var _state: State = State.IDLE
+var _hesitate_timer: float = 0.0
+var _last_move_command: AircraftScript.Command = AircraftScript.Command.ADVANCE
+
+func _process(delta: float) -> void:
+	var in_view: bool = vision_cone.is_point_in_view(marshaller.global_position)
+	var hand_signal: SignalInputScript.SignalType = signal_input.get_signal() if in_view else SignalInputScript.SignalType.NONE
+
+	match _state:
+		State.IDLE:
+			_process_idle(hand_signal)
+		State.MOVING:
+			_process_moving(hand_signal, in_view)
+		State.HESITATING:
+			_process_hesitating(hand_signal, in_view, delta)
+		State.STOPPING:
+			_process_stopping(hand_signal)
+
+func _process_idle(hand_signal: SignalInputScript.SignalType) -> void:
+	aircraft.issue_command(AircraftScript.Command.STOP)
+	if _is_move_signal(hand_signal):
+		_last_move_command = _to_command(hand_signal)
+		_enter_moving()
+
+func _process_moving(hand_signal: SignalInputScript.SignalType, in_view: bool) -> void:
+	if not in_view or hand_signal == SignalInputScript.SignalType.STOP:
+		_enter_stopping()
+		return
+	if hand_signal == SignalInputScript.SignalType.NONE:
+		_enter_hesitating()
+		return
+	_last_move_command = _to_command(hand_signal)
+	aircraft.issue_command(_last_move_command)
+
+func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: bool, delta: float) -> void:
+	aircraft.issue_command(_last_move_command)
+
+	if not in_view or hand_signal == SignalInputScript.SignalType.STOP:
+		_enter_stopping()
+		return
+	if _is_move_signal(hand_signal):
+		_last_move_command = _to_command(hand_signal)
+		_state = State.MOVING
+		return
+
+	_hesitate_timer = maxf(_hesitate_timer - delta, 0.0)
+	if _hesitate_timer == 0.0:
+		_enter_stopping()
+
+func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
+	aircraft.issue_command(AircraftScript.Command.STOP)
+	if _is_move_signal(hand_signal):
+		_last_move_command = _to_command(hand_signal)
+		_enter_moving()
+		return
+	if aircraft.get_speed() < 0.05:
+		_state = State.IDLE
+
+func _enter_moving() -> void:
+	_state = State.MOVING
+	aircraft.issue_command(_last_move_command)
+
+func _enter_hesitating() -> void:
+	_state = State.HESITATING
+	_hesitate_timer = hesitate_duration
+
+func _enter_stopping() -> void:
+	_state = State.STOPPING
+	aircraft.issue_command(AircraftScript.Command.STOP)
+
+func _is_move_signal(s: SignalInputScript.SignalType) -> bool:
+	return s == SignalInputScript.SignalType.ADVANCE \
+		or s == SignalInputScript.SignalType.TURN_LEFT \
+		or s == SignalInputScript.SignalType.TURN_RIGHT
+
+func _to_command(s: SignalInputScript.SignalType) -> AircraftScript.Command:
+	match s:
+		SignalInputScript.SignalType.ADVANCE: return AircraftScript.Command.ADVANCE
+		SignalInputScript.SignalType.TURN_LEFT: return AircraftScript.Command.TURN_LEFT
+		SignalInputScript.SignalType.TURN_RIGHT: return AircraftScript.Command.TURN_RIGHT
+		_: return AircraftScript.Command.STOP
