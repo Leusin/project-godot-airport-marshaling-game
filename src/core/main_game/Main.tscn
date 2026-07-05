@@ -16,22 +16,7 @@
 [ext_resource type="Script" path="res://src/core/utils/screen_clamp.gd" id="14_screen_clamp_script"]
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 [ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
-radius = 0.3
-height = 1.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marshaller"]
-albedo_color = Color(1, 0.8, 0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_aircraft"]
-size = Vector3(2, 0.6, 3)
-
-[sub_resource type="BoxMesh" id="BoxMesh_nose_marker"]
-size = Vector3(0.3, 0.3, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nose_marker"]
-albedo_color = Color(0.1, 0.6, 1, 1)
+[ext_resource type="PackedScene" path="res://assets/models/marshaller.glb" id="17_marshaller_model"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -91,12 +76,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_parking")
 [node name="EntityRoot" type="Node3D" parent="World"]
 
 [node name="Marshaller" type="Node3D" parent="World/EntityRoot" groups=["marshaller"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 script = ExtResource("1_marshaller_script")
 
-[node name="MarshallerMesh" type="MeshInstance3D" parent="World/EntityRoot/Marshaller"]
-mesh = SubResource("CapsuleMesh_marshaller")
-surface_material_override/0 = SubResource("StandardMaterial3D_marshaller")
+[node name="MarshallerModel" parent="World/EntityRoot/Marshaller" instance=ExtResource("17_marshaller_model")]
 
 [node name="MoveInput" type="Node" parent="World/EntityRoot/Marshaller"]
 script = ExtResource("2_move_input_script")
