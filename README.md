@@ -37,8 +37,9 @@ scripts/common/ 여러 노드가 공유하는 재사용 가능한 스크립트 (
 assets/         스프라이트, 사운드
 ```
 
-### 주요 구성 (초안)
-![](docs\20260627.png)
+### 주요 구성
+
+![씬 구조 다이어그램](docs/scene_diagram.svg)
 
 **마샬러**
 - `MarshallerController` — 이동만 담당 (WASD, 화면 경계 클램프)
