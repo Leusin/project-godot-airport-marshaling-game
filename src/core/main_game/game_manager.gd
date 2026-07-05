@@ -3,6 +3,7 @@ extends Node
 ## HUD 참조는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
+const GameGroups = preload("res://src/core/game_groups.gd")
 
 var _game_over_hud: Control
 var _success_hud: Control
@@ -12,8 +13,8 @@ var _is_success: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_game_over_hud = SceneQuery.get_singleton(get_tree(), "game_over_hud", "GameManager")
-	_success_hud = SceneQuery.get_singleton(get_tree(), "success_hud", "GameManager")
+	_game_over_hud = SceneQuery.get_singleton(get_tree(), GameGroups.GAME_OVER_HUD, "GameManager")
+	_success_hud = SceneQuery.get_singleton(get_tree(), GameGroups.SUCCESS_HUD, "GameManager")
 
 func trigger_game_over() -> void:
 	if _is_game_over or _is_success:

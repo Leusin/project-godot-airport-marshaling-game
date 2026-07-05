@@ -10,6 +10,7 @@ const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd
 const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
+const GameGroups = preload("res://src/core/game_groups.gd")
 
 ## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
 const STOP_SPEED_EPSILON := 0.05
@@ -31,8 +32,8 @@ var marshaller: Node3D
 var signal_input: SignalInputScript
 
 func _ready() -> void:
-	marshaller = SceneQuery.get_singleton(get_tree(), "marshaller", "AircraftFSM")
-	signal_input = SceneQuery.get_singleton(get_tree(), "signal_input", "AircraftFSM")
+	marshaller = SceneQuery.get_singleton(get_tree(), GameGroups.MARSHALLER, "AircraftFSM")
+	signal_input = SceneQuery.get_singleton(get_tree(), GameGroups.SIGNAL_INPUT, "AircraftFSM")
 	# 필수 참조가 없으면 _process에서 크래시하는 대신 조용히 비활성화 (경고는 위에서 출력됨).
 	if marshaller == null or signal_input == null:
 		set_process(false)
@@ -54,6 +55,10 @@ func _process(delta: float) -> void:
 			_process_hesitating(hand_signal, in_view, delta)
 		State.STOPPING:
 			_process_stopping(hand_signal)
+
+## 현재 상태 이름 (디버그 표시용).
+func state_name() -> String:
+	return State.keys()[_state]
 
 func _process_idle(hand_signal: SignalInputScript.SignalType) -> void:
 	aircraft.issue_command(AircraftScript.Command.STOP)

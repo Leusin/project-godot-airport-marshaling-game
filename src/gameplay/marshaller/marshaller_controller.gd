@@ -9,6 +9,6 @@ const MoveInputScript = preload("res://src/gameplay/marshaller/move_input.gd")
 @onready var move_input: MoveInputScript = $MoveInput
 
 func _physics_process(delta: float) -> void:
-	var dir := move_input.get_move_direction()
-	if dir != Vector3.ZERO:
-		position += dir * speed * delta
+	var direction := move_input.get_move_direction()
+	if direction != Vector3.ZERO:
+		position += direction * speed * delta
