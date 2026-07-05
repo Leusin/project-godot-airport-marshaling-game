@@ -15,6 +15,11 @@
 
 ## Log
 
+- 2026-07-05 [세션] DebugLayer에 디버그 오버레이(FPS + 버전) 추가.
+	- src/debug/debug_hud.gd: DebugRoot에 부착. 화면 우상단에 "v{버전} {FPS} FPS" 표시. ProjectSettings의 application/config/version을 읽음. process_mode=Always라 일시정지 중에도 갱신.
+	- project.godot에 config/version="0.1.0" 추가 (기존엔 없어서 0.0.0으로 표시됐음).
+	- docs/scene_diagram.svg: 스크립트 관계도 → 실제 씬 계층 트리(레이어/그룹/Process Mode 뱃지 포함)로 전면 갱신.
+
 - 2026-07-05 [결정] 씬 계층 구조를 표준 레이어 트리로 재편.
 	- 기존 평평한 root(Node3D) 아래 모든 노드 나열 → MainGame(Always) / Systems / World(Pausable) / HudLayer / PauseLayer / TransitionLayer / DebugLayer 로 재편.
 	- World 아래 LevelRoot(배경: Ground/Obstacle/ParkingSpot) / EntityRoot(핵심: Marshaller/Aircraft) / EffectRoot(향후 효과) 로 분리. TopDownCamera는 World 직속.
