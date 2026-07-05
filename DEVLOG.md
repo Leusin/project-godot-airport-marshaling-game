@@ -15,6 +15,13 @@
 
 ## Log
 
+- 2026-07-05 [세션] 충돌 박스 디버그 시각화 추가.
+	- src/core/utils/collision_shapes.gd: 노드 메쉬 AABB에서 XZ 반크기를 뽑는 헬퍼를 aircraft_collision에서 분리. 판정과 시각화가 같은 소스를 쓰게 함 → "그려진 박스 = 실제 판정 범위" 보장.
+	- src/debug/collision_debug_visual.gd (World 아래 MeshInstance3D): ImmediateMesh 선으로 매 프레임 충돌 사각형을 바닥 위에 그림. 비행기=회전 OBB(시안), 주차=초록, 장애물/마샬러=빨강. 개발 빌드 전용, 백틱(toggle_debug)으로 토글, process_mode=Always(정지 중에도 토글/표시).
+	- game_groups에 AIRCRAFT 추가, Main.tscn의 Aircraft에 aircraft 그룹 부착 (시각화가 비행기를 찾도록).
+	- aircraft_collision은 CollisionShapes.half_extents_xz를 쓰도록 정리(중복 헬퍼 제거).
+	- 테스트 34/34, 게임 정상.
+
 - 2026-07-05 [세션] 그룹 이름 중앙화 + 줄임말 제거 + 디버그 HUD 강화/토글.
 	- src/core/game_groups.gd: 그룹 이름(marshaller/signal_input/aircraft_fsm/game_manager/game_over_hud/success_hud/obstacle/parking)을 StringName 상수로 중앙 관리. scene_query 조회·충돌 그룹 조회를 전부 이 상수로 교체 (문자열 오타 방지). .tscn의 groups=[...]는 코드 참조 불가라 문자열 그대로 둠.
 	  - [결정] 물리 튜닝값(max_speed 등)은 중앙화 안 함 — @export가 인스펙터 조정을 주므로 오히려 손해. epsilon류 단일 사용 상수도 로컬 유지.
