@@ -44,6 +44,40 @@ src/
 docs/                       문서, 다이어그램
 ```
 
+### 씬 계층 구조
+
+```text
+MainGame (Node)                  앱 루트. Process Mode = Always
+├─ Systems                       상위 시스템 (초기화/전환/게임 진행)
+│  └─ GameManager                판정 + 재시작  [group: game_manager]
+├─ World (Node3D)                게임 세계. Process Mode = Pausable
+│  ├─ TopDownCamera              직교 탑다운 카메라
+│  ├─ LevelRoot                  배경 요소
+│  │  ├─ Ground
+│  │  ├─ Obstacle                [group: obstacle]
+│  │  └─ ParkingSpot             [group: parking]
+│  ├─ EntityRoot                 핵심 요소
+│  │  ├─ Marshaller              [group: marshaller]
+│  │  │  ├─ MoveInput / SignalInput [group: signal_input]
+│  │  │  └─ MarshallerMesh
+│  │  └─ Aircraft
+│  │     ├─ AircraftMesh / NoseMarker
+│  │     ├─ VisionCone / VisionConeVisual
+│  │     ├─ AircraftFSM
+│  │     └─ AircraftHitbox
+│  └─ EffectRoot                 임시 시각 효과 (향후)
+├─ HudLayer (layer 10, Pausable) └─ HudRoot
+│     ├─ SignalIndicator
+│     ├─ GameOverHUD             [group: game_over_hud]
+│     └─ SuccessHUD              [group: success_hud]
+├─ PauseLayer (layer 20, Always)      └─ PauseRoot        (향후)
+├─ TransitionLayer (layer 100, Always) └─ TransitionRoot  (향후)
+└─ DebugLayer (layer 128, Always)     └─ DebugRoot        (향후)
+```
+
+- 각 `*Root` Control 은 `mouse_filter = Ignore`.
+- 노드 간 참조는 계층 경로가 아니라 **그룹**으로 찾아 트리 위치에 독립적이다 (`get_tree().get_first_node_in_group(...)`).
+
 ### 주요 구성
 
 ![씬 구조 다이어그램](docs/scene_diagram.svg)
