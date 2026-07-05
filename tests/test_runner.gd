@@ -1,9 +1,7 @@
-extends Node
-## 단위 테스트 러너. tests/tests.tscn 의 루트에 붙어 있으며, 씬을 실행하면
-## 모든 테스트를 돌리고 결과를 출력한 뒤 실패 개수를 종료 코드로 반환한다.
-##
-## 실행: Godot 에디터에서 tests/tests.tscn 을 실행하거나,
-##       godot --headless res://tests/tests.tscn
+extends Control
+## 단위 테스트 러너 + 결과 출력.
+##  - 창 모드(에디터 F6): 결과를 씬 화면(RichTextLabel)에 색상으로 렌더한다.
+##  - 헤드리스(run_tests.ps1 / CI): 콘솔에 출력하고 실패 개수를 종료 코드로 반환한다.
 
 const TestLib := preload("res://tests/test_lib.gd")
 const ScreenBounds := preload("res://src/core/utils/screen_bounds.gd")
@@ -13,14 +11,41 @@ const SignalInputScript := preload("res://src/gameplay/marshaller/signal_input.g
 const AircraftScript := preload("res://src/gameplay/aircraft/aircraft.gd")
 const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 
+@onready var _report: RichTextLabel = $Report
+
 func _ready() -> void:
-	print("=== 단위 테스트 시작 ===")
 	var t := TestLib.new()
 	_test_screen_bounds(t)
 	_test_vision_cone(t)
 	_test_aircraft_fsm(t)
-	var failed := t.report()
-	get_tree().call_deferred("quit", 1 if failed > 0 else 0)
+
+	if DisplayServer.get_name() == "headless":
+		_print_console(t)
+		get_tree().call_deferred("quit", t.failed)
+	else:
+		_render_scene(t)
+
+func _print_console(t: TestLib) -> void:
+	print("=== 단위 테스트 시작 ===")
+	for r in t.results:
+		print("  [%s] %s :: %s" % ["PASS" if r.ok else "FAIL", r.section, r.msg])
+	print("──────────────────────────────")
+	print(t.summary())
+
+func _render_scene(t: TestLib) -> void:
+	var out := PackedStringArray()
+	var head_color := "#66bb6a" if t.failed == 0 else "#ef5350"
+	out.append("[font_size=26][b][color=%s]%s[/color][/b][/font_size]\n" % [head_color, t.summary()])
+	var section := ""
+	for r in t.results:
+		if r.section != section:
+			section = r.section
+			out.append("\n[b][color=#90caf9]%s[/color][/b]" % section)
+		if r.ok:
+			out.append("  [color=#66bb6a]PASS[/color]  %s" % r.msg)
+		else:
+			out.append("  [color=#ef5350]FAIL[/color]  %s" % r.msg)
+	_report.text = "\n".join(out)
 
 # ─────────────────────────────────────────────────────────
 # screen_bounds: 카메라 orthogonal size + 뷰포트 비율로 절반 크기 계산 (순수 함수)

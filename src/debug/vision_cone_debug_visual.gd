@@ -5,6 +5,8 @@ extends MeshInstance3D
 const SEGMENTS := 24
 const VISUAL_HEIGHT := 0.05
 
+const SceneQuery = preload("res://src/core/utils/scene_query.gd")
+
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
 
 # 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
@@ -13,7 +15,10 @@ var marshaller: Node3D
 var _material := StandardMaterial3D.new()
 
 func _ready() -> void:
-	marshaller = get_tree().get_first_node_in_group("marshaller")
+	marshaller = SceneQuery.get_singleton(get_tree(), "marshaller", "VisionConeVisual")
+	# 디버그 시각화 전용이므로 마샬러가 없으면 색상 갱신만 끈다 (부채꼴 메쉬는 그대로 표시).
+	if marshaller == null:
+		set_process(false)
 	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_material.cull_mode = BaseMaterial3D.CULL_DISABLED
