@@ -113,6 +113,7 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
 script = ExtResource("5_aircraft_script")
 
 [node name="AircraftModel" parent="World/EntityRoot/Aircraft" instance=ExtResource("16_aircraft_model")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="VisionCone" type="Node" parent="World/EntityRoot/Aircraft"]
 script = ExtResource("3_vision_cone_script")
