@@ -1,184 +1,179 @@
-<svg viewBox="0 0 780 520" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Consolas','Menlo',monospace">
+<svg viewBox="0 0 984 720" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Consolas','Menlo',monospace">
 <title>Airport Marshaling — 씬 구조 다이어그램</title>
-<desc>Main.tscn 노드 계층과 스크립트 연결 관계도</desc>
+<desc>Main.tscn 노드 계층과 스크립트 연결 관계도 (밝은 테마)</desc>
 
-<rect width="780" height="520" fill="#141420" rx="10"/>
+<rect width="984" height="720" fill="#f4f4f8" rx="12"/>
+<text x="492" y="36" text-anchor="middle" fill="#2a2a40" font-size="19" font-weight="bold" letter-spacing="1">Main.tscn — 씬 구조</text>
 
-<!-- Title -->
-<text x="390" y="24" text-anchor="middle" fill="#c8c8e8" font-size="13" font-weight="bold" letter-spacing="1">Main.tscn  —  씬 구조</text>
+<!-- ===== MARSHALLER ===== -->
+<rect x="24" y="56" width="276" height="268" rx="8" fill="#e3effb" stroke="#3a7bd5" stroke-width="2"/>
+<text x="162" y="82" text-anchor="middle" fill="#1a5fa8" font-size="15" font-weight="bold">Marshaller (Node3D)</text>
 
-<!-- MARSHALLER GROUP -->
-<rect x="16" y="38" width="182" height="196" rx="6" fill="#0d1f3a" stroke="#4a90d9" stroke-width="1.5"/>
-<text x="107" y="54" text-anchor="middle" fill="#4a90d9" font-size="10" font-weight="bold">Marshaller  (Node3D)</text>
+<rect x="36" y="92" width="252" height="48" rx="5" fill="#cfe3f7"/>
+<text x="162" y="114" text-anchor="middle" fill="#134a86" font-size="13" font-weight="bold">MarshallerController</text>
+<text x="162" y="132" text-anchor="middle" fill="#3f6f9e" font-size="11">marshaller_controller.gd</text>
 
-<rect x="26" y="60" width="162" height="32" rx="3" fill="#163050"/>
-<text x="107" y="72" text-anchor="middle" fill="#7eb8f7" font-size="9" font-weight="bold">MarshallerController</text>
-<text x="107" y="84" text-anchor="middle" fill="#5a8ab8" font-size="8">marshaller_controller.gd</text>
+<rect x="36" y="148" width="252" height="48" rx="5" fill="#cfe3f7"/>
+<text x="162" y="170" text-anchor="middle" fill="#134a86" font-size="13" font-weight="bold">MoveInput</text>
+<text x="162" y="188" text-anchor="middle" fill="#3f6f9e" font-size="11">move_input.gd · WASD</text>
 
-<rect x="26" y="98" width="162" height="32" rx="3" fill="#163050"/>
-<text x="107" y="110" text-anchor="middle" fill="#7eb8f7" font-size="9" font-weight="bold">MoveInput</text>
-<text x="107" y="122" text-anchor="middle" fill="#5a8ab8" font-size="8">move_input.gd  ·  WASD</text>
+<rect x="36" y="204" width="252" height="48" rx="5" fill="#cfe3f7"/>
+<text x="162" y="226" text-anchor="middle" fill="#134a86" font-size="13" font-weight="bold">SignalInput</text>
+<text x="162" y="244" text-anchor="middle" fill="#3f6f9e" font-size="11">signal_input.gd · 방향키</text>
 
-<rect x="26" y="136" width="162" height="32" rx="3" fill="#163050"/>
-<text x="107" y="148" text-anchor="middle" fill="#7eb8f7" font-size="9" font-weight="bold">SignalInput</text>
-<text x="107" y="160" text-anchor="middle" fill="#5a8ab8" font-size="8">signal_input.gd  ·  방향키</text>
+<rect x="36" y="260" width="252" height="30" rx="5" fill="#eef5fc" stroke="#8ab0d8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="162" y="280" text-anchor="middle" fill="#5a80a8" font-size="11">MarshallerHitbox (Area3D)</text>
 
-<rect x="26" y="174" width="162" height="24" rx="3" fill="#0a1828" stroke="#2a5080" stroke-width="0.8"/>
-<text x="107" y="190" text-anchor="middle" fill="#2a6090" font-size="8">MarshallerHitbox  (Area3D)</text>
+<text x="162" y="312" text-anchor="middle" fill="#7090b0" font-size="11">MarshallerMesh (CapsuleMesh)</text>
 
-<text x="107" y="224" text-anchor="middle" fill="#2a5070" font-size="8">MarshallerMesh  (CapsuleMesh)</text>
+<!-- ===== AIRCRAFT ===== -->
+<rect x="324" y="56" width="336" height="336" rx="8" fill="#efe6fb" stroke="#7b4fc9" stroke-width="2"/>
+<text x="492" y="82" text-anchor="middle" fill="#5a2fa0" font-size="15" font-weight="bold">Aircraft (Node3D)</text>
 
-<!-- AIRCRAFT GROUP -->
-<rect x="216" y="38" width="222" height="274" rx="6" fill="#1a0d38" stroke="#9b6fd9" stroke-width="1.5"/>
-<text x="327" y="54" text-anchor="middle" fill="#9b6fd9" font-size="10" font-weight="bold">Aircraft  (Node3D)</text>
+<rect x="336" y="92" width="312" height="48" rx="5" fill="#e0d0f5"/>
+<text x="492" y="114" text-anchor="middle" fill="#48208a" font-size="13" font-weight="bold">Aircraft</text>
+<text x="492" y="132" text-anchor="middle" fill="#6a4aa8" font-size="11">aircraft.gd · 위치/속도/회전</text>
 
-<rect x="226" y="60" width="202" height="32" rx="3" fill="#2a1550"/>
-<text x="327" y="72" text-anchor="middle" fill="#c09cf0" font-size="9" font-weight="bold">Aircraft</text>
-<text x="327" y="84" text-anchor="middle" fill="#7055a8" font-size="8">aircraft.gd  ·  위치/속도/회전</text>
+<rect x="336" y="148" width="312" height="48" rx="5" fill="#e0d0f5"/>
+<text x="492" y="170" text-anchor="middle" fill="#48208a" font-size="13" font-weight="bold">AircraftFSM</text>
+<text x="492" y="188" text-anchor="middle" fill="#6a4aa8" font-size="11">aircraft_fsm.gd · IDLE/MOVING/HESITATING/STOPPING</text>
 
-<rect x="226" y="98" width="202" height="32" rx="3" fill="#2a1550"/>
-<text x="327" y="110" text-anchor="middle" fill="#c09cf0" font-size="9" font-weight="bold">AircraftFSM</text>
-<text x="327" y="122" text-anchor="middle" fill="#7055a8" font-size="8">aircraft_fsm.gd  ·  IDLE/MOVING/HESITATING/STOPPING</text>
+<rect x="336" y="204" width="312" height="48" rx="5" fill="#e0d0f5"/>
+<text x="492" y="226" text-anchor="middle" fill="#48208a" font-size="13" font-weight="bold">AircraftVisionCone</text>
+<text x="492" y="244" text-anchor="middle" fill="#6a4aa8" font-size="11">aircraft_vision_cone.gd · 70° 시야 판정</text>
 
-<rect x="226" y="136" width="202" height="32" rx="3" fill="#2a1550"/>
-<text x="327" y="148" text-anchor="middle" fill="#c09cf0" font-size="9" font-weight="bold">AircraftVisionCone</text>
-<text x="327" y="160" text-anchor="middle" fill="#7055a8" font-size="8">aircraft_vision_cone.gd  ·  70° 시야 판정</text>
+<rect x="336" y="260" width="312" height="48" rx="5" fill="#e0d0f5"/>
+<text x="492" y="282" text-anchor="middle" fill="#48208a" font-size="13" font-weight="bold">AircraftCollision</text>
+<text x="492" y="300" text-anchor="middle" fill="#6a4aa8" font-size="11">aircraft_collision.gd · XZ 거리 충돌 감지</text>
 
-<rect x="226" y="174" width="202" height="32" rx="3" fill="#2a1550"/>
-<text x="327" y="186" text-anchor="middle" fill="#c09cf0" font-size="9" font-weight="bold">AircraftHitbox</text>
-<text x="327" y="198" text-anchor="middle" fill="#7055a8" font-size="8">aircraft_collision.gd  ·  XZ 거리 충돌 감지</text>
+<rect x="336" y="316" width="312" height="30" rx="5" fill="#f4eefc" stroke="#a888d8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="492" y="336" text-anchor="middle" fill="#7858a8" font-size="11">VisionConeVisual (디버그 메쉬)</text>
 
-<rect x="226" y="212" width="202" height="24" rx="3" fill="#150830" stroke="#5a3080" stroke-width="0.8"/>
-<text x="327" y="228" text-anchor="middle" fill="#40256a" font-size="8">VisionConeVisual  (디버그 메쉬)</text>
+<rect x="336" y="350" width="312" height="30" rx="5" fill="#f4eefc" stroke="#a888d8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="492" y="370" text-anchor="middle" fill="#7858a8" font-size="11">AircraftMesh + NoseMarker (시각)</text>
 
-<rect x="226" y="242" width="202" height="24" rx="3" fill="#150830" stroke="#5a3080" stroke-width="0.8"/>
-<text x="327" y="258" text-anchor="middle" fill="#40256a" font-size="8">AircraftMesh + NoseMarker  (시각)</text>
+<!-- ===== SCENE / ENV ===== -->
+<rect x="684" y="56" width="276" height="268" rx="8" fill="#fbf1dd" stroke="#c8901f" stroke-width="2"/>
+<text x="822" y="82" text-anchor="middle" fill="#8a5f10" font-size="15" font-weight="bold">씬 / 환경</text>
 
-<!-- SCENE / ENV GROUP -->
-<rect x="456" y="38" width="182" height="196" rx="6" fill="#1e1200" stroke="#d4952a" stroke-width="1.5"/>
-<text x="547" y="54" text-anchor="middle" fill="#d4952a" font-size="10" font-weight="bold">씬 / 환경</text>
+<rect x="696" y="92" width="252" height="48" rx="5" fill="#f5e4c0"/>
+<text x="822" y="114" text-anchor="middle" fill="#79510c" font-size="13" font-weight="bold">GameManager</text>
+<text x="822" y="132" text-anchor="middle" fill="#98701e" font-size="11">game_manager.gd · 판정 + 재시작</text>
 
-<rect x="466" y="60" width="162" height="32" rx="3" fill="#2e1c00"/>
-<text x="547" y="72" text-anchor="middle" fill="#f0b84a" font-size="9" font-weight="bold">GameManager</text>
-<text x="547" y="84" text-anchor="middle" fill="#906830" font-size="8">game_manager.gd  ·  판정 + 재시작</text>
+<rect x="696" y="148" width="252" height="30" rx="5" fill="#fbf6e8" stroke="#d8b268" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="822" y="168" text-anchor="middle" fill="#98701e" font-size="11">TopDownCamera (직교 탑뷰)</text>
 
-<rect x="466" y="98" width="162" height="24" rx="3" fill="#180e00" stroke="#6a4800" stroke-width="0.8"/>
-<text x="547" y="114" text-anchor="middle" fill="#604020" font-size="8">TopDownCamera  (직교 탑뷰)</text>
+<rect x="696" y="182" width="252" height="30" rx="5" fill="#fbf6e8" stroke="#d8b268" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="822" y="202" text-anchor="middle" fill="#98701e" font-size="11">ParkingSpot + ParkingHitbox</text>
 
-<rect x="466" y="128" width="162" height="24" rx="3" fill="#180e00" stroke="#6a4800" stroke-width="0.8"/>
-<text x="547" y="144" text-anchor="middle" fill="#604020" font-size="8">ParkingSpot  +  ParkingHitbox</text>
+<rect x="696" y="216" width="252" height="30" rx="5" fill="#fbf6e8" stroke="#d8b268" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="822" y="236" text-anchor="middle" fill="#98701e" font-size="11">Obstacle + ObstacleHitbox</text>
 
-<rect x="466" y="158" width="162" height="24" rx="3" fill="#180e00" stroke="#6a4800" stroke-width="0.8"/>
-<text x="547" y="174" text-anchor="middle" fill="#604020" font-size="8">Obstacle  +  ObstacleHitbox</text>
+<rect x="696" y="250" width="252" height="30" rx="5" fill="#fbf6e8" stroke="#d8b268" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="822" y="270" text-anchor="middle" fill="#98701e" font-size="11">Ground (PlaneMesh 50×50)</text>
 
-<rect x="466" y="188" width="162" height="24" rx="3" fill="#180e00" stroke="#6a4800" stroke-width="0.8"/>
-<text x="547" y="204" text-anchor="middle" fill="#604020" font-size="8">Ground  (PlaneMesh 50×50)</text>
+<!-- ===== HUD ===== -->
+<rect x="24" y="410" width="636" height="120" rx="8" fill="#dff3e8" stroke="#2a9d5f" stroke-width="2"/>
+<text x="342" y="436" text-anchor="middle" fill="#1a7a48" font-size="15" font-weight="bold">HUD (CanvasLayer)</text>
 
-<!-- HUD GROUP -->
-<rect x="16" y="260" width="420" height="110" rx="6" fill="#0a2018" stroke="#3cb87a" stroke-width="1.5"/>
-<text x="226" y="276" text-anchor="middle" fill="#3cb87a" font-size="10" font-weight="bold">HUD  (CanvasLayer)</text>
+<rect x="36" y="446" width="196" height="56" rx="5" fill="#c8ecd8"/>
+<text x="134" y="472" text-anchor="middle" fill="#136436" font-size="13" font-weight="bold">SignalIndicator</text>
+<text x="134" y="490" text-anchor="middle" fill="#2f8058" font-size="10.5">signal_indicator_hud.gd</text>
 
-<rect x="26" y="282" width="126" height="36" rx="3" fill="#122818"/>
-<text x="89" y="294" text-anchor="middle" fill="#60d9a0" font-size="9" font-weight="bold">SignalIndicator</text>
-<text x="89" y="308" text-anchor="middle" fill="#2a7050" font-size="8">signal_indicator_hud.gd</text>
+<rect x="244" y="446" width="196" height="56" rx="5" fill="#c8ecd8"/>
+<text x="342" y="472" text-anchor="middle" fill="#136436" font-size="13" font-weight="bold">GameOverHUD</text>
+<text x="342" y="490" text-anchor="middle" fill="#2f8058" font-size="10.5">game_over_hud.gd</text>
 
-<rect x="160" y="282" width="126" height="36" rx="3" fill="#122818"/>
-<text x="223" y="294" text-anchor="middle" fill="#60d9a0" font-size="9" font-weight="bold">GameOverHUD</text>
-<text x="223" y="308" text-anchor="middle" fill="#2a7050" font-size="8">game_over_hud.gd</text>
+<rect x="452" y="446" width="196" height="56" rx="5" fill="#c8ecd8"/>
+<text x="550" y="472" text-anchor="middle" fill="#136436" font-size="13" font-weight="bold">SuccessHUD</text>
+<text x="550" y="490" text-anchor="middle" fill="#2f8058" font-size="10.5">success_hud.gd</text>
 
-<rect x="294" y="282" width="126" height="36" rx="3" fill="#122818"/>
-<text x="357" y="294" text-anchor="middle" fill="#60d9a0" font-size="9" font-weight="bold">SuccessHUD</text>
-<text x="357" y="308" text-anchor="middle" fill="#2a7050" font-size="8">success_hud.gd</text>
+<!-- ===== COMMON ===== -->
+<rect x="684" y="410" width="276" height="120" rx="8" fill="#ececf0" stroke="#808090" stroke-width="2"/>
+<text x="822" y="436" text-anchor="middle" fill="#505060" font-size="15" font-weight="bold">src/core/utils/</text>
+<rect x="696" y="446" width="252" height="56" rx="5" fill="#dcdce4"/>
+<text x="822" y="472" text-anchor="middle" fill="#3a3a48" font-size="13" font-weight="bold">screen_bounds.gd</text>
+<text x="822" y="490" text-anchor="middle" fill="#606070" font-size="10.5">카메라 가시 영역 반환 (공유)</text>
 
-<!-- COMMON UTILS -->
-<rect x="456" y="260" width="182" height="72" rx="6" fill="#141414" stroke="#606060" stroke-width="1.5"/>
-<text x="547" y="276" text-anchor="middle" fill="#909090" font-size="10" font-weight="bold">src/core/utils/</text>
-<rect x="466" y="282" width="162" height="36" rx="3" fill="#1e1e1e"/>
-<text x="547" y="294" text-anchor="middle" fill="#a0a0a0" font-size="9" font-weight="bold">screen_bounds.gd</text>
-<text x="547" y="308" text-anchor="middle" fill="#606060" font-size="8">카메라 가시 영역 반환 (공유)</text>
-
-<!-- ARROWS -->
+<!-- ===== ARROWS ===== -->
 <defs>
-  <marker id="a1" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5Z" fill="#5a8ab8"/></marker>
-  <marker id="a2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5Z" fill="#8060c0"/></marker>
-  <marker id="a3" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5Z" fill="#d09028"/></marker>
-  <marker id="a4" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5Z" fill="#3a9860"/></marker>
-  <marker id="a5" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5Z" fill="#606060"/></marker>
+  <marker id="mb" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#2f6fb8"/></marker>
+  <marker id="mp" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#6a3fb8"/></marker>
+  <marker id="ma" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#c8901f"/></marker>
+  <marker id="mg" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#2a9d5f"/></marker>
+  <marker id="mm" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#909098"/></marker>
 </defs>
 
-<!-- SignalInput → AircraftFSM -->
-<path d="M188,152 Q205,130 226,114" fill="none" stroke="#5a8ab8" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#a1)"/>
-<rect x="186" y="126" width="36" height="12" rx="2" fill="#141420"/>
-<text x="204" y="135" text-anchor="middle" fill="#4a7aa0" font-size="7.5">수신호</text>
+<!-- SignalInput -> AircraftFSM -->
+<path d="M288,222 Q312,196 336,176" fill="none" stroke="#2f6fb8" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#mb)"/>
+<rect x="292" y="188" width="44" height="16" rx="3" fill="#f4f4f8"/>
+<text x="314" y="200" text-anchor="middle" fill="#2f6fb8" font-size="10.5">수신호</text>
 
-<!-- VisionCone → AircraftFSM -->
-<path d="M327,136 L327,130" fill="none" stroke="#8060c0" stroke-width="1.3" marker-end="url(#a2)"/>
+<!-- VisionCone -> AircraftFSM -->
+<path d="M492,204 L492,198" fill="none" stroke="#6a3fb8" stroke-width="1.6" marker-end="url(#mp)"/>
 
-<!-- AircraftFSM → Aircraft -->
-<path d="M327,98 L327,92" fill="none" stroke="#8060c0" stroke-width="1.3" marker-end="url(#a2)"/>
-<rect x="304" y="84" width="46" height="11" rx="2" fill="#141420"/>
-<text x="327" y="92" text-anchor="middle" fill="#7050b0" font-size="7.5">issue_command</text>
+<!-- AircraftFSM -> Aircraft -->
+<path d="M492,148 L492,142" fill="none" stroke="#6a3fb8" stroke-width="1.6" marker-end="url(#mp)"/>
+<rect x="452" y="130" width="80" height="16" rx="3" fill="#f4f4f8"/>
+<text x="492" y="142" text-anchor="middle" fill="#6a3fb8" font-size="10.5">issue_command</text>
 
-<!-- AircraftHitbox → GameManager -->
-<path d="M428,190 Q445,152 466,88" fill="none" stroke="#d09028" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#a3)"/>
-<rect x="428" y="148" width="44" height="20" rx="2" fill="#141420"/>
-<text x="450" y="157" text-anchor="middle" fill="#a07020" font-size="7.5">충돌/성공</text>
-<text x="450" y="167" text-anchor="middle" fill="#a07020" font-size="7.5">trigger_*()</text>
+<!-- AircraftCollision -> GameManager -->
+<path d="M648,284 Q680,200 696,124" fill="none" stroke="#c8901f" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#ma)"/>
+<rect x="646" y="196" width="70" height="30" rx="3" fill="#f4f4f8"/>
+<text x="681" y="209" text-anchor="middle" fill="#a5751a" font-size="10.5">충돌/성공</text>
+<text x="681" y="222" text-anchor="middle" fill="#a5751a" font-size="10.5">trigger_*()</text>
 
-<!-- GameManager → GameOverHUD -->
-<path d="M500,92 Q400,180 258,282" fill="none" stroke="#3a9860" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a4)"/>
+<!-- GameManager -> HUD -->
+<path d="M760,140 Q560,300 342,446" fill="none" stroke="#2a9d5f" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#mg)"/>
+<rect x="470" y="300" width="70" height="16" rx="3" fill="#f4f4f8"/>
+<text x="505" y="312" text-anchor="middle" fill="#1f8a50" font-size="10.5">HUD 갱신</text>
 
-<!-- GameManager → SuccessHUD -->
-<path d="M530,92 Q480,200 392,282" fill="none" stroke="#3a9860" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a4)"/>
+<!-- SignalInput -> SignalIndicator -->
+<path d="M120,252 Q100,340 130,446" fill="none" stroke="#2a9d5f" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#mg)"/>
 
-<!-- SignalInput → SignalIndicator -->
-<path d="M107,200 L89,282" fill="none" stroke="#3a9860" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a4)"/>
-<rect x="70" y="238" width="28" height="11" rx="2" fill="#141420"/>
-<text x="84" y="246" text-anchor="middle" fill="#2a7850" font-size="7.5">표시</text>
+<!-- screen_bounds -> Aircraft + Marshaller -->
+<path d="M822,446 Q640,420 492,392" fill="none" stroke="#909098" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#mm)"/>
+<path d="M696,474 Q400,430 288,300" fill="none" stroke="#909098" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#mm)"/>
 
-<!-- screen_bounds → Aircraft + Marshaller -->
-<path d="M547,282 Q480,270 327,272" fill="none" stroke="#606060" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#a5)"/>
-<path d="M466,300 Q300,330 107,256" fill="none" stroke="#606060" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#a5)"/>
-<rect x="285" y="325" width="72" height="11" rx="2" fill="#141420"/>
-<text x="321" y="333" text-anchor="middle" fill="#505050" font-size="7.5">화면 경계 계산 공유</text>
+<!-- ===== LEGEND ===== -->
+<rect x="24" y="552" width="936" height="150" rx="8" fill="#fafafc" stroke="#d0d0dc" stroke-width="1"/>
+<text x="492" y="578" text-anchor="middle" fill="#4a4a5a" font-size="14" font-weight="bold">범례</text>
 
-<!-- LEGEND -->
-<rect x="16" y="400" width="742" height="106" rx="5" fill="#0e0e18" stroke="#2a2a40" stroke-width="1"/>
-<text x="389" y="416" text-anchor="middle" fill="#606070" font-size="9" font-weight="bold">범례</text>
+<!-- category swatches -->
+<rect x="44" y="594" width="16" height="16" rx="3" fill="#cfe3f7" stroke="#3a7bd5" stroke-width="1.2"/>
+<text x="68" y="607" fill="#1a5fa8" font-size="12">마샬러 스크립트</text>
 
-<rect x="30" y="424" width="10" height="10" rx="2" fill="#163050" stroke="#4a90d9" stroke-width="1"/>
-<text x="46" y="433" fill="#4a90d9" font-size="8">마샬러 스크립트</text>
+<rect x="214" y="594" width="16" height="16" rx="3" fill="#e0d0f5" stroke="#7b4fc9" stroke-width="1.2"/>
+<text x="238" y="607" fill="#5a2fa0" font-size="12">비행기 스크립트</text>
 
-<rect x="140" y="424" width="10" height="10" rx="2" fill="#2a1550" stroke="#9b6fd9" stroke-width="1"/>
-<text x="156" y="433" fill="#9b6fd9" font-size="8">비행기 스크립트</text>
+<rect x="384" y="594" width="16" height="16" rx="3" fill="#f5e4c0" stroke="#c8901f" stroke-width="1.2"/>
+<text x="408" y="607" fill="#8a5f10" font-size="12">씬 / 게임 로직</text>
 
-<rect x="250" y="424" width="10" height="10" rx="2" fill="#2e1c00" stroke="#d4952a" stroke-width="1"/>
-<text x="266" y="433" fill="#d4952a" font-size="8">씬/게임 로직</text>
+<rect x="540" y="594" width="16" height="16" rx="3" fill="#c8ecd8" stroke="#2a9d5f" stroke-width="1.2"/>
+<text x="564" y="607" fill="#1a7a48" font-size="12">HUD</text>
 
-<rect x="350" y="424" width="10" height="10" rx="2" fill="#122818" stroke="#3cb87a" stroke-width="1"/>
-<text x="366" y="433" fill="#3cb87a" font-size="8">HUD</text>
+<rect x="630" y="594" width="16" height="16" rx="3" fill="#dcdce4" stroke="#808090" stroke-width="1.2"/>
+<text x="654" y="607" fill="#505060" font-size="12">공유 유틸</text>
 
-<rect x="420" y="424" width="10" height="10" rx="2" fill="#1e1e1e" stroke="#606060" stroke-width="1"/>
-<text x="436" y="433" fill="#909090" font-size="8">공유 유틸</text>
+<rect x="762" y="594" width="16" height="16" rx="3" fill="none" stroke="#a0a0b0" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="786" y="607" fill="#707080" font-size="12">스크립트 없는 노드</text>
 
-<rect x="500" y="424" width="10" height="8" rx="1" fill="none" stroke="#404050" stroke-width="0.8"/>
-<text x="516" y="432" fill="#404050" font-size="8">스크립트 없는 노드</text>
+<!-- arrow legend -->
+<line x1="44" y1="640" x2="88" y2="640" stroke="#2f6fb8" stroke-width="1.6" stroke-dasharray="6 3"/>
+<polygon points="88,636 95,640 88,644" fill="#2f6fb8"/>
+<text x="102" y="644" fill="#2f6fb8" font-size="12">신호 / 데이터 흐름</text>
 
-<line x1="30" y1="454" x2="70" y2="454" stroke="#5a8ab8" stroke-width="1.2" stroke-dasharray="4 2"/>
-<polygon points="70,451 75,454 70,457" fill="#5a8ab8"/>
-<text x="82" y="457" fill="#5a8ab8" font-size="8">신호/데이터 흐름</text>
+<line x1="284" y1="640" x2="328" y2="640" stroke="#6a3fb8" stroke-width="1.6"/>
+<polygon points="328,636 335,640 328,644" fill="#6a3fb8"/>
+<text x="342" y="644" fill="#6a3fb8" font-size="12">직접 메서드 호출</text>
 
-<line x1="180" y1="454" x2="220" y2="454" stroke="#8060c0" stroke-width="1.2"/>
-<polygon points="220,451 225,454 220,457" fill="#8060c0"/>
-<text x="232" y="457" fill="#8060c0" font-size="8">직접 메서드 호출</text>
+<line x1="524" y1="640" x2="568" y2="640" stroke="#2a9d5f" stroke-width="1.4" stroke-dasharray="5 3"/>
+<polygon points="568,636 575,640 568,644" fill="#2a9d5f"/>
+<text x="582" y="644" fill="#2a9d5f" font-size="12">HUD 갱신</text>
 
-<line x1="340" y1="454" x2="380" y2="454" stroke="#606060" stroke-width="1" stroke-dasharray="3 2"/>
-<polygon points="380,451 385,454 380,457" fill="#606060"/>
-<text x="392" y="457" fill="#606060" font-size="8">유틸 참조</text>
+<line x1="720" y1="640" x2="764" y2="640" stroke="#909098" stroke-width="1.2" stroke-dasharray="3 3"/>
+<polygon points="764,636 771,640 764,644" fill="#909098"/>
+<text x="778" y="644" fill="#707080" font-size="12">유틸 참조</text>
 
-<line x1="480" y1="454" x2="520" y2="454" stroke="#3a9860" stroke-width="1.1" stroke-dasharray="4 2"/>
-<polygon points="520,451 525,454 520,457" fill="#3a9860"/>
-<text x="532" y="457" fill="#3a9860" font-size="8">HUD 갱신</text>
-
-<text x="389" y="496" text-anchor="middle" fill="#303040" font-size="8">src/core/utils/screen_bounds.gd  —  Marshaller + Aircraft 공유 (카메라 가시 영역 계산)</text>
+<text x="492" y="680" text-anchor="middle" fill="#8a8a98" font-size="11">src/core/utils/screen_bounds.gd — Marshaller + Aircraft 공유 (카메라 가시 영역 계산)</text>
 </svg>
