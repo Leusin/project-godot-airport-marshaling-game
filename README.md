@@ -106,10 +106,11 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 ![씬 구조 다이어그램](docs/scene_diagram.svg)
 
 **마샬러**
-- `MarshallerController` — 이동만 담당 (WASD, 화면 경계 클램프)
+- `MarshallerController` — 이동만 담당 (WASD)
 - `MoveInput` — 이동 입력 전담
 - `SignalInput` — 수신호 입력 전담. 방향키 -> 신호 타입(전진/정지/좌우회전) 변환만, 판정은 안 함.
   모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값
+- `ScreenClamp` — (공용 컴포넌트) 부모를 화면 경계 안으로 클램프. 마샬러/비행기가 공유
 
 **비행기**
 - `Aircraft` — 위치/속도/회전, 딜레이+관성 이동 로직
@@ -121,8 +122,9 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 - `SignalIndicatorHUD` — 마샬러가 현재 입력 중인 수신호를 화면에 아이콘으로 표시 (텍스처 없이 코드로 그림)
 
 **공유/판정**
-- `Obstacle` — 정적 콜라이더만 있는 장애물
-- `GameManager` — 충돌 이벤트 수신 (비행기-장애물, 사람-비행기) -> 게임오버 / A->B 도착 판정
+- `Obstacle` / `ParkingSpot` — 그룹(obstacle/parking)만 붙은 위치 마커. AircraftCollision이 거리로 판정
+- `GameManager` — 게임오버(비행기-장애물/사람) / A->B 도착 성공 처리 + 재시작
+- `ScreenBounds` / `ScreenClamp` / `SceneQuery` — 공용 유틸 (경계 계산 / 경계 클램프 / 그룹 단일 조회)
 
 ### 로드맵
 
@@ -150,21 +152,21 @@ MainGame (Node)                  앱 루트. Process Mode = Always
   - [x] AircraftFSM: IDLE/MOVING/HESITATING/STOPPING 전이
   - [x] NONE(무신호): 이동 중 1초 멈칫 후 정지 (재지시 오면 MOVING 복귀)
   - [x] STOP(명확한 정지): 즉시 정지 시작, 멈칫 없음
-  - [x] 시야 밖 = 무신호와 동일 처리
+  - [x] 시야 밖: 유도자를 놓친 것이므로 즉시 정지 (무신호 멈칫보다 엄격)
 - [x] 충돌 -> 게임 오버 (비행기-장애물, 사람-비행기)
-  - [x] AircraftHitbox: 비행기 충돌 감지 (Area3D)
-  - [x] MarshallerHitbox: 마샬러 피격 영역 (collision_marshaller 그룹)
-  - [x] Obstacle: 테스트용 장애물 배치 (collision_obstacle 그룹)
+  - [x] AircraftCollision: 비행기가 XZ 거리로 근접 판정 (Area3D 시그널 대신)
+  - [x] 마샬러/장애물을 그룹(marshaller/obstacle)으로 조회 → 접촉 시 게임 오버
   - [x] GameManager: 게임 오버 처리, 재시작 (엔터/ESC)
   - [x] GameOverHUD: 전체화면 오버레이 표시
 - [x] A->B 유도 목표 및 성공/실패 판정
-  - [x] ParkingSpot: 목표 주차 지점 (초록 박스, collision_parking 그룹)
-  - [x] 비행기가 ParkingSpot Area3D에 진입 → 유도 성공
+  - [x] ParkingSpot: 목표 주차 지점 (초록 박스, parking 그룹)
+  - [x] 비행기가 ParkingSpot 근접 거리 안에 들어오면 → 유도 성공
   - [x] SuccessHUD: 초록 오버레이 + "유도 성공!" 텍스트
   - [x] 성공/실패 모두 엔터 / ESC 로 재시작
 
 ## 관리 문서
 
 - README.md 개요
+- [docs/CODE_GUIDE.md](docs/CODE_GUIDE.md) 코드 읽기 가이드 (처음 읽는 순서 + 핵심 패턴)
 - DEVLOG.md 진행 로그
 - MEMORY.md 회고
