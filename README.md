@@ -168,5 +168,6 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 
 - README.md 개요
 - [docs/CODE_GUIDE.md](docs/CODE_GUIDE.md) 코드 읽기 가이드 (처음 읽는 순서 + 핵심 패턴)
+- [docs/ASSET_GUIDE.md](docs/ASSET_GUIDE.md) 3D 에셋 제작 파이프라인 (Blender MCP → Godot)
 - DEVLOG.md 진행 로그
 - MEMORY.md 회고
