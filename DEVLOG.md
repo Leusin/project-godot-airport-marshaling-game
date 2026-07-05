@@ -15,6 +15,14 @@
 
 ## Log
 
+- 2026-07-05 [결정] 폴더 구조를 src/ 트리로 재편.
+	- 기존 scenes/ + 평평한 scripts/ 구조 → src/{core,gameplay,ui,debug} 로 역할별 분리.
+	- src/core/main_game(Main.tscn, game_manager.gd), src/core/utils(screen_bounds.gd), src/gameplay/aircraft, src/gameplay/marshaller, src/ui, src/debug(vision_cone_debug_visual, apply_project_settings).
+	- 다른 프로젝트 예시 구조를 참고하되 우리 규모(스크립트 14개)에 맞게 levels/resources/shaders/autoload 등 빈 폴더는 생략.
+	- 이동 후 preload 경로, Main.tscn ext_resource path, project.godot main_scene 모두 갱신. run_project로 참조 깨짐 없음 확인.
+	- 미사용 aircraft_signal_receiver.gd(AircraftFSM으로 대체된 임시 브릿지) 삭제.
+	- apply_project_settings.gd(EditorScript)를 tools/ → src/debug/로 이동.
+
 - 2026-07-01 [세션] A→B 유도 성공 판정 구현 완료.
 	- scenes/Main.tscn: ParkingSpot 노드 추가 (위치 (-3, 0, 3), 밝은 초록 납작 박스). Area3D에 collision_parking 그룹 부착. 충돌 감지용 BoxShape3D(3×2×3) — 높이 2로 y=0.3에 있는 비행기를 잡을 수 있게.
 	- scripts/aircraft_collision.gd: collision_parking 그룹 감지 시 trigger_success() 호출 (기존 collision_marshaller/collision_obstacle는 trigger_game_over() 유지). 주차 성공이 충돌보다 우선.

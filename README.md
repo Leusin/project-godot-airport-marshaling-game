@@ -27,14 +27,21 @@ Godot 4.7 / GDScript / 3D 탑다운 시뮬레이션 (카메라만 탑뷰, 노드
 * A->B 유도 성공/실패 판정
 
 ## 설계
-### 폴더 구조 (초안)
+### 폴더 구조
 
 ```text
 project.godot
-scenes/         .tscn 씬 파일
-scripts/        .gd 스크립트
-scripts/common/ 여러 노드가 공유하는 재사용 가능한 스크립트 (예: screen_bounds.gd)
-assets/         스프라이트, 사운드
+assets/                     아트, 사운드, 폰트 등 게임 에셋
+src/
+  core/
+    main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
+    utils/                  여러 노드가 공유하는 재사용 스크립트 (screen_bounds.gd)
+  gameplay/
+    aircraft/               비행기 로직 (이동/FSM/시야/충돌)
+    marshaller/             마샬러 로직 (이동/입력/수신호)
+  ui/                       HUD (수신호 표시, 게임오버, 성공)
+  debug/                    개발/디버그 도구 (시야 시각화, 프로젝트 설정 스크립트)
+docs/                       문서, 다이어그램
 ```
 
 ### 주요 구성
@@ -50,8 +57,8 @@ assets/         스프라이트, 사운드
 **비행기**
 - `Aircraft` — 위치/속도/회전, 딜레이+관성 이동 로직
 - `AircraftVisionCone` — 정면 기준 70도 원뿔 판정, 마샬러가 원뿔 안에 있는지 bool만 반환
-- `AircraftFSM` — IDLE/INTERPRETING/MOVING/STOPPING 전이. 신호 + 시야 판정을 함께 받아야 인식
-- `AircraftSignalReceiver` — (임시, AircraftFSM으로 대체될 예정) 시야 판정 + SignalInput을 조합해 Aircraft에 명령 전달. 시야 밖/무신호면 정지
+- `AircraftFSM` — IDLE/MOVING/HESITATING/STOPPING 전이. 신호 + 시야 판정을 함께 받아 Aircraft에 명령 전달. 무신호는 멈칫 후 정지, STOP은 즉시 정지
+- `AircraftCollision` — XZ 거리 기반으로 마샬러/장애물/주차지점 근접 판정 -> GameManager 통지
 
 **UI**
 - `SignalIndicatorHUD` — 마샬러가 현재 입력 중인 수신호를 화면에 아이콘으로 표시 (텍스처 없이 코드로 그림)
