@@ -15,6 +15,14 @@
 
 ## Log
 
+- 2026-07-05 [세션] 그룹 이름 중앙화 + 줄임말 제거 + 디버그 HUD 강화/토글.
+	- src/core/game_groups.gd: 그룹 이름(marshaller/signal_input/aircraft_fsm/game_manager/game_over_hud/success_hud/obstacle/parking)을 StringName 상수로 중앙 관리. scene_query 조회·충돌 그룹 조회를 전부 이 상수로 교체 (문자열 오타 방지). .tscn의 groups=[...]는 코드 참조 불가라 문자열 그대로 둠.
+	  - [결정] 물리 튜닝값(max_speed 등)은 중앙화 안 함 — @export가 인스펙터 조정을 주므로 오히려 손해. epsilon류 단일 사용 상수도 로컬 유지.
+	- 줄임말 제거: collision_2d(ca/ha/fa→center_a/half_extents_a/forward_a 등), aircraft_collision(_xz→_to_xz, f→forward, size→mesh_size 등), marshaller_controller(dir→direction), test_runner(t→suite, cam→camera, vp→viewport, he→half_extents, obs→obstacle_center 등).
+	- 디버그 HUD 강화(debug_hud.gd): 기존 버전/FPS에 비행기 FSM 상태 + 현재 수신호 추가. aircraft_fsm에 state_name() 게터 + AIRCRAFT_FSM 그룹 부착.
+	- 개발 빌드에서 ` (백틱) 키로 디버그 오버레이 토글. project.godot에 toggle_debug 액션(physical_keycode 96) 추가. 릴리스 빌드(OS.is_debug_build()==false)에서는 숨기고 비활성화.
+	- 테스트 34/34 유지, 게임 정상.
+
 - 2026-07-05 [세션] 손수 돌리던 타이머를 Countdown 유틸로 승격 + 로직 매직 넘버 상수화.
 	- src/core/utils/countdown.gd: 초 단위 카운트다운. tick(delta)가 0 도달 프레임에 한 번만 true. aircraft.gd(_pending_timer)와 aircraft_fsm.gd(_hesitate_timer)에 복붙돼 있던 `t -= delta; if t <= 0` 패턴을 대체.
 	  - Godot Timer 노드 대신 순수 함수 유틸 선택: FSM/비행기가 매 프레임 폴링 구조라 시그널 노드보다 잘 붙고, 헤드리스 테스트가 됨 (테스트 9개 추가).

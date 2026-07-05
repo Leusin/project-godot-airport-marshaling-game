@@ -6,6 +6,7 @@ const SEGMENTS := 24
 const VISUAL_HEIGHT := 0.05
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
+const GameGroups = preload("res://src/core/game_groups.gd")
 
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
 
@@ -15,7 +16,7 @@ var marshaller: Node3D
 var _material := StandardMaterial3D.new()
 
 func _ready() -> void:
-	marshaller = SceneQuery.get_singleton(get_tree(), "marshaller", "VisionConeVisual")
+	marshaller = SceneQuery.get_singleton(get_tree(), GameGroups.MARSHALLER, "VisionConeVisual")
 	# 디버그 시각화 전용이므로 마샬러가 없으면 색상 갱신만 끈다 (부채꼴 메쉬는 그대로 표시).
 	if marshaller == null:
 		set_process(false)

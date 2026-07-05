@@ -124,7 +124,7 @@ script = ExtResource("3_vision_cone_script")
 [node name="VisionConeVisual" type="MeshInstance3D" parent="World/EntityRoot/Aircraft"]
 script = ExtResource("4_vision_cone_visual_script")
 
-[node name="AircraftFSM" type="Node" parent="World/EntityRoot/Aircraft"]
+[node name="AircraftFSM" type="Node" parent="World/EntityRoot/Aircraft" groups=["aircraft_fsm"]]
 script = ExtResource("7_aircraft_fsm_script")
 
 [node name="AircraftHitbox" type="Node" parent="World/EntityRoot/Aircraft"]
