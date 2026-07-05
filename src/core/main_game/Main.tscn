@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://src/debug/debug_hud.gd" id="13_debug_hud_script"]
 [ext_resource type="Script" path="res://src/core/utils/screen_clamp.gd" id="14_screen_clamp_script"]
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
+[ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
 radius = 0.3
@@ -111,13 +112,7 @@ edge_margin = 0.5
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
 script = ExtResource("5_aircraft_script")
 
-[node name="AircraftMesh" type="MeshInstance3D" parent="World/EntityRoot/Aircraft"]
-mesh = SubResource("BoxMesh_aircraft")
-
-[node name="NoseMarker" type="MeshInstance3D" parent="World/EntityRoot/Aircraft"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
-mesh = SubResource("BoxMesh_nose_marker")
-surface_material_override/0 = SubResource("StandardMaterial3D_nose_marker")
+[node name="AircraftModel" parent="World/EntityRoot/Aircraft" instance=ExtResource("16_aircraft_model")]
 
 [node name="VisionCone" type="Node" parent="World/EntityRoot/Aircraft"]
 script = ExtResource("3_vision_cone_script")
