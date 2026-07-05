@@ -15,6 +15,13 @@
 
 ## Log
 
+- 2026-07-05 [세션] 테스트 결과 씬 출력 + 그룹 조회 널 가드/싱글턴 정리.
+	- tests: 창 모드(에디터 F6)면 결과를 씬 화면(RichTextLabel, 색상 BBCode)에 렌더, 헤드리스(run_tests.ps1/CI)면 콘솔 출력 + 실패 수를 종료 코드로. DisplayServer.get_name()=="headless"로 분기.
+	  - test_lib은 결과를 누적만 하도록 바꾸고(출력은 러너가 담당), tests.tscn을 Control+ColorRect+RichTextLabel 구조로 교체.
+	- src/core/utils/scene_query.gd: 그룹 단일 인스턴스 조회 유틸. 0개면 null+경고, 2개 이상이면 첫 번째+경고(싱글턴 가정 위반을 드러냄). 흩어져 있던 get_first_node_in_group + 널 처리를 한 곳으로.
+	- 적용: aircraft_fsm(마샬러/수신호 없으면 set_process(false)), game_manager(HUD 널 가드 + trigger_*에서 null 체크), aircraft_collision(game_manager를 _ready에서 1회 캐시 → 매 프레임 조회 제거, 없으면 set_physics_process(false)), vision_cone_debug_visual(마샬러 없으면 색상 갱신만 off), signal_indicator_hud(_draw가 이미 널 가드).
+	- 게임/테스트 모두 정상 (실 씬엔 싱글턴이 다 있어 경고 없음, 테스트 19/19 유지).
+
 - 2026-07-05 [세션] 화면 경계 중복 제거(ScreenClamp 컴포넌트) + 단위 테스트 도입.
 	- src/core/utils/screen_clamp.gd: 부모 Node3D를 카메라 가시 영역으로 클램프하는 재사용 컴포넌트. aircraft.gd/marshaller_controller.gd에 복붙돼 있던 _update_bounds + 클램프 로직을 이 자식 노드 하나로 통합. Marshaller(edge_margin 0.5)/Aircraft(1.0)에 부착. 부모가 자식보다 먼저 _physics_process → 부모 이동 후 클램프되는 순서 보장.
 	- aircraft.gd/marshaller_controller.gd에서 경계 관련 코드 전부 제거(각 스크립트가 이동 로직만 남음).

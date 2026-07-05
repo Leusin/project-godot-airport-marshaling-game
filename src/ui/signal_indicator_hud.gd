@@ -3,12 +3,14 @@ extends Control
 ## 판정에는 관여하지 않고 SignalInput의 현재 값을 그대로 시각화한다.
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 
 # SignalInput은 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
+# 없으면 _draw가 조기 반환하므로 별도 비활성화는 불필요.
 var _signal_input: SignalInputScript
 
 func _ready() -> void:
-	_signal_input = get_tree().get_first_node_in_group("signal_input")
+	_signal_input = SceneQuery.get_singleton(get_tree(), "signal_input", "SignalIndicator")
 
 func _process(_delta: float) -> void:
 	queue_redraw()

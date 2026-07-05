@@ -8,6 +8,7 @@ extends Node
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
 const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
+const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 
 enum State { IDLE, MOVING, HESITATING, STOPPING }
 
@@ -21,8 +22,11 @@ var marshaller: Node3D
 var signal_input: SignalInputScript
 
 func _ready() -> void:
-	marshaller = get_tree().get_first_node_in_group("marshaller")
-	signal_input = get_tree().get_first_node_in_group("signal_input")
+	marshaller = SceneQuery.get_singleton(get_tree(), "marshaller", "AircraftFSM")
+	signal_input = SceneQuery.get_singleton(get_tree(), "signal_input", "AircraftFSM")
+	# 필수 참조가 없으면 _process에서 크래시하는 대신 조용히 비활성화 (경고는 위에서 출력됨).
+	if marshaller == null or signal_input == null:
+		set_process(false)
 
 var _state: State = State.IDLE
 var _hesitate_timer: float = 0.0

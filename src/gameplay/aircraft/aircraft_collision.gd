@@ -5,31 +5,36 @@ extends Node
 ##   parking  그룹 진입 -> 유도 성공
 ##   marshaller / obstacle 그룹 접촉 -> 게임 오버
 
+const SceneQuery = preload("res://src/core/utils/scene_query.gd")
+
 @export var hit_radius: float = 1.5
 @export var park_radius: float = 1.5
 
 @onready var _aircraft: Node3D = get_parent()
 
-func _physics_process(_delta: float) -> void:
-	var game_manager := get_tree().get_first_node_in_group("game_manager")
-	if game_manager == null:
-		return
+var _game_manager: Node
 
+func _ready() -> void:
+	_game_manager = SceneQuery.get_singleton(get_tree(), "game_manager", "AircraftCollision")
+	# GameManager가 없으면 판정할 대상이 없으므로 물리 처리를 끈다 (경고는 위에서 출력됨).
+	set_physics_process(_game_manager != null)
+
+func _physics_process(_delta: float) -> void:
 	var ap := Vector2(_aircraft.global_position.x, _aircraft.global_position.z)
 
 	for spot in get_tree().get_nodes_in_group("parking"):
 		if _xz_dist(ap, spot) < park_radius:
-			game_manager.trigger_success()
+			_game_manager.trigger_success()
 			return
 
 	for hazard in get_tree().get_nodes_in_group("marshaller"):
 		if _xz_dist(ap, hazard) < hit_radius:
-			game_manager.trigger_game_over()
+			_game_manager.trigger_game_over()
 			return
 
 	for hazard in get_tree().get_nodes_in_group("obstacle"):
 		if _xz_dist(ap, hazard) < hit_radius:
-			game_manager.trigger_game_over()
+			_game_manager.trigger_game_over()
 			return
 
 func _xz_dist(from: Vector2, to_node: Node3D) -> float:
