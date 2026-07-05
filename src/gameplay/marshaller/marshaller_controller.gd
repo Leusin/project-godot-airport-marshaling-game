@@ -2,8 +2,8 @@ extends Node3D
 ## 마샬러 이동만 담당. 입력은 MoveInput에서 받아온다.
 ## 화면 경계 클램프는 탑다운 카메라의 실제 가시 범위(orthogonal size + 화면 비율)를 기준으로 계산한다.
 
-const MoveInputScript = preload("res://scripts/move_input.gd")
-const ScreenBoundsScript = preload("res://scripts/common/screen_bounds.gd")
+const MoveInputScript = preload("res://src/gameplay/marshaller/move_input.gd")
+const ScreenBoundsScript = preload("res://src/core/utils/screen_bounds.gd")
 
 @export var speed: float = 5.0
 @export var edge_margin: float = 0.5

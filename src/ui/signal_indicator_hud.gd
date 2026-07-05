@@ -2,7 +2,7 @@ extends Control
 ## 마샬러가 현재 입력 중인 수신호를 화면에 아이콘으로 표시하는 HUD.
 ## 판정에는 관여하지 않고 SignalInput의 현재 값을 그대로 시각화한다.
 
-const SignalInputScript = preload("res://scripts/signal_input.gd")
+const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
 
 @export var signal_input_path: NodePath
 

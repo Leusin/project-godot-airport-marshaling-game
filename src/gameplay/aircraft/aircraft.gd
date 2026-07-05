@@ -2,7 +2,7 @@ extends Node3D
 ## 비행기 위치/속도/회전 갱신. 딜레이(명령 수신 후 반응 지연) + 관성(가속/감속)으로 움직인다.
 ## 신호 해석/오인식은 AircraftFSM이 담당하고, 여기서는 Command를 받아 물리적으로만 반영한다.
 
-const ScreenBoundsScript = preload("res://scripts/common/screen_bounds.gd")
+const ScreenBoundsScript = preload("res://src/core/utils/screen_bounds.gd")
 
 enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 

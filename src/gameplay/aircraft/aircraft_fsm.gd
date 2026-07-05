@@ -5,8 +5,8 @@ extends Node
 ## STOP(명확한 정지): 즉시 정지 시작. NONE과 달리 멈칫 없음.
 ## 시야 밖 신호는 NONE으로 처리 (마샬러가 보이지 않으면 무신호와 동일).
 
-const SignalInputScript = preload("res://scripts/signal_input.gd")
-const AircraftScript = preload("res://scripts/aircraft.gd")
+const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
 
 enum State { IDLE, MOVING, HESITATING, STOPPING }
 

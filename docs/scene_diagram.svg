@@ -92,7 +92,7 @@
 
 <!-- COMMON UTILS -->
 <rect x="456" y="260" width="182" height="72" rx="6" fill="#141414" stroke="#606060" stroke-width="1.5"/>
-<text x="547" y="276" text-anchor="middle" fill="#909090" font-size="10" font-weight="bold">scripts/common/</text>
+<text x="547" y="276" text-anchor="middle" fill="#909090" font-size="10" font-weight="bold">src/core/utils/</text>
 <rect x="466" y="282" width="162" height="36" rx="3" fill="#1e1e1e"/>
 <text x="547" y="294" text-anchor="middle" fill="#a0a0a0" font-size="9" font-weight="bold">screen_bounds.gd</text>
 <text x="547" y="308" text-anchor="middle" fill="#606060" font-size="8">카메라 가시 영역 반환 (공유)</text>
@@ -180,5 +180,5 @@
 <polygon points="520,451 525,454 520,457" fill="#3a9860"/>
 <text x="532" y="457" fill="#3a9860" font-size="8">HUD 갱신</text>
 
-<text x="389" y="496" text-anchor="middle" fill="#303040" font-size="8">scripts/common/screen_bounds.gd  —  Marshaller + Aircraft 공유  |  aircraft_signal_receiver.gd  —  AircraftFSM 전환 전 임시 브릿지 (미사용)</text>
+<text x="389" y="496" text-anchor="middle" fill="#303040" font-size="8">src/core/utils/screen_bounds.gd  —  Marshaller + Aircraft 공유 (카메라 가시 영역 계산)</text>
 </svg>
