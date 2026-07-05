@@ -40,9 +40,23 @@ src/
     aircraft/               비행기 로직 (이동/FSM/시야/충돌)
     marshaller/             마샬러 로직 (이동/입력/수신호)
   ui/                       HUD (수신호 표시, 게임오버, 성공)
-  debug/                    개발/디버그 도구 (시야 시각화, 프로젝트 설정 스크립트)
+  debug/                    개발/디버그 도구 (시야 시각화, FPS/버전 HUD, 프로젝트 설정)
+tests/                      단위 테스트 (자체 경량 하네스, 애드온 없음)
 docs/                       문서, 다이어그램
 ```
+
+### 테스트
+
+외부 애드온 없이 도는 경량 자체 하네스. `tests/tests.tscn` 을 실행하면 모든 테스트를 돌리고
+통과/실패를 출력한 뒤 실패 개수를 종료 코드로 반환한다 (CI 연동 가능).
+
+```bash
+godot --headless --path . res://tests/tests.tscn
+```
+
+- `screen_bounds` — 카메라 가시 영역 계산 (순수 함수)
+- `aircraft_vision_cone` — 시야 원뿔 각도/반경 판정 (상태 없는 기하)
+- `aircraft_fsm` — 신호 해석 상태 전이 (페이크 비행기/시야/수신호로 구동)
 
 ### 씬 계층 구조
 

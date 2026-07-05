@@ -15,6 +15,15 @@
 
 ## Log
 
+- 2026-07-05 [세션] 화면 경계 중복 제거(ScreenClamp 컴포넌트) + 단위 테스트 도입.
+	- src/core/utils/screen_clamp.gd: 부모 Node3D를 카메라 가시 영역으로 클램프하는 재사용 컴포넌트. aircraft.gd/marshaller_controller.gd에 복붙돼 있던 _update_bounds + 클램프 로직을 이 자식 노드 하나로 통합. Marshaller(edge_margin 0.5)/Aircraft(1.0)에 부착. 부모가 자식보다 먼저 _physics_process → 부모 이동 후 클램프되는 순서 보장.
+	- aircraft.gd/marshaller_controller.gd에서 경계 관련 코드 전부 제거(각 스크립트가 이동 로직만 남음).
+	- tests/: 외부 애드온 없는 경량 자체 테스트 하네스.
+	  - test_lib.gd(check/check_eq/check_almost/report), test_runner.gd(러너 + 페이크 노드), tests.tscn, fakes/fake_signal_input.gd.
+	  - 커버: screen_bounds(순수 계산), aircraft_vision_cone(각도/반경 기하), aircraft_fsm(상태 전이 — 페이크로 구동). 19개 단언.
+	  - 실행: godot --headless --path . res://tests/tests.tscn → 실패 개수를 종료 코드로 반환.
+	- [교훈] FSM 테스트가 주석-코드 불일치를 잡음: 주석엔 "시야 밖=무신호(멈칫)"였지만 실제 코드는 시야 밖이면 즉시 STOPPING(멈칫 없음)이었다. "유도자를 놓치면 지체 없이 정지"가 더 안전한 동작이라 코드를 정답으로 두고 주석을 정정.
+
 - 2026-07-05 [세션] DebugLayer에 디버그 오버레이(FPS + 버전) 추가.
 	- src/debug/debug_hud.gd: DebugRoot에 부착. 화면 우상단에 "v{버전} {FPS} FPS" 표시. ProjectSettings의 application/config/version을 읽음. process_mode=Always라 일시정지 중에도 갱신.
 	- project.godot에 config/version="0.1.0" 추가 (기존엔 없어서 0.0.0으로 표시됐음).
