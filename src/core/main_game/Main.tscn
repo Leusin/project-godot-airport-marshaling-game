@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://src/ui/success_hud.gd" id="12_success_hud_script"]
 [ext_resource type="Script" path="res://src/debug/debug_hud.gd" id="13_debug_hud_script"]
 [ext_resource type="Script" path="res://src/core/utils/screen_clamp.gd" id="14_screen_clamp_script"]
+[ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_marshaller"]
 radius = 0.3
@@ -106,7 +107,7 @@ script = ExtResource("6_signal_input_script")
 script = ExtResource("14_screen_clamp_script")
 edge_margin = 0.5
 
-[node name="Aircraft" type="Node3D" parent="World/EntityRoot"]
+[node name="Aircraft" type="Node3D" parent="World/EntityRoot" groups=["aircraft"]]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
 script = ExtResource("5_aircraft_script")
 
@@ -135,6 +136,9 @@ script = ExtResource("14_screen_clamp_script")
 edge_margin = 1.0
 
 [node name="EffectRoot" type="Node3D" parent="World"]
+
+[node name="CollisionDebugVisual" type="MeshInstance3D" parent="World"]
+script = ExtResource("15_collision_debug_script")
 
 [node name="HudLayer" type="CanvasLayer" parent="."]
 layer = 10

@@ -5,6 +5,7 @@ extends RefCounted
 
 const MARSHALLER := &"marshaller"
 const SIGNAL_INPUT := &"signal_input"
+const AIRCRAFT := &"aircraft"
 const AIRCRAFT_FSM := &"aircraft_fsm"
 const GAME_MANAGER := &"game_manager"
 const GAME_OVER_HUD := &"game_over_hud"

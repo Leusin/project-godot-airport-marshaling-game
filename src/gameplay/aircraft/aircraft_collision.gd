@@ -8,19 +8,17 @@ extends Node
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const Collision2D = preload("res://src/core/utils/collision_2d.gd")
+const CollisionShapes = preload("res://src/core/utils/collision_shapes.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
-
-## 메쉬를 못 찾았을 때 쓰는 기본 반크기 (지름 1m 정도).
-const DEFAULT_HALF_EXTENT := 0.5
 
 @onready var _aircraft: Node3D = get_parent()
 
 var _game_manager: Node
-var _self_half_extents := Vector2(DEFAULT_HALF_EXTENT, DEFAULT_HALF_EXTENT)  # 비행기 XZ 반크기 (메쉬에서 읽음)
+var _self_half_extents := Vector2.ZERO  # 비행기 XZ 반크기 (메쉬에서 읽음)
 
 func _ready() -> void:
 	_game_manager = SceneQuery.get_singleton(get_tree(), GameGroups.GAME_MANAGER, "AircraftCollision")
-	_self_half_extents = _mesh_half_extents_xz(_aircraft)
+	_self_half_extents = CollisionShapes.half_extents_xz(_aircraft)
 	# GameManager가 없으면 판정할 대상이 없으므로 물리 처리를 끈다 (경고는 위에서 출력됨).
 	set_physics_process(_game_manager != null)
 
@@ -47,7 +45,7 @@ func _physics_process(_delta: float) -> void:
 func _overlaps(center: Vector2, forward: Vector2, target: Node3D) -> bool:
 	return Collision2D.obb_overlap(
 		center, _self_half_extents, forward,
-		_to_xz(target.global_position), _mesh_half_extents_xz(target), Vector2(0.0, 1.0))
+		_to_xz(target.global_position), CollisionShapes.half_extents_xz(target), Vector2(0.0, 1.0))
 
 ## Vector3의 x, z 만 뽑아 XZ 평면 좌표로.
 func _to_xz(world_position: Vector3) -> Vector2:
@@ -57,20 +55,3 @@ func _to_xz(world_position: Vector3) -> Vector2:
 func _forward_xz(node: Node3D) -> Vector2:
 	var forward := -node.global_transform.basis.z
 	return Vector2(forward.x, forward.z).normalized()
-
-## 노드의 첫 MeshInstance3D를 찾아 그 메쉬의 XZ 반크기를 반환 (보이는 모델 크기에 맞춤).
-func _mesh_half_extents_xz(node: Node) -> Vector2:
-	var mesh_instance := _find_mesh_instance(node)
-	if mesh_instance == null or mesh_instance.mesh == null:
-		return Vector2(DEFAULT_HALF_EXTENT, DEFAULT_HALF_EXTENT)
-	var mesh_size := mesh_instance.mesh.get_aabb().size
-	return Vector2(mesh_size.x, mesh_size.z) * 0.5
-
-func _find_mesh_instance(node: Node) -> MeshInstance3D:
-	if node is MeshInstance3D:
-		return node
-	for child in node.get_children():
-		var found := _find_mesh_instance(child)
-		if found != null:
-			return found
-	return null
