@@ -6,6 +6,7 @@ extends Control
 const TestLib := preload("res://tests/test_lib.gd")
 const ScreenBounds := preload("res://src/core/utils/screen_bounds.gd")
 const Collision2D := preload("res://src/core/utils/collision_2d.gd")
+const CountdownScript := preload("res://src/core/utils/countdown.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
 const SignalInputScript := preload("res://src/gameplay/marshaller/signal_input.gd")
@@ -17,6 +18,7 @@ const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 func _ready() -> void:
 	var t := TestLib.new()
 	_test_screen_bounds(t)
+	_test_countdown(t)
 	_test_collision_2d(t)
 	_test_vision_cone(t)
 	_test_aircraft_fsm(t)
@@ -66,6 +68,26 @@ func _test_screen_bounds(t: TestLib) -> void:
 	t.check_almost(he.x, 10.0 * aspect, "half_width = half_height * aspect")
 
 	cam.queue_free()
+
+# ─────────────────────────────────────────────────────────
+# countdown: 프레임 폴링 카운트다운 (딜레이/멈칫 타이머의 공용 구현)
+func _test_countdown(t: TestLib) -> void:
+	t.start("countdown")
+	var c := CountdownScript.new()
+	t.check(not c.is_running(), "초기 상태: 안 돎")
+	t.check(not c.tick(0.1), "안 돌 때 tick → false")
+
+	c.start(1.0)
+	t.check(c.is_running(), "start 후 → 돎")
+	t.check(not c.tick(0.4), "진행 중 (0.6 남음) → false")
+	t.check(not c.tick(0.4), "진행 중 (0.2 남음) → false")
+	t.check(c.tick(0.4), "0 도달 프레임 → true (한 번만)")
+	t.check(not c.tick(0.1), "완료 후 → false")
+	t.check(not c.is_running(), "완료 후: 안 돎")
+
+	c.start(1.0)
+	c.stop()
+	t.check(not c.is_running(), "stop() → 즉시 멈춤")
 
 # ─────────────────────────────────────────────────────────
 # collision_2d: 모델 크기 기반 OBB/원 겹침 판정 (SAT). 회전이 결과를 바꾸는지 확인.

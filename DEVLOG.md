@@ -15,6 +15,13 @@
 
 ## Log
 
+- 2026-07-05 [세션] 손수 돌리던 타이머를 Countdown 유틸로 승격 + 로직 매직 넘버 상수화.
+	- src/core/utils/countdown.gd: 초 단위 카운트다운. tick(delta)가 0 도달 프레임에 한 번만 true. aircraft.gd(_pending_timer)와 aircraft_fsm.gd(_hesitate_timer)에 복붙돼 있던 `t -= delta; if t <= 0` 패턴을 대체.
+	  - Godot Timer 노드 대신 순수 함수 유틸 선택: FSM/비행기가 매 프레임 폴링 구조라 시그널 노드보다 잘 붙고, 헤드리스 테스트가 됨 (테스트 9개 추가).
+	- 매직 넘버 상수화: aircraft_fsm STOP_SPEED_EPSILON(0.05), aircraft_vision_cone COINCIDENT_EPSILON(0.001), aircraft_collision DEFAULT_HALF_EXTENT(0.5).
+	  - HUD 그리기 좌표/폰트 크기 같은 순수 레이아웃 상수는 의도적으로 그대로 둠 (다 상수화하면 오히려 잡음, 프로토타입엔 과함).
+	- 테스트 34/34 통과, 게임 정상.
+
 - 2026-07-05 [세션] 충돌을 원(거리) → 모델 크기 기반 사각형(OBB)으로 교체.
 	- 기존 aircraft_collision은 XZ 거리 + 고정 반지름(1.5)이라 2×3 비행기/1.5×1.5 장애물/3×3 주차를 원 하나로 뭉뚱그렸음. 사용자 요청으로 보이는 메쉬 크기에 맞춤.
 	- src/core/utils/collision_2d.gd: XZ 평면 SAT(분리축) OBB-OBB 겹침 + OBB-원 겹침. 순수 함수.
