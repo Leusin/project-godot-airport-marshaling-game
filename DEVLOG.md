@@ -15,6 +15,13 @@
 
 ## Log
 
+- 2026-07-05 [세션] 충돌을 원(거리) → 모델 크기 기반 사각형(OBB)으로 교체.
+	- 기존 aircraft_collision은 XZ 거리 + 고정 반지름(1.5)이라 2×3 비행기/1.5×1.5 장애물/3×3 주차를 원 하나로 뭉뚱그렸음. 사용자 요청으로 보이는 메쉬 크기에 맞춤.
+	- src/core/utils/collision_2d.gd: XZ 평면 SAT(분리축) OBB-OBB 겹침 + OBB-원 겹침. 순수 함수.
+	- aircraft_collision: 비행기를 회전하는 OBB(정면=-Z), 대상을 축정렬 사각형으로 보고 겹침 판정. 각 도형의 반크기는 노드의 MeshInstance3D 메쉬 AABB에서 읽어와 모델이 바뀌면 자동으로 따라감. hit_radius/park_radius export 제거.
+	- 테스트 6개 추가(collision_2d): 기본 겹침/분리, "정면이면 닿고 옆으로 돌면 안 닿음"으로 회전 반영 확인, 원 판정. 총 25/25 통과.
+	- [참고] Godot 물리(Area3D) 대신 수동 SAT 유지 — 예전에 Area3D 시그널 불안정으로 걷어낸 경로라서. 순수 함수라 헤드리스 테스트도 가능.
+
 - 2026-07-05 [세션] 테스트 결과 씬 출력 + 그룹 조회 널 가드/싱글턴 정리.
 	- tests: 창 모드(에디터 F6)면 결과를 씬 화면(RichTextLabel, 색상 BBCode)에 렌더, 헤드리스(run_tests.ps1/CI)면 콘솔 출력 + 실패 수를 종료 코드로. DisplayServer.get_name()=="headless"로 분기.
 	  - test_lib은 결과를 누적만 하도록 바꾸고(출력은 러너가 담당), tests.tscn을 Control+ColorRect+RichTextLabel 구조로 교체.

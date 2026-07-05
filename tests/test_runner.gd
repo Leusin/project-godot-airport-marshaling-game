@@ -5,6 +5,7 @@ extends Control
 
 const TestLib := preload("res://tests/test_lib.gd")
 const ScreenBounds := preload("res://src/core/utils/screen_bounds.gd")
+const Collision2D := preload("res://src/core/utils/collision_2d.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
 const SignalInputScript := preload("res://src/gameplay/marshaller/signal_input.gd")
@@ -16,6 +17,7 @@ const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 func _ready() -> void:
 	var t := TestLib.new()
 	_test_screen_bounds(t)
+	_test_collision_2d(t)
 	_test_vision_cone(t)
 	_test_aircraft_fsm(t)
 
@@ -64,6 +66,31 @@ func _test_screen_bounds(t: TestLib) -> void:
 	t.check_almost(he.x, 10.0 * aspect, "half_width = half_height * aspect")
 
 	cam.queue_free()
+
+# ─────────────────────────────────────────────────────────
+# collision_2d: 모델 크기 기반 OBB/원 겹침 판정 (SAT). 회전이 결과를 바꾸는지 확인.
+func _test_collision_2d(t: TestLib) -> void:
+	t.start("collision_2d")
+	var fz := Vector2(0.0, 1.0)
+
+	t.check(Collision2D.obb_overlap(Vector2.ZERO, Vector2(1, 1), fz, Vector2.ZERO, Vector2(1, 1), fz),
+		"같은 위치 → 겹침")
+	t.check(not Collision2D.obb_overlap(Vector2.ZERO, Vector2(1, 1), fz, Vector2(5, 0), Vector2(1, 1), fz),
+		"멀리 → 안 겹침")
+
+	# 2×3 비행기 코앞 2.0 지점의 0.75×0.75 장애물: 정면이면 닿고, 옆으로 돌면 안 닿음
+	var plane_half := Vector2(1.0, 1.5)
+	var obs := Vector2(0.0, 2.0)
+	var obs_half := Vector2(0.75, 0.75)
+	t.check(Collision2D.obb_overlap(Vector2.ZERO, plane_half, Vector2(0, 1), obs, obs_half, fz),
+		"정면이 장애물 향함 → 겹침")
+	t.check(not Collision2D.obb_overlap(Vector2.ZERO, plane_half, Vector2(1, 0), obs, obs_half, fz),
+		"옆으로 돌면 → 안 겹침 (회전 반영)")
+
+	t.check(Collision2D.obb_circle_overlap(Vector2.ZERO, Vector2(1, 1), fz, Vector2(1.2, 0), 0.3),
+		"원이 모서리 근처 → 겹침")
+	t.check(not Collision2D.obb_circle_overlap(Vector2.ZERO, Vector2(1, 1), fz, Vector2(1.4, 0), 0.3),
+		"원이 멀면 → 안 겹침")
 
 # ─────────────────────────────────────────────────────────
 # vision_cone: 정면(-Z) 기준 좌우 half_angle + 반경 판정 (상태 없는 기하)
