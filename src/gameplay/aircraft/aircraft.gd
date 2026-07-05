@@ -3,6 +3,8 @@ extends Node3D
 ## 신호 해석/오인식은 AircraftFSM이 담당하고, 여기서는 Command를 받아 물리적으로만 반영한다.
 ## 화면 경계 클램프는 자식 ScreenClamp 컴포넌트가 담당한다.
 
+const CountdownScript = preload("res://src/core/utils/countdown.gd")
+
 enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 
 @export var max_speed: float = 3.0
@@ -13,7 +15,7 @@ enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 
 var _active_command: Command = Command.STOP
 var _pending_command: Command = Command.STOP
-var _pending_timer: float = 0.0
+var _delay := CountdownScript.new()
 var _current_speed: float = 0.0
 
 func get_speed() -> float:
@@ -23,13 +25,11 @@ func issue_command(command: Command) -> void:
 	if command == _pending_command:
 		return
 	_pending_command = command
-	_pending_timer = command_delay
+	_delay.start(command_delay)
 
 func _physics_process(delta: float) -> void:
-	if _pending_timer > 0.0:
-		_pending_timer = maxf(_pending_timer - delta, 0.0)
-		if _pending_timer == 0.0:
-			_active_command = _pending_command
+	if _delay.tick(delta):
+		_active_command = _pending_command
 
 	var target_speed := max_speed if _active_command == Command.ADVANCE else 0.0
 	if target_speed > _current_speed:

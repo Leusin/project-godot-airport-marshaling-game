@@ -9,10 +9,13 @@ extends Node
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const Collision2D = preload("res://src/core/utils/collision_2d.gd")
 
+## 메쉬를 못 찾았을 때 쓰는 기본 반크기 (지름 1m 정도).
+const DEFAULT_HALF_EXTENT := 0.5
+
 @onready var _aircraft: Node3D = get_parent()
 
 var _game_manager: Node
-var _self_half: Vector2 = Vector2(0.5, 0.5)  # 비행기 XZ 반크기 (메쉬에서 읽음)
+var _self_half := Vector2(DEFAULT_HALF_EXTENT, DEFAULT_HALF_EXTENT)  # 비행기 XZ 반크기 (메쉬에서 읽음)
 
 func _ready() -> void:
 	_game_manager = SceneQuery.get_singleton(get_tree(), "game_manager", "AircraftCollision")
@@ -57,7 +60,7 @@ func _xz_forward(node: Node3D) -> Vector2:
 func _xz_half_extents(node: Node) -> Vector2:
 	var mesh_instance := _find_mesh_instance(node)
 	if mesh_instance == null or mesh_instance.mesh == null:
-		return Vector2(0.5, 0.5)
+		return Vector2(DEFAULT_HALF_EXTENT, DEFAULT_HALF_EXTENT)
 	var size := mesh_instance.mesh.get_aabb().size
 	return Vector2(size.x, size.z) * 0.5
 

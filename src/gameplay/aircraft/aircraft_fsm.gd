@@ -9,6 +9,10 @@ extends Node
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
 const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
+const CountdownScript = preload("res://src/core/utils/countdown.gd")
+
+## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
+const STOP_SPEED_EPSILON := 0.05
 
 enum State { IDLE, MOVING, HESITATING, STOPPING }
 
@@ -29,7 +33,7 @@ func _ready() -> void:
 		set_process(false)
 
 var _state: State = State.IDLE
-var _hesitate_timer: float = 0.0
+var _hesitate := CountdownScript.new()
 var _last_move_command: AircraftScript.Command = AircraftScript.Command.ADVANCE
 
 func _process(delta: float) -> void:
@@ -73,8 +77,7 @@ func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: boo
 		_state = State.MOVING
 		return
 
-	_hesitate_timer = maxf(_hesitate_timer - delta, 0.0)
-	if _hesitate_timer == 0.0:
+	if _hesitate.tick(delta):
 		_enter_stopping()
 
 func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
@@ -83,7 +86,7 @@ func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
 		_last_move_command = _to_command(hand_signal)
 		_enter_moving()
 		return
-	if aircraft.get_speed() < 0.05:
+	if aircraft.get_speed() < STOP_SPEED_EPSILON:
 		_state = State.IDLE
 
 func _enter_moving() -> void:
@@ -92,7 +95,7 @@ func _enter_moving() -> void:
 
 func _enter_hesitating() -> void:
 	_state = State.HESITATING
-	_hesitate_timer = hesitate_duration
+	_hesitate.start(hesitate_duration)
 
 func _enter_stopping() -> void:
 	_state = State.STOPPING
