@@ -4,12 +4,11 @@ extends Control
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
 
-@export var signal_input_path: NodePath
-
+# SignalInput은 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 var _signal_input: SignalInputScript
 
 func _ready() -> void:
-	_signal_input = get_node(signal_input_path)
+	_signal_input = get_tree().get_first_node_in_group("signal_input")
 
 func _process(_delta: float) -> void:
 	queue_redraw()

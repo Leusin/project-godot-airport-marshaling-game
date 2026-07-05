@@ -15,6 +15,17 @@
 
 ## Log
 
+- 2026-07-05 [결정] 씬 계층 구조를 표준 레이어 트리로 재편.
+	- 기존 평평한 root(Node3D) 아래 모든 노드 나열 → MainGame(Always) / Systems / World(Pausable) / HudLayer / PauseLayer / TransitionLayer / DebugLayer 로 재편.
+	- World 아래 LevelRoot(배경: Ground/Obstacle/ParkingSpot) / EntityRoot(핵심: Marshaller/Aircraft) / EffectRoot(향후 효과) 로 분리. TopDownCamera는 World 직속.
+	- CanvasLayer 레이어 번호: HudLayer=10, PauseLayer=20, TransitionLayer=100, DebugLayer=128. 각 Layer 아래 *Root(Control, mouse_filter=Ignore) 를 두고 그 밑에 UI 배치.
+	- Pause/Transition/Debug 는 Process Mode Always, World/HudLayer 는 Pausable → 게임오버/성공 시 tree.paused=true 로 World가 멈춰도 오버레이(각 노드 process_mode=Always)는 계속 동작.
+	- 크로스 트리 참조를 계층 경로(get_parent().get_parent().get_node()) → 그룹 조회(get_tree().get_first_node_in_group / get_nodes_in_group)로 전환. 그룹: game_manager, marshaller, signal_input, game_over_hud, success_hud, obstacle, parking. 트리 위치에 독립적이고 다중 배치도 지원.
+	- 거리 기반 감지로 이미 미사용이던 Area3D 히트박스 + CollisionShape(마샬러/장애물/주차) 제거, 그룹을 엔티티 루트 노드에 직접 부착. 관련 미사용 sub_resource도 정리.
+	- GameOverHUD/SuccessHUD: HudRoot(full-rect) 아래 full-rect 앵커로 자동 사이징 → _ready의 수동 size 설정 + size_changed 연결 제거 (앵커 경고 해소).
+	- 템플릿의 "BehaviorRecursive Disabled"는 표준 Godot 속성이 아니라 생략, "Layer 0"(World)은 3D 노드라 무의미해 생략.
+	- run_project로 참조 깨짐/경고 없음 확인.
+
 - 2026-07-05 [결정] 폴더 구조를 src/ 트리로 재편.
 	- 기존 scenes/ + 평평한 scripts/ 구조 → src/{core,gameplay,ui,debug} 로 역할별 분리.
 	- src/core/main_game(Main.tscn, game_manager.gd), src/core/utils(screen_bounds.gd), src/gameplay/aircraft, src/gameplay/marshaller, src/ui, src/debug(vision_cone_debug_visual, apply_project_settings).

@@ -14,8 +14,14 @@ enum State { IDLE, MOVING, HESITATING, STOPPING }
 
 @onready var aircraft: Node3D = get_parent()
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
-@onready var marshaller: Node3D = get_parent().get_parent().get_node("Marshaller")
-@onready var signal_input: SignalInputScript = marshaller.get_node("SignalInput")
+
+# 마샬러/수신호는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
+var marshaller: Node3D
+var signal_input: SignalInputScript
+
+func _ready() -> void:
+	marshaller = get_tree().get_first_node_in_group("marshaller")
+	signal_input = get_tree().get_first_node_in_group("signal_input")
 
 var _state: State = State.IDLE
 var _hesitate_timer: float = 0.0

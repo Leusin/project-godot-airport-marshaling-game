@@ -6,11 +6,14 @@ const SEGMENTS := 24
 const VISUAL_HEIGHT := 0.05
 
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
-@onready var marshaller: Node3D = get_parent().get_parent().get_node("Marshaller")
+
+# 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
+var marshaller: Node3D
 
 var _material := StandardMaterial3D.new()
 
 func _ready() -> void:
+	marshaller = get_tree().get_first_node_in_group("marshaller")
 	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_material.cull_mode = BaseMaterial3D.CULL_DISABLED

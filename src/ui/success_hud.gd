@@ -1,16 +1,10 @@
 extends Control
 ## 유도 성공 시 전체화면 오버레이.
-## CanvasLayer는 자식 Control에 크기를 주지 않으므로 _ready에서 viewport 크기로 직접 설정.
+## HudRoot(full-rect Control) 아래에서 full-rect 앵커로 뷰포트 크기를 자동으로 따라간다.
 
 func _ready() -> void:
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_fit_to_viewport()
-	get_viewport().size_changed.connect(_fit_to_viewport)
-
-func _fit_to_viewport() -> void:
-	position = Vector2.ZERO
-	size = get_viewport().get_visible_rect().size
 
 func _process(_delta: float) -> void:
 	if visible:
