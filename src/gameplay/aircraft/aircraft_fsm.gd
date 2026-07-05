@@ -3,7 +3,8 @@ extends Node
 ## IDLE -> MOVING -> HESITATING -> STOPPING -> IDLE 전이.
 ## NONE(무신호): 이동 중이면 hesitate_duration만큼 멈칫(계속 이동)하다가 정지.
 ## STOP(명확한 정지): 즉시 정지 시작. NONE과 달리 멈칫 없음.
-## 시야 밖 신호는 NONE으로 처리 (마샬러가 보이지 않으면 무신호와 동일).
+## 시야 밖: 마샬러를 놓치면 즉시 STOPPING (in-view 무신호의 멈칫보다 엄격 — 지체 없이 정지).
+##   또한 IDLE에서는 시야 밖이면 이동 신호를 받아도 출발하지 않는다.
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
 const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
