@@ -14,7 +14,12 @@ const CountdownScript = preload("res://src/core/utils/countdown.gd")
 ## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
 const STOP_SPEED_EPSILON := 0.05
 
-enum State { IDLE, MOVING, HESITATING, STOPPING }
+enum State {
+	IDLE,
+	MOVING,
+	HESITATING,
+	STOPPING,
+}
 
 @export var hesitate_duration: float = 1.0
 
