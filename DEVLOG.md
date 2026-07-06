@@ -15,6 +15,13 @@
 
 ## Log
 
+- 2026-07-06 [세션] 확정 연출에 유예 구간 추가 (스페이스 → 포즈 → 1초 뒤 성공 HUD).
+	- game_manager.gd: is_confirming_shutdown 상태 + Countdown(SHUTDOWN_CONFIRM_DELAY=1.0) 추가. begin_shutdown_confirm()이 확정 버튼 누른 순간 호출되어 유예를 시작하고, _process에서 카운트다운이 끝나면 그제서야 trigger_success() 실행(성공 HUD 표시 + 일시정지).
+	- aircraft_collision.gd: 확정 버튼 감지 시 trigger_success() 직접 호출 대신 begin_shutdown_confirm() 호출로 변경.
+	- marshaller_sprite.gd: 엔진정지 포즈 표시 조건을 is_awaiting_shutdown_confirm(대기 중, 스페이스 누르기 전) -> is_confirming_shutdown(스페이스 누른 직후 유예 구간)으로 변경. 이제 포즈는 실제로 버튼을 누른 순간부터만 보임.
+	- HUD의 확정 아이콘 프롬프트(하단)는 기존대로 is_awaiting_shutdown_confirm 기준 유지 — "지금 스페이스를 눌러도 된다"는 안내이므로 대기 중부터 보이는 게 맞음. 마샬러의 실제 포즈만 버튼을 누른 뒤로 미뤄짐.
+	- 테스트 38/38 유지.
+
 - 2026-07-06 [세션] 주차 성공을 즉시 판정 -> 확정 버튼(스페이스) 방식으로 변경.
 	- project.godot: signal_shutdown 입력 액션 추가 (스페이스바, physical_keycode 32).
 	- signal_input.gd: is_shutdown_confirm_pressed() 추가. 이동 신호(SignalType/get_signal)와는 별개 메서드로 분리 — 확정은 "누르는 순간"만 의미 있는 단발 입력이라 FSM의 hold 방식 제스처와 섞이면 안 됨.
