@@ -17,7 +17,6 @@
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 [ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
 [ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_sprite.gd" id="17_marshaller_sprite_script"]
-[ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_direction_arrow.gd" id="18_marshaller_direction_arrow_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -85,13 +84,6 @@ pixel_size = 0.006
 billboard = 1
 texture_filter = 0
 script = ExtResource("17_marshaller_sprite_script")
-
-[node name="MarshallerDirectionArrow" type="Sprite3D" parent="World/EntityRoot/Marshaller"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
-pixel_size = 0.004
-billboard = 1
-texture_filter = 0
-script = ExtResource("18_marshaller_direction_arrow_script")
 
 [node name="MoveInput" type="Node" parent="World/EntityRoot/Marshaller"]
 script = ExtResource("2_move_input_script")
