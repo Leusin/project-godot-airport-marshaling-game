@@ -15,6 +15,14 @@
 
 ## Log
 
+- 2026-07-06 [세션] 주차 성공을 즉시 판정 -> 확정 버튼(스페이스) 방식으로 변경.
+	- project.godot: signal_shutdown 입력 액션 추가 (스페이스바, physical_keycode 32).
+	- signal_input.gd: is_shutdown_confirm_pressed() 추가. 이동 신호(SignalType/get_signal)와는 별개 메서드로 분리 — 확정은 "누르는 순간"만 의미 있는 단발 입력이라 FSM의 hold 방식 제스처와 섞이면 안 됨.
+	- game_manager.gd: is_awaiting_shutdown_confirm bool 추가. AircraftCollision이 매 프레임 갱신, HUD가 읽어서 표시를 바꾼다.
+	- aircraft_collision.gd: 비행기가 주차존에 완전히 들어와도(_fully_within) 더 이상 즉시 trigger_success() 하지 않고, "확정 대기" 상태만 세팅. 그 상태에서 확정 버튼이 눌려야 실제 성공 처리. 비행기가 다시 나가면 매 프레임 재계산이라 자동으로 평소 상태로 복귀.
+	- signal_indicator_hud.gd: 확정 대기 상태면 하단 신호 목록 대신 확정(엔진 정지 아이콘, signal_shutdown.png) 하나만 표시.
+	- 테스트 38/38 유지(신규 로직은 씬 트리/입력 의존이라 순수 함수 테스트 대상 아님, 실행으로 검증).
+
 - 2026-07-06 [세션] 판정 난이도 완화: 주차존 확대 + 마샬러 원형 히트박스.
 	- ParkingSpot BoxMesh 3.0×3.0 -> 4.5×4.5. 비행기 풋프린트(~2.71×2.74) 대비 여유가 0.15~0.3 → 0.9~1.0 정도로 넉넉해짐. 완전 포함 판정(obb_within_aabb)은 그대로.
 	- aircraft_collision: 마샬러 충돌을 사각형(OBB-AABB) 대신 원(MARSHALLER_HIT_RADIUS=0.45)으로 변경. 마샬러가 이제 3D 모델이 아니라 빌보드 스프라이트라 메쉬 크기를 못 읽어 CollisionShapes 기본값(0.5×0.5 사각형)으로 판정되던 걸, 실제로 사람 판정에 더 자연스러운 원으로 명시.
