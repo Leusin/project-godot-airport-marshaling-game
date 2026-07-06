@@ -15,6 +15,11 @@
 
 ## Log
 
+- 2026-07-06 [세션] 판정 난이도 완화: 주차존 확대 + 마샬러 원형 히트박스.
+	- ParkingSpot BoxMesh 3.0×3.0 -> 4.5×4.5. 비행기 풋프린트(~2.71×2.74) 대비 여유가 0.15~0.3 → 0.9~1.0 정도로 넉넉해짐. 완전 포함 판정(obb_within_aabb)은 그대로.
+	- aircraft_collision: 마샬러 충돌을 사각형(OBB-AABB) 대신 원(MARSHALLER_HIT_RADIUS=0.45)으로 변경. 마샬러가 이제 3D 모델이 아니라 빌보드 스프라이트라 메쉬 크기를 못 읽어 CollisionShapes 기본값(0.5×0.5 사각형)으로 판정되던 걸, 실제로 사람 판정에 더 자연스러운 원으로 명시.
+	- 장애물 충돌은 기존 사각형(OBB-OBB) 겹침 그대로.
+
 - 2026-07-06 [세션] 주차 판정을 "겹침"에서 "완전 포함"으로 강화.
 	- collision_2d.gd: obb_corners(회전 OBB의 네 꼭짓점) + obb_within_aabb(그 꼭짓점이 모두 축정렬 사각형 안에 있는지) 추가.
 	- aircraft_collision.gd: parking 그룹만 _overlaps 대신 _fully_within 사용 (마샬러/장애물 충돌은 기존 겹침 판정 유지). 비행기가 주차존에 일부만 걸치면 실패, 완전히 들어와야 성공.
