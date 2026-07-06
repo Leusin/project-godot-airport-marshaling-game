@@ -3,7 +3,7 @@ extends Node
 ## (Node3D 부모를 직접 이동시키는 구조에서 Area3D entered 시그널이 불안정해 직접 판정한다.)
 ## 비행기는 회전하는 사각형(OBB), 대상은 축정렬 사각형으로 보고 SAT로 겹침 판정.
 ## 대상은 씬 계층 경로가 아니라 그룹으로 찾는다 (트리 위치에 독립적, 다중 배치 지원).
-##   parking  그룹 겹침 -> 유도 성공
+##   parking  그룹: 비행기가 완전히 들어와야(포함) 유도 성공
 ##   marshaller / obstacle 그룹 겹침 -> 게임 오버
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
@@ -27,7 +27,7 @@ func _physics_process(_delta: float) -> void:
 	var forward := _forward_xz(_aircraft)
 
 	for parking_spot in get_tree().get_nodes_in_group(GameGroups.PARKING):
-		if _overlaps(center, forward, parking_spot):
+		if _fully_within(center, forward, parking_spot):
 			_game_manager.trigger_success()
 			return
 
@@ -46,6 +46,12 @@ func _overlaps(center: Vector2, forward: Vector2, target: Node3D) -> bool:
 	return Collision2D.obb_overlap(
 		center, _self_half_extents, forward,
 		_to_xz(target.global_position), CollisionShapes.half_extents_xz(target), Vector2(0.0, 1.0))
+
+## 비행기(OBB)가 대상(축정렬 사각형) 안에 완전히 들어와 있는지. 대상은 회전 안 한다고 봄.
+func _fully_within(center: Vector2, forward: Vector2, target: Node3D) -> bool:
+	return Collision2D.obb_within_aabb(
+		center, _self_half_extents, forward,
+		_to_xz(target.global_position), CollisionShapes.half_extents_xz(target))
 
 ## Vector3의 x, z 만 뽑아 XZ 평면 좌표로.
 func _to_xz(world_position: Vector3) -> Vector2:

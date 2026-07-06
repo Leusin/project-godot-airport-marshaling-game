@@ -25,3 +25,23 @@ static func obb_circle_overlap(
 	var local := Vector2(offset.dot(right), offset.dot(forward))
 	var closest := Vector2(clampf(local.x, -half_extents.x, half_extents.x), clampf(local.y, -half_extents.y, half_extents.y))
 	return local.distance_to(closest) <= radius
+
+## 회전하는 OBB의 네 꼭짓점 (월드 좌표).
+static func obb_corners(center: Vector2, half_extents: Vector2, forward: Vector2) -> PackedVector2Array:
+	var right := Vector2(forward.y, -forward.x)
+	return PackedVector2Array([
+		center - right * half_extents.x - forward * half_extents.y,
+		center + right * half_extents.x - forward * half_extents.y,
+		center + right * half_extents.x + forward * half_extents.y,
+		center - right * half_extents.x + forward * half_extents.y,
+	])
+
+## 회전하는 OBB가 축정렬 사각형(AABB) 안에 완전히 들어와 있는지 (네 꼭짓점 모두 포함되는지로 판정).
+static func obb_within_aabb(
+		center: Vector2, half_extents: Vector2, forward: Vector2,
+		aabb_center: Vector2, aabb_half_extents: Vector2) -> bool:
+	for corner in obb_corners(center, half_extents, forward):
+		var local := corner - aabb_center
+		if absf(local.x) > aabb_half_extents.x or absf(local.y) > aabb_half_extents.y:
+			return false
+	return true
