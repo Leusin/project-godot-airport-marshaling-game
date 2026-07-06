@@ -15,6 +15,15 @@
 
 ## Log
 
+- 2026-07-06 [세션] 카메라 원근(Perspective) 전환 + HUD 신호 목록을 하단으로 이동.
+	- TopDownCamera: projection=ORTHOGONAL(size=20) → PERSPECTIVE(fov=45). 원근감 부재 문제 해결.
+	- 문제: 기존 screen_bounds/screen_clamp는 직교 카메라 + 월드원점 중심 가정이라 원근 전환 시 그대로 깨짐.
+	- screen_bounds.gd: compute_ground_frustum(camera, viewport) 추가. 카메라 틸트/원근을 반영해 y=0 지면과 만나는 실제 가시 영역을 계산 (원근은 근거리 변 기준 폭으로 안전한 내접 사각형, 직교는 1/cos(tilt) 보정). 중심(center)과 half_extents를 함께 반환 — 틸트된 카메라는 가시 영역 중심이 월드 원점이 아니므로 필수.
+	- screen_clamp.gd: 월드원점 대칭 클램프 → center 기준 클램프로 변경.
+	- 기존 compute_half_extents(직교 전용, center 없음)는 테스트 호환을 위해 유지.
+	- signal_indicator_hud.gd: 신호 목록 줄을 화면 정중앙(게임 시야 가림) → 화면 하단 중앙으로 이동. "동작할 수 있는 신호를 중앙에 나열"은 가로 중앙 정렬을 의미한 것이었지 화면 세로 중앙은 아니었음.
+	- 검증: 실행 중 디버그 출력으로 center=(0,-2.48), half=(~11,~9) 확인 (기존 장애물/주차/스폰 위치를 모두 포함하는 타당한 범위). 테스트 34/34, 게임 무오류.
+
 - 2026-07-05 [세션] 충돌 박스 디버그 시각화 추가.
 	- src/core/utils/collision_shapes.gd: 노드 메쉬 AABB에서 XZ 반크기를 뽑는 헬퍼를 aircraft_collision에서 분리. 판정과 시각화가 같은 소스를 쓰게 함 → "그려진 박스 = 실제 판정 범위" 보장.
 	- src/debug/collision_debug_visual.gd (World 아래 MeshInstance3D): ImmediateMesh 선으로 매 프레임 충돌 사각형을 바닥 위에 그림. 비행기=회전 OBB(시안), 주차=초록, 장애물/마샬러=빨강. 개발 빌드 전용, 백틱(toggle_debug)으로 토글, process_mode=Always(정지 중에도 토글/표시).

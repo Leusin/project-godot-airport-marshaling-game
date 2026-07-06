@@ -14,6 +14,7 @@ const TOP_ICON_SIZE := 110.0
 const TOP_MARGIN := 20.0
 const ROW_ICON_SIZE := 70.0
 const ROW_GAP := 14.0
+const ROW_BOTTOM_MARGIN := 24.0
 
 # 화면 중앙에 나열할 순서 (게임플레이에서 실제로 가능한 신호)
 const ROW_SIGNALS: Array = [
@@ -51,10 +52,10 @@ func _draw() -> void:
 	var top_rect := Rect2(size.x / 2.0 - TOP_ICON_SIZE / 2.0, TOP_MARGIN, TOP_ICON_SIZE, TOP_ICON_SIZE)
 	_draw_icon(top_rect, current, 1.0)
 
-	# 화면 중앙: 가능한 모든 신호 나열, 현재 신호만 강조
+	# 하단 중앙: 가능한 모든 신호를 가로로 나열, 현재 신호만 강조 (화면 정중앙은 시야를 가려 하단으로 배치)
 	var total_width := ROW_SIGNALS.size() * ROW_ICON_SIZE + (ROW_SIGNALS.size() - 1) * ROW_GAP
 	var start_x := size.x / 2.0 - total_width / 2.0
-	var row_y := size.y / 2.0 - ROW_ICON_SIZE / 2.0
+	var row_y := size.y - ROW_ICON_SIZE - ROW_BOTTOM_MARGIN
 	for i in ROW_SIGNALS.size():
 		var sig: SignalInputScript.SignalType = ROW_SIGNALS[i]
 		var is_active := sig == current
