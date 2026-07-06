@@ -15,6 +15,12 @@
 
 ## Log
 
+- 2026-07-06 [세션] 레벨이 전체적으로 어두운 문제 해결 (조명/환경 자체가 없었음).
+	- 원인: 씬에 Light 노드도 WorldEnvironment도 전혀 없어서, 지면/장애물/비행기 등 셰이딩되는 StandardMaterial3D가 빛을 전혀 못 받아 거의 검게 렌더링되고 있었음.
+	- Sun(DirectionalLight3D) 추가 (카메라와 같은 30도 틸트, light_energy 1.1, shadow_enabled).
+	- level_lighting.gd(WorldEnvironment에 부착): Environment를 코드로 구성(배경색 + 컬러 앰비언트). .tscn에 Environment enum을 raw int로 적으면 값 실수 위험이 있어, Environment.BG_COLOR/AMBIENT_SOURCE_COLOR처럼 이름으로 참조해 엔진이 보장하는 값만 쓰도록 함.
+	- 마샬러 Sprite3D는 기본적으로 unshaded라 조명 영향을 안 받음 — 그림판으로 그린 플랫컬러가 조명 때문에 탁해지는 일 없음.
+
 - 2026-07-06 [세션] 확정 연출에 유예 구간 추가 (스페이스 → 포즈 → 1초 뒤 성공 HUD).
 	- game_manager.gd: is_confirming_shutdown 상태 + Countdown(SHUTDOWN_CONFIRM_DELAY=1.0) 추가. begin_shutdown_confirm()이 확정 버튼 누른 순간 호출되어 유예를 시작하고, _process에서 카운트다운이 끝나면 그제서야 trigger_success() 실행(성공 HUD 표시 + 일시정지).
 	- aircraft_collision.gd: 확정 버튼 감지 시 trigger_success() 직접 호출 대신 begin_shutdown_confirm() 호출로 변경.

@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 [ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
 [ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_sprite.gd" id="17_marshaller_sprite_script"]
+[ext_resource type="Script" path="res://src/core/main_game/level_lighting.gd" id="19_level_lighting_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -51,6 +52,14 @@ process_mode = 1
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 16.0, 9.0)
 current = true
 fov = 45.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+script = ExtResource("19_level_lighting_script")
+
+[node name="Sun" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 10, 0)
+light_energy = 1.1
+shadow_enabled = true
 
 [node name="LevelRoot" type="Node3D" parent="World"]
 
