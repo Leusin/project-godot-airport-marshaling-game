@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpokraykrp6j0"
-path="res://.godot/imported/marshaller_placeholder.svg-bab3f4d045ad0e81e855b69fd1a9d970.ctex"
+uid="uid://uajacduvqmjg"
+path="res://.godot/imported/signal_turn_right.png-66810419f6a9f898d0fca9151665a5e5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/marshaller_placeholder.svg"
-dest_files=["res://.godot/imported/marshaller_placeholder.svg-bab3f4d045ad0e81e855b69fd1a9d970.ctex"]
+source_file="res://assets/sprites/marshaller/signal_turn_right.png"
+dest_files=["res://.godot/imported/signal_turn_right.png-66810419f6a9f898d0fca9151665a5e5.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

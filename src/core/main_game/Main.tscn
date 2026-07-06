@@ -16,7 +16,7 @@
 [ext_resource type="Script" path="res://src/core/utils/screen_clamp.gd" id="14_screen_clamp_script"]
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 [ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
-[ext_resource type="Texture2D" path="res://assets/sprites/marshaller_placeholder.svg" id="17_marshaller_sprite"]
+[ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_sprite.gd" id="17_marshaller_sprite_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -83,7 +83,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0)
 pixel_size = 0.006
 billboard = 1
 texture_filter = 0
-texture = ExtResource("17_marshaller_sprite")
+script = ExtResource("17_marshaller_sprite_script")
 
 [node name="MoveInput" type="Node" parent="World/EntityRoot/Marshaller"]
 script = ExtResource("2_move_input_script")
