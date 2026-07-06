@@ -1,0 +1,19 @@
+<svg viewBox="0 0 140 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- 임시 마샬러 플레이스홀더 (정면). 나중에 실제 스프라이트로 교체 -->
+  <!-- 다리 -->
+  <rect x="56" y="182" width="13" height="84" rx="3" fill="#20293a"/>
+  <rect x="71" y="182" width="13" height="84" rx="3" fill="#20293a"/>
+  <!-- 팔 (A 포즈) -->
+  <path d="M58 112 L24 176" stroke="#f27208" stroke-width="15" stroke-linecap="round"/>
+  <path d="M82 112 L116 176" stroke="#f27208" stroke-width="15" stroke-linecap="round"/>
+  <!-- 몸통(하이비스 조끼) -->
+  <rect x="47" y="96" width="46" height="94" rx="7" fill="#f27208"/>
+  <!-- 머리 -->
+  <circle cx="70" cy="60" r="27" fill="#cc9a72"/>
+  <!-- 손 -->
+  <circle cx="23" cy="178" r="10" fill="#cc9a72"/>
+  <circle cx="117" cy="178" r="10" fill="#cc9a72"/>
+  <!-- 마샬링 배트(패널) -->
+  <rect x="6" y="150" width="28" height="44" rx="4" fill="#ffd60a" stroke="#c9a400" stroke-width="2.5"/>
+  <rect x="106" y="150" width="28" height="44" rx="4" fill="#ffd60a" stroke="#c9a400" stroke-width="2.5"/>
+</svg>
