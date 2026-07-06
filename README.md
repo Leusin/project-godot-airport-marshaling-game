@@ -160,7 +160,9 @@ MainGame (Node)                  앱 루트. Process Mode = Always
   - [x] GameOverHUD: 전체화면 오버레이 표시
 - [x] A->B 유도 목표 및 성공/실패 판정
   - [x] ParkingSpot: 목표 주차 지점 (초록 박스, parking 그룹)
-  - [x] 비행기가 ParkingSpot 근접 거리 안에 들어오면 → 유도 성공
+  - [x] 비행기가 ParkingSpot에 완전히 들어오면(포함 판정) → "확정 대기" 상태
+  - [x] 확정 대기 중 마샬러가 확정 버튼(스페이스, signal_shutdown)을 누르면 → 유도 성공 확정
+  - [x] 확정 대기 중에는 하단 신호 목록 대신 확정 아이콘 하나만 표시
   - [x] SuccessHUD: 초록 오버레이 + "유도 성공!" 텍스트
   - [x] 성공/실패 모두 엔터 / ESC 로 재시작
 

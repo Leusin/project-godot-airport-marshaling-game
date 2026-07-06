@@ -15,3 +15,8 @@ func get_signal() -> SignalType:
 	if Input.is_action_pressed("signal_down"):
 		return SignalType.STOP
 	return SignalType.NONE
+
+## 엔진 정지(목 긋기) 확정 버튼. 이동 신호(SignalType)와는 별개로, 주차 확정처럼
+## "누르는 순간"만 의미 있는 단발성 입력이라 별도 메서드로 분리한다.
+func is_shutdown_confirm_pressed() -> bool:
+	return Input.is_action_just_pressed("signal_shutdown")
