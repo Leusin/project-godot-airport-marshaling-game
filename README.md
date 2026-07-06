@@ -17,7 +17,7 @@ Godot 4.7 / GDScript / 3D 탑다운 시뮬레이션 (카메라만 탑뷰, 노드
 * 수신호 입력 (전진/정지/좌우회전), 시야 안에서만 인식, hold-to-move
   * 마샬러 이동(WASD)과 수신호(방향키)를 분리 — ↑전진, ←좌회전, →우회전, ↓정지, 모두 누르고 있는 동안만 유지
   * 무신호(NONE)와 정지(STOP)는 의미가 다름 — 실제 마샬링도 "신호 없음"과 "정지 명령"을 구분
-    (지금은 둘 다 비행기를 멈추지만, AircraftFSM에서 무신호는 모호함/멈칫으로 다르게 처리할 예정)
+	(지금은 둘 다 비행기를 멈추지만, AircraftFSM에서 무신호는 모호함/멈칫으로 다르게 처리할 예정)
 * 비행기 FSM (딜레이+관성으로 신호 해석, 즉각 반응 금지)
   * IDLE -> INTERPRETING -> MOVING -> STOPPING
   * 모호한 신호는 멈칫 또는 오해 가능
@@ -34,11 +34,11 @@ project.godot
 assets/                     아트, 사운드, 폰트 등 게임 에셋
 src/
   core/
-    main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
-    utils/                  여러 노드가 공유하는 재사용 스크립트 (screen_bounds.gd)
+	main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
+	utils/                  여러 노드가 공유하는 재사용 스크립트 (screen_bounds.gd)
   gameplay/
-    aircraft/               비행기 로직 (이동/FSM/시야/충돌)
-    marshaller/             마샬러 로직 (이동/입력/수신호)
+	aircraft/               비행기 로직 (이동/FSM/시야/충돌)
+	marshaller/             마샬러 로직 (이동/입력/수신호)
   ui/                       HUD (수신호 표시, 게임오버, 성공)
   debug/                    개발/디버그 도구 (시야 시각화, FPS/버전 HUD, 프로젝트 설정)
 tests/                      단위 테스트 (자체 경량 하네스, 애드온 없음)
