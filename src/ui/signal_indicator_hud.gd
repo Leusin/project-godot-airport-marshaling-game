@@ -1,8 +1,7 @@
 extends Control
 ## 마샬러가 현재 입력 중인 수신호를 화면에 아이콘으로 표시하는 HUD.
 ## 판정에는 관여하지 않고 SignalInput의 현재 값을 그대로 시각화한다.
-##   - 상단 중앙: 현재 신호를 큰 아이콘으로 강조
-##   - 화면 중앙: 가능한 모든 신호를 나열, 현재 신호만 밝게 강조
+##   - 하단 중앙: 가능한 모든 신호를 나열, 현재 신호만 밝게 강조 (강조 자체가 현재 신호 표시를 겸함)
 ## 아이콘은 제공받은 마샬링 수신호 참고 이미지를 그대로 잘라 쓴다 (assets/sprites/hud_icons/).
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
@@ -10,8 +9,6 @@ const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 
 const DIM_ALPHA := 0.35
-const TOP_ICON_SIZE := 110.0
-const TOP_MARGIN := 20.0
 const ROW_ICON_SIZE := 70.0
 const ROW_GAP := 14.0
 const ROW_BOTTOM_MARGIN := 24.0
@@ -47,10 +44,6 @@ func _draw() -> void:
 	if _signal_input == null:
 		return
 	var current: SignalInputScript.SignalType = _signal_input.get_signal()
-
-	# 상단 중앙: 현재 신호 강조
-	var top_rect := Rect2(size.x / 2.0 - TOP_ICON_SIZE / 2.0, TOP_MARGIN, TOP_ICON_SIZE, TOP_ICON_SIZE)
-	_draw_icon(top_rect, current, 1.0)
 
 	# 하단 중앙: 가능한 모든 신호를 가로로 나열, 현재 신호만 강조 (화면 정중앙은 시야를 가려 하단으로 배치)
 	var total_width := ROW_SIGNALS.size() * ROW_ICON_SIZE + (ROW_SIGNALS.size() - 1) * ROW_GAP
