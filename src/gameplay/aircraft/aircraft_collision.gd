@@ -4,7 +4,8 @@ extends Node
 ## 비행기는 회전하는 사각형(OBB), 대상은 축정렬 사각형으로 보고 SAT로 겹침 판정.
 ## 대상은 씬 계층 경로가 아니라 그룹으로 찾는다 (트리 위치에 독립적, 다중 배치 지원).
 ##   parking  그룹: 비행기가 완전히 들어오면(포함) 즉시 성공이 아니라 "확정 대기" 상태가 됨.
-##                  이 상태에서 마샬러가 확정 버튼(스페이스)을 눌러야 유도 성공으로 확정.
+##                  이 상태에서 마샬러가 확정 버튼(스페이스)을 누르면 GameManager가 짧은 유예
+##                  뒤에 실제 성공 처리를 한다 (연출: 엔진정지 포즈 → 성공 HUD).
 ##   marshaller 그룹: 원형 히트박스로 판정 (사람은 사각형보다 원이 자연스러움) -> 게임 오버
 ##   obstacle 그룹: 사각형 겹침 -> 게임 오버
 
@@ -42,7 +43,7 @@ func _physics_process(_delta: float) -> void:
 
 	if is_parked:
 		if _signal_input != null and _signal_input.is_shutdown_confirm_pressed():
-			_game_manager.trigger_success()
+			_game_manager.begin_shutdown_confirm()
 		return
 
 	for hazard in get_tree().get_nodes_in_group(GameGroups.MARSHALLER):
