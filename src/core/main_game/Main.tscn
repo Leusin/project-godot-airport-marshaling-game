@@ -81,7 +81,7 @@ script = ExtResource("1_marshaller_script")
 [node name="MarshallerSprite" type="Sprite3D" parent="World/EntityRoot/Marshaller"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0)
 pixel_size = 0.006
-billboard = 2
+billboard = 1
 texture_filter = 0
 texture = ExtResource("17_marshaller_sprite")
 
