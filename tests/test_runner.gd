@@ -115,6 +115,20 @@ func _test_collision_2d(suite: TestLib) -> void:
 	suite.check(not Collision2D.obb_circle_overlap(Vector2.ZERO, Vector2(1, 1), forward_z, Vector2(1.4, 0), 0.3),
 		"원이 멀면 → 안 겹침")
 
+	# obb_within_aabb: 완전 포함 판정 (주차 성공 조건)
+	var parking_center := Vector2(0, 0)
+	var parking_half := Vector2(1.5, 1.5)
+	suite.check(Collision2D.obb_within_aabb(Vector2.ZERO, Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
+		"작은 OBB가 완전히 안에 있음 → 포함")
+	suite.check(not Collision2D.obb_within_aabb(Vector2(1.0, 0), Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
+		"일부만 겹침(모서리가 밖) → 비포함")
+	suite.check(not Collision2D.obb_within_aabb(Vector2(5.0, 5.0), Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
+		"완전히 밖 → 비포함")
+	# 45도 회전하면 대각선 폭이 늘어나 같은 위치라도 밖으로 삐져나올 수 있음 (회전 반영 확인)
+	var diag := Vector2(1, 1).normalized()
+	suite.check(not Collision2D.obb_within_aabb(Vector2.ZERO, Vector2(1.0, 1.2), diag, parking_center, parking_half),
+		"45도 회전 시 대각선 폭 초과 → 비포함")
+
 # ─────────────────────────────────────────────────────────
 # vision_cone: 정면(-Z) 기준 좌우 half_angle + 반경 판정 (상태 없는 기하)
 func _test_vision_cone(suite: TestLib) -> void:
