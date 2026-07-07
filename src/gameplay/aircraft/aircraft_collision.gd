@@ -24,8 +24,8 @@ var _signal_input: Node
 var _self_half_extents := Vector2.ZERO  # 비행기 XZ 반크기 (메쉬에서 읽음)
 
 func _ready() -> void:
-	_game_manager = SceneQuery.get_singleton(get_tree(), GameGroups.GAME_MANAGER, "AircraftCollision")
-	_signal_input = SceneQuery.get_singleton(get_tree(), GameGroups.SIGNAL_INPUT, "AircraftCollision")
+	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
+	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
 	_self_half_extents = CollisionShapes.half_extents_xz(_aircraft)
 	# GameManager가 없으면 판정할 대상이 없으므로 물리 처리를 끈다 (경고는 위에서 출력됨).
 	set_physics_process(_game_manager != null)

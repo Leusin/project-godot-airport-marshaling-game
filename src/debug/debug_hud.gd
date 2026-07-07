@@ -28,8 +28,8 @@ func _ready() -> void:
 		set_process_input(false)
 		return
 
-	_signal_input = SceneQuery.get_singleton(get_tree(), GameGroups.SIGNAL_INPUT, "DebugHUD")
-	_aircraft_fsm = SceneQuery.get_singleton(get_tree(), GameGroups.AIRCRAFT_FSM, "DebugHUD")
+	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
+	_aircraft_fsm = SceneQuery.require_single(GameGroups.AIRCRAFT_FSM)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):

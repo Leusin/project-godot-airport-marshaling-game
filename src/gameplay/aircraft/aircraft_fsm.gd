@@ -32,8 +32,8 @@ var marshaller: Node3D
 var signal_input: SignalInputScript
 
 func _ready() -> void:
-	marshaller = SceneQuery.get_singleton(get_tree(), GameGroups.MARSHALLER, "AircraftFSM")
-	signal_input = SceneQuery.get_singleton(get_tree(), GameGroups.SIGNAL_INPUT, "AircraftFSM")
+	marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
+	signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
 	# 필수 참조가 없으면 _process에서 크래시하는 대신 조용히 비활성화 (경고는 위에서 출력됨).
 	if marshaller == null or signal_input == null:
 		set_process(false)

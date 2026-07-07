@@ -38,8 +38,8 @@ var _textures: Dictionary = {}
 var _confirm_texture: Texture2D
 
 func _ready() -> void:
-	_signal_input = SceneQuery.get_singleton(get_tree(), GameGroups.SIGNAL_INPUT, "SignalIndicator")
-	_game_manager = SceneQuery.get_singleton(get_tree(), GameGroups.GAME_MANAGER, "SignalIndicator")
+	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
+	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
 	for sig in ICON_PATHS:
 		_textures[sig] = load(ICON_PATHS[sig])
 	_confirm_texture = load(CONFIRM_ICON_PATH)

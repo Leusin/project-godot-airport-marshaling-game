@@ -39,8 +39,8 @@ func begin_shutdown_confirm() -> void:
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_game_over_hud = SceneQuery.get_singleton(get_tree(), GameGroups.GAME_OVER_HUD, "GameManager")
-	_success_hud = SceneQuery.get_singleton(get_tree(), GameGroups.SUCCESS_HUD, "GameManager")
+	_game_over_hud = SceneQuery.require_single(GameGroups.GAME_OVER_HUD)
+	_success_hud = SceneQuery.require_single(GameGroups.SUCCESS_HUD)
 
 func _process(delta: float) -> void:
 	if is_confirming_shutdown and _confirm_delay.tick(delta):
