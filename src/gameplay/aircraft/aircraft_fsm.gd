@@ -7,7 +7,6 @@ extends Node
 ##   또한 IDLE에서는 시야 밖이면 이동 신호를 받아도 출발하지 않는다.
 
 const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
-const AircraftScript = preload("res://src/gameplay/aircraft/aircraft.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
@@ -40,7 +39,7 @@ func _ready() -> void:
 
 var _state: State = State.IDLE
 var _hesitate := CountdownScript.new()
-var _last_move_command: AircraftScript.Command = AircraftScript.Command.ADVANCE
+var _last_move_signal: SignalInputScript.SignalType = SignalInputScript.SignalType.ADVANCE
 
 func _process(delta: float) -> void:
 	var in_view: bool = vision_cone.is_point_in_view(marshaller.global_position)
@@ -61,9 +60,9 @@ func state_name() -> String:
 	return State.keys()[_state]
 
 func _process_idle(hand_signal: SignalInputScript.SignalType) -> void:
-	aircraft.issue_command(AircraftScript.Command.STOP)
-	if _is_move_signal(hand_signal):
-		_last_move_command = _to_command(hand_signal)
+	aircraft.issue_signal(SignalInputScript.SignalType.STOP)
+	if SignalInputScript.is_move_signal(hand_signal):
+		_last_move_signal = hand_signal
 		_enter_moving()
 
 func _process_moving(hand_signal: SignalInputScript.SignalType, in_view: bool) -> void:
@@ -73,17 +72,17 @@ func _process_moving(hand_signal: SignalInputScript.SignalType, in_view: bool) -
 	if hand_signal == SignalInputScript.SignalType.NONE:
 		_enter_hesitating()
 		return
-	_last_move_command = _to_command(hand_signal)
-	aircraft.issue_command(_last_move_command)
+	_last_move_signal = hand_signal
+	aircraft.issue_signal(hand_signal)
 
 func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: bool, delta: float) -> void:
-	aircraft.issue_command(_last_move_command)
+	aircraft.issue_signal(_last_move_signal)
 
 	if not in_view or hand_signal == SignalInputScript.SignalType.STOP:
 		_enter_stopping()
 		return
-	if _is_move_signal(hand_signal):
-		_last_move_command = _to_command(hand_signal)
+	if SignalInputScript.is_move_signal(hand_signal):
+		_last_move_signal = hand_signal
 		_state = State.MOVING
 		return
 
@@ -91,9 +90,9 @@ func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: boo
 		_enter_stopping()
 
 func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
-	aircraft.issue_command(AircraftScript.Command.STOP)
-	if _is_move_signal(hand_signal):
-		_last_move_command = _to_command(hand_signal)
+	aircraft.issue_signal(SignalInputScript.SignalType.STOP)
+	if SignalInputScript.is_move_signal(hand_signal):
+		_last_move_signal = hand_signal
 		_enter_moving()
 		return
 	if aircraft.get_speed() < STOP_SPEED_EPSILON:
@@ -101,7 +100,7 @@ func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
 
 func _enter_moving() -> void:
 	_state = State.MOVING
-	aircraft.issue_command(_last_move_command)
+	aircraft.issue_signal(_last_move_signal)
 
 func _enter_hesitating() -> void:
 	_state = State.HESITATING
@@ -109,16 +108,4 @@ func _enter_hesitating() -> void:
 
 func _enter_stopping() -> void:
 	_state = State.STOPPING
-	aircraft.issue_command(AircraftScript.Command.STOP)
-
-func _is_move_signal(s: SignalInputScript.SignalType) -> bool:
-	return s == SignalInputScript.SignalType.ADVANCE \
-		or s == SignalInputScript.SignalType.TURN_LEFT \
-		or s == SignalInputScript.SignalType.TURN_RIGHT
-
-func _to_command(s: SignalInputScript.SignalType) -> AircraftScript.Command:
-	match s:
-		SignalInputScript.SignalType.ADVANCE: return AircraftScript.Command.ADVANCE
-		SignalInputScript.SignalType.TURN_LEFT: return AircraftScript.Command.TURN_LEFT
-		SignalInputScript.SignalType.TURN_RIGHT: return AircraftScript.Command.TURN_RIGHT
-		_: return AircraftScript.Command.STOP
+	aircraft.issue_signal(SignalInputScript.SignalType.STOP)

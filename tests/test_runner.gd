@@ -10,7 +10,6 @@ const CountdownScript := preload("res://src/core/utils/countdown.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
 const SignalInputScript := preload("res://src/gameplay/marshaller/signal_input.gd")
-const AircraftScript := preload("res://src/gameplay/aircraft/aircraft.gd")
 const GameGroups := preload("res://src/core/game_groups.gd")
 const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 
@@ -186,18 +185,18 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	fake_signal.sig = SignalInputScript.SignalType.ADVANCE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.MOVING, "ADVANCE → MOVING")
-	suite.check_eq(fake_aircraft.last_command, AircraftScript.Command.ADVANCE, "ADVANCE 명령 전달")
+	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "ADVANCE 신호 전달")
 
-	# 무신호(NONE) → HESITATING, 마지막 이동 명령 유지
+	# 무신호(NONE) → HESITATING, 마지막 이동 신호 유지
 	fake_signal.sig = SignalInputScript.SignalType.NONE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.HESITATING, "MOVING + NONE → HESITATING(멈칫)")
-	suite.check_eq(fake_aircraft.last_command, AircraftScript.Command.ADVANCE, "멈칫 중 이동 유지")
+	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "멈칫 중 이동 유지")
 
 	# 멈칫 시간 경과 → STOPPING
 	fsm._process(1.0)
 	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "멈칫 시간 경과 → STOPPING")
-	suite.check_eq(fake_aircraft.last_command, AircraftScript.Command.STOP, "STOPPING 시 STOP 명령")
+	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.STOP, "STOPPING 시 STOP 신호")
 
 	# 속도 0 → IDLE 복귀
 	fake_aircraft.speed = 0.0
@@ -233,10 +232,10 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 
 # ── 페이크 노드 ────────────────────────────────────────────
 class FakeAircraft extends Node3D:
-	var last_command: int = -1
+	var last_signal: int = -1
 	var speed: float = 0.0
-	func issue_command(command: int) -> void:
-		last_command = command
+	func issue_signal(sig: int) -> void:
+		last_signal = sig
 	func get_speed() -> float:
 		return speed
 

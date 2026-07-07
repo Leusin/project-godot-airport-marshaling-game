@@ -16,6 +16,13 @@ func get_signal() -> SignalType:
 		return SignalType.STOP
 	return SignalType.NONE
 
+## 이동 신호(ADVANCE/TURN_LEFT/TURN_RIGHT)인지 판별. STOP/NONE은 이동 신호가 아니다.
+## 신호 자체의 성질이므로 신호 도메인(여기)에 둔다 — FSM의 지식이 아니다.
+static func is_move_signal(sig: SignalType) -> bool:
+	return sig == SignalType.ADVANCE \
+		or sig == SignalType.TURN_LEFT \
+		or sig == SignalType.TURN_RIGHT
+
 ## 엔진 정지(목 긋기) 확정 버튼. 이동 신호(SignalType)와는 별개로, 주차 확정처럼
 ## "누르는 순간"만 의미 있는 단발성 입력이라 별도 메서드로 분리한다.
 func is_shutdown_confirm_pressed() -> bool:
