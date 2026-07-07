@@ -24,4 +24,4 @@
 
 ## 더 볼 것
 
-설계·패턴·씬 계층 → [README](../README.md) · 왜 이렇게 짰는지 → [DEVLOG](../DEVLOG.md) · 구조 그림 → [scene_diagram.svg](scene_diagram.svg)
+설계·패턴·씬 계층 → [ARCHITECTURE](ARCHITECTURE.md) · 왜 이렇게 짰는지 → [DEVLOG](DEVLOG.md) · 구조 그림 → [scene_diagram.svg](attachment/scene_diagram.svg)
