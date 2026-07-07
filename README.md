@@ -33,4 +33,5 @@ Godot 4.7 · GDScript · 3D Top-down
 - [docs/MEMORY.md](docs/MEMORY.md) - 개발 회고
 - [docs/ROADMAP.md](docs/ROADMAP.md) - 완료/예정 항목
 - [docs/CODE_GUIDE.md](docs/CODE_GUIDE.md) - 코드 읽는 순서 · 핵심 패턴
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - 폴더 구조 · 씬 계층 · 컴포넌트 · 테스트
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - 폴더 구조 · 씬 계층 · 컴포넌트
+- [docs/TESTING.md](docs/TESTING.md) - 테스트 하네스 · 실행 방법

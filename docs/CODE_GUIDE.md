@@ -1,7 +1,8 @@
 # 코드 읽기 가이드
 
-20개 스크립트 / 약 800줄. 아래 **데이터 흐름 순서**대로 읽으면 빠르다.
-파일별 상세 책임은 각 스크립트 맨 위 `##` 주석에 있으니 그걸 본다. 이 표는 "읽는 순서"만 준다.
+코드를 빠르게 파악하기 위한 가이드입니다. 
+
+아래 표는 "읽는 순서"만 제공하고, 파일별 상세 책임은 각 스크립트 맨 위 `##` 주석 참고.
 
 | # | 파일 | 흐름 단계 |
 |---|---|---|
@@ -15,13 +16,15 @@
 | 8 | `core/main_game/game_manager.gd` | 게임오버/성공 |
 | 9 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |
 
-**5번만 이해하면 게임 규칙 대부분을 안다.**
 
 ## 실행
 
 - 게임: 에디터 F5
 - 테스트: `tests/tests.tscn` 열고 F6 (화면에 결과) / 또는 `./run_tests.ps1`
 
-## 더 볼 것
+## 관련 문서
 
-설계·패턴·씬 계층 → [ARCHITECTURE](ARCHITECTURE.md) · 왜 이렇게 짰는지 → [DEVLOG](DEVLOG.md) · 구조 그림 → [scene_diagram.svg](attachment/scene_diagram.svg)
+- [ARCHITECTURE](ARCHITECTURE.md) - 씬 구조와 설계
+- [TESTING](TESTING.md) - 테스트 하네스와 실행 방법
+- [DEVLOG](DEVLOG.md) - 변경 이력과 설계 이유
+- [scene_diagram.svg](attachment/scene_diagram.svg) - 씬 계층 다이어그램
