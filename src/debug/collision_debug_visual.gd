@@ -5,6 +5,7 @@ extends MeshInstance3D
 ## 개발 빌드 전용. ` (백틱 = toggle_debug)로 껐다 켤 수 있다.
 
 const CollisionShapes = preload("res://src/core/utils/collision_shapes.gd")
+const Collision2D = preload("res://src/core/utils/collision_2d.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 
 const DRAW_HEIGHT := 0.08
@@ -61,16 +62,11 @@ func _add_axis_aligned_rect(node: Node3D, color: Color) -> void:
 	_add_rect(_to_xz(node.global_position), CollisionShapes.half_extents_xz(node), Vector2(0.0, 1.0), color)
 
 ## center/half_extents/forward(단위)로 정의한 사각형의 4변을 선으로 추가.
+## 코너는 판정과 동일한 Collision2D.obb_corners를 써서 "그려진 박스 = 실제 판정 범위"를 보장한다.
 func _add_rect(center: Vector2, half_extents: Vector2, forward: Vector2, color: Color) -> void:
-	var right := Vector2(forward.y, -forward.x)
-	var corner_0 := center - right * half_extents.x - forward * half_extents.y
-	var corner_1 := center + right * half_extents.x - forward * half_extents.y
-	var corner_2 := center + right * half_extents.x + forward * half_extents.y
-	var corner_3 := center - right * half_extents.x + forward * half_extents.y
-	_add_line(corner_0, corner_1, color)
-	_add_line(corner_1, corner_2, color)
-	_add_line(corner_2, corner_3, color)
-	_add_line(corner_3, corner_0, color)
+	var corners := Collision2D.obb_corners(center, half_extents, forward)
+	for i in corners.size():
+		_add_line(corners[i], corners[(i + 1) % corners.size()], color)
 
 func _add_line(from: Vector2, to: Vector2, color: Color) -> void:
 	_immediate_mesh.surface_set_color(color)
