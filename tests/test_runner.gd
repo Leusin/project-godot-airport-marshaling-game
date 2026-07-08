@@ -9,7 +9,7 @@ const Collision2D := preload("res://src/core/utils/collision_2d.gd")
 const CountdownScript := preload("res://src/core/utils/countdown.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
-const SignalInputScript := preload("res://src/gameplay/marshaller/signal_input.gd")
+const SignalInputScript := preload("res://src/gameplay/input/signal_input.gd")
 const GameGroups := preload("res://src/core/game_groups.gd")
 const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 

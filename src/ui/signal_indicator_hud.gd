@@ -5,7 +5,7 @@ extends Control
 ##   - 비행기가 주차존에 완전히 들어와 확정 대기 상태면: 목록 대신 확정(엔진 정지) 아이콘 하나만 표시
 ## 아이콘은 제공받은 마샬링 수신호 참고 이미지를 그대로 잘라 쓴다 (assets/sprites/hud_icons/).
 
-const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 

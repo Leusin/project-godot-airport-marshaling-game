@@ -5,7 +5,7 @@ extends Control
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
-const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
 
 const RIGHT_MARGIN := 12.0
 const TOP_MARGIN := 24.0

@@ -5,7 +5,7 @@ extends Node3D
 ## 비행기의 구현 세부사항이라 여기서 처리한다 (외부는 신호만 넘긴다).
 
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
-const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
 
 enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 

@@ -6,7 +6,7 @@ extends Node
 ## 시야 밖: 마샬러를 놓치면 즉시 STOPPING (in-view 무신호의 멈칫보다 엄격 — 지체 없이 정지).
 ##   또한 IDLE에서는 시야 밖이면 이동 신호를 받아도 출발하지 않는다.
 
-const SignalInputScript = preload("res://src/gameplay/marshaller/signal_input.gd")
+const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
