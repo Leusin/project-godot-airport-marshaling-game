@@ -13,11 +13,11 @@
 [ext_resource type="Script" path="res://src/ui/game_over_hud.gd" id="11_game_over_hud_script"]
 [ext_resource type="Script" path="res://src/ui/success_hud.gd" id="12_success_hud_script"]
 [ext_resource type="Script" path="res://src/debug/debug_hud.gd" id="13_debug_hud_script"]
-[ext_resource type="Script" path="res://src/core/utils/screen_clamp.gd" id="14_screen_clamp_script"]
 [ext_resource type="Script" path="res://src/debug/collision_debug_visual.gd" id="15_collision_debug_script"]
 [ext_resource type="PackedScene" path="res://assets/models/aircraft.glb" id="16_aircraft_model"]
 [ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_sprite.gd" id="17_marshaller_sprite_script"]
 [ext_resource type="Script" path="res://src/core/main_game/level_lighting.gd" id="19_level_lighting_script"]
+[ext_resource type="Script" path="res://src/gameplay/aircraft/aircraft_control.gd" id="20_aircraft_control_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -100,16 +100,15 @@ script = ExtResource("2_move_input_script")
 [node name="SignalInput" type="Node" parent="World/EntityRoot/Marshaller" groups=["signal_input"]]
 script = ExtResource("6_signal_input_script")
 
-[node name="ScreenClamp" type="Node" parent="World/EntityRoot/Marshaller"]
-script = ExtResource("14_screen_clamp_script")
-edge_margin = 0.5
-
 [node name="Aircraft" type="Node3D" parent="World/EntityRoot" groups=["aircraft"]]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
 script = ExtResource("5_aircraft_script")
 
 [node name="AircraftModel" parent="World/EntityRoot/Aircraft" instance=ExtResource("16_aircraft_model")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="AircraftControl" type="Node" parent="World/EntityRoot/Aircraft"]
+script = ExtResource("20_aircraft_control_script")
 
 [node name="VisionCone" type="Node" parent="World/EntityRoot/Aircraft"]
 script = ExtResource("3_vision_cone_script")
@@ -122,10 +121,6 @@ script = ExtResource("7_aircraft_fsm_script")
 
 [node name="AircraftHitbox" type="Node" parent="World/EntityRoot/Aircraft"]
 script = ExtResource("10_aircraft_collision_script")
-
-[node name="ScreenClamp" type="Node" parent="World/EntityRoot/Aircraft"]
-script = ExtResource("14_screen_clamp_script")
-edge_margin = 1.0
 
 [node name="EffectRoot" type="Node3D" parent="World"]
 

@@ -1,6 +1,5 @@
 extends Node3D
 ## 마샬러 이동만 담당. 입력은 MoveInput에서 받아온다.
-## 화면 경계 클램프는 자식 ScreenClamp 컴포넌트가 담당한다.
 
 const MoveInputScript = preload("res://src/gameplay/marshaller/move_input.gd")
 
