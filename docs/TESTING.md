@@ -20,4 +20,5 @@ godot --headless --path . res://tests/tests.tscn
 - `countdown` — 프레임 폴링 카운트다운 (딜레이/멈칫 타이머 공용 구현)
 - `collision_2d` — OBB/원 겹침·완전포함 판정 (SAT, 순수 함수)
 - `aircraft_vision_cone` — 시야 원뿔 각도/반경 판정 (상태 없는 기하)
+- `signal_input` — 이벤트 기반 수신호 상태/시그널 (Input.action_press + 합성 이벤트로 구동)
 - `aircraft_fsm` — 신호 해석 상태 전이 (페이크 비행기/시야/수신호로 구동)

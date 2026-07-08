@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-08 [결정] 입력 처리를 폴링→이벤트(`_unhandled_input`) — 입력 노드가 이벤트로 현재 상태를 보관·방출한다. 연속 입력(이동/유지 신호)은 소비자가 캐시(move_direction/hand_signal)를 매 프레임 읽고, 단발 입력(엔진정지 확정)은 shutdown_confirmed 시그널로 받는다. `get_signal()`이 캐시를 반환해 기존 폴링 소비자(FSM/HUD/스프라이트)는 무변경. 입력은 특정 엔티티 비의존이라 Systems/Input에 둠. 물리프레임 `is_action_just_pressed`의 단발입력 유실/중복도 해소.
+
 - 2026-07-08 [결정] 엔티티 루트/이동 분리 — 루트(Aircraft/Marshaller)는 설정·정체성·명령, 실제 이동은 자식 Control 컴포넌트(AircraftControl/MarshallerControl). 부모가 먼저 명령을 해소한 뒤 자식이 움직여 충돌 판정보다 앞서 위치가 반영됨. 외부 인터페이스(issue_signal/get_speed)는 루트에 유지해 FSM/충돌 호출부 불변.
 
 - 2026-07-08 [결정] 입력 스크립트를 gameplay/input/으로 분리 — move_input/signal_input은 특정 엔티티(마샬러) 비의존이라 marshaller/ 밖으로. 신호↔명령 번역은 Aircraft(구현 세부사항), is_move_signal은 SignalInput(신호의 성질)에 각각 귀속. ScreenClamp(화면 경계 클램프)는 제거.
@@ -38,6 +40,8 @@ Prototype Complete
 - 2026-06-28 [에러] GDScript class_name과 const 별칭 이름 충돌 → 파서 에러. 해결: class_name 제거하고 preload const로만 참조. 교훈: MCP 헤드리스 재실행 구조라 전역 클래스 캐시 갱신이 불안정, 작은 유틸은 class_name 없이 preload로.
 
 ## 세션 로그
+
+- 2026-07-08 입력 별도 엔티티화 + 이벤트 기반 전환 — MoveInput/SignalInput을 Marshaller 자식 → Systems/Input로 분리, `_unhandled_input`으로 상태 갱신(move_direction/hand_signal + hand_signal_changed 시그널). 엔진정지 확정을 폴링 → shutdown_confirmed 시그널로(AircraftCollision 구독). MarshallerControl은 MoveInput을 그룹(move_input) 조회. signal_input 이벤트 테스트 추가 (45/45). Godot 실물 실행 확인.
 
 - 2026-07-08 컴포넌트 책임 정리 리팩터링 — 이동을 루트에서 AircraftControl/MarshallerControl로 분리, 입력 스크립트를 gameplay/input/으로 이동, ScreenClamp 제거(→ 미사용된 screen_bounds.compute_ground_frustum 제거). FSM은 상태 전이만, 신호→명령 번역은 Aircraft.issue_signal로, is_move_signal은 SignalInput으로. SceneQuery.get_singleton→require_single. 디버그 시각화가 Collision2D.obb_corners 재사용. 누락 .uid 트래킹 일관화. (테스트 38/38, MCP 실물 실행 확인)
 

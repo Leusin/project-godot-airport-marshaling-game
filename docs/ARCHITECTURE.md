@@ -29,8 +29,11 @@ docs/                       문서, 다이어그램
 
 ```text
 MainGame (Node)                  앱 루트. Process Mode = Always
-├─ Systems                       상위 시스템 (초기화/전환/게임 진행)
-│  └─ GameManager                판정 + 재시작  [group: game_manager]
+├─ Systems                       상위 시스템 (게임 진행 · 입력)
+│  ├─ GameManager                판정 + 재시작  [group: game_manager]
+│  └─ Input                      입력 라우팅 (이벤트 기반)
+│     ├─ MoveInput               [group: move_input]
+│     └─ SignalInput             [group: signal_input]
 ├─ World (Node3D)                게임 세계. Process Mode = Pausable
 │  ├─ TopDownCamera              직교 탑다운 카메라
 │  ├─ LevelRoot                  배경 요소
@@ -40,8 +43,7 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 │  ├─ EntityRoot                 핵심 요소
 │  │  ├─ Marshaller              [group: marshaller]
 │  │  │  ├─ MarshallerSprite
-│  │  │  ├─ MoveInput / SignalInput [group: signal_input]
-│  │  │  └─ MarshallerControl     이동 실행
+│  │  │  └─ MarshallerControl     이동 실행  (입력은 Systems/Input)
 │  │  └─ Aircraft                [group: aircraft]
 │  │     ├─ AircraftModel
 │  │     ├─ AircraftControl       이동 실행
@@ -67,9 +69,9 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 - `Marshaller` — 설정(speed)·정체성 루트. 이동/입력/스프라이트 컴포넌트를 붙인다
 - `MarshallerControl` — 이동 실행 (MoveInput 방향 × speed로 부모 이동)
 
-**입력** (`gameplay/input/`, 특정 엔티티 비의존)
-- `MoveInput` — 이동 입력 전담 (WASD → XZ 방향)
-- `SignalInput` — 수신호 입력 전담. 방향키 -> 신호 타입(전진/정지/좌우회전) 변환만, 판정은 안 함.
+**입력** (`gameplay/input/`, 씬에서는 `Systems/Input` 아래 · 특정 엔티티 비의존 · 이벤트 기반)
+- `MoveInput` — 이동 입력 전담. `_unhandled_input`으로 현재 방향을 `move_direction`에 보관, 소비자가 매 프레임 읽음 [group: move_input]
+- `SignalInput` — 수신호 입력 전담. `_unhandled_input`으로 현재 신호를 상태로 보관(`get_signal()`은 캐시 반환)하고 바뀔 때 `hand_signal_changed` 방출. 엔진정지 확정은 단발 `shutdown_confirmed` 시그널.
   모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값. 이동 신호 판별(`is_move_signal`) 제공
 
 **비행기**
