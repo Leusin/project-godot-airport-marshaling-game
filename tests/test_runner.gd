@@ -21,6 +21,7 @@ func _ready() -> void:
 	_test_countdown(suite)
 	_test_collision_2d(suite)
 	_test_vision_cone(suite)
+	_test_signal_input(suite)
 	_test_aircraft_fsm(suite)
 
 	if DisplayServer.get_name() == "headless":
@@ -153,6 +154,48 @@ func _test_vision_cone(suite: TestLib) -> void:
 		"20도(<35) → 시야 내")
 
 	aircraft.queue_free()
+
+# ─────────────────────────────────────────────────────────
+# signal_input: 이벤트 기반 수신호 — 키 이벤트에 반응해 hand_signal 갱신 + 시그널 방출
+func _test_signal_input(suite: TestLib) -> void:
+	suite.start("signal_input")
+	var si := SignalInputScript.new()
+	add_child(si)
+
+	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "초기 상태 NONE")
+
+	var changes: Array = []
+	si.hand_signal_changed.connect(func(s): changes.append(s))
+
+	# ADVANCE 누름 → hand_signal 갱신 + 시그널 1회
+	Input.action_press("signal_advance")
+	si._unhandled_input(_action_event("signal_advance", true))
+	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.ADVANCE, "ADVANCE 누름 → ADVANCE")
+	suite.check(changes.size() == 1, "바뀌면 hand_signal_changed 1회 방출")
+
+	# 같은 상태의 이벤트가 또 와도 재방출 안 함
+	si._unhandled_input(_action_event("signal_advance", true))
+	suite.check(changes.size() == 1, "값 그대로면 재방출 없음")
+
+	# 뗌 → NONE
+	Input.action_release("signal_advance")
+	si._unhandled_input(_action_event("signal_advance", false))
+	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "뗌 → NONE")
+
+	# 엔진정지 확정은 hand_signal과 무관한 단발 시그널
+	var confirms: Array = []
+	si.shutdown_confirmed.connect(func(): confirms.append(true))
+	si._unhandled_input(_action_event("signal_shutdown", true))
+	suite.check(confirms.size() == 1, "signal_shutdown 누름 → shutdown_confirmed 1회")
+	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "확정은 hand_signal 안 바꿈")
+
+	si.queue_free()
+
+func _action_event(action: StringName, pressed: bool) -> InputEventAction:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	return event
 
 # ─────────────────────────────────────────────────────────
 # aircraft_fsm: 신호 해석 상태 전이 (페이크 비행기/시야/수신호로 구동)

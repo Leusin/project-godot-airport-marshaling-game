@@ -22,11 +22,15 @@ const MARSHALLER_HIT_RADIUS := 0.45
 var _game_manager: Node
 var _signal_input: Node
 var _self_half_extents := Vector2.ZERO  # 비행기 XZ 반크기 (메쉬에서 읽음)
+var _is_parked: bool = false  # 확정 대기(주차 완전 진입) 상태. shutdown_confirmed 처리에서 참조.
 
 func _ready() -> void:
 	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
 	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
 	_self_half_extents = CollisionShapes.half_extents_xz(_aircraft)
+	# 엔진정지 확정은 폴링이 아니라 이벤트로 받는다 (물리프레임 just_pressed 유실/중복 방지).
+	if _signal_input != null:
+		_signal_input.connect("shutdown_confirmed", _on_shutdown_confirmed)
 	# GameManager가 없으면 판정할 대상이 없으므로 물리 처리를 끈다 (경고는 위에서 출력됨).
 	set_physics_process(_game_manager != null)
 
@@ -39,11 +43,10 @@ func _physics_process(_delta: float) -> void:
 		if _fully_within(center, forward, parking_spot):
 			is_parked = true
 			break
+	_is_parked = is_parked
 	_game_manager.set_awaiting_shutdown_confirm(is_parked)
 
 	if is_parked:
-		if _signal_input != null and _signal_input.is_shutdown_confirm_pressed():
-			_game_manager.begin_shutdown_confirm()
 		return
 
 	for hazard in get_tree().get_nodes_in_group(GameGroups.MARSHALLER):
@@ -55,6 +58,11 @@ func _physics_process(_delta: float) -> void:
 		if _overlaps(center, forward, hazard):
 			_game_manager.trigger_game_over()
 			return
+
+## 확정 버튼 이벤트. 비행기가 주차존에 완전히 들어온 상태에서만 성공 유예를 시작한다.
+func _on_shutdown_confirmed() -> void:
+	if _is_parked:
+		_game_manager.begin_shutdown_confirm()
 
 ## 비행기(OBB) vs 대상(축정렬 사각형) 겹침. 대상은 회전 안 한다고 보고 forward = +Z.
 func _overlaps(center: Vector2, forward: Vector2, target: Node3D) -> bool:

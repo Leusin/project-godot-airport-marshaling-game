@@ -46,6 +46,14 @@ process_mode = 3
 [node name="GameManager" type="Node" parent="Systems" groups=["game_manager"]]
 script = ExtResource("9_game_manager_script")
 
+[node name="Input" type="Node" parent="Systems"]
+
+[node name="MoveInput" type="Node" parent="Systems/Input" groups=["move_input"]]
+script = ExtResource("2_move_input_script")
+
+[node name="SignalInput" type="Node" parent="Systems/Input" groups=["signal_input"]]
+script = ExtResource("6_signal_input_script")
+
 [node name="World" type="Node3D" parent="."]
 process_mode = 1
 
@@ -95,14 +103,8 @@ billboard = 1
 texture_filter = 0
 script = ExtResource("17_marshaller_sprite_script")
 
-[node name="MoveInput" type="Node" parent="World/EntityRoot/Marshaller"]
-script = ExtResource("2_move_input_script")
-
 [node name="MarshallerControl" type="Node" parent="World/EntityRoot/Marshaller"]
 script = ExtResource("21_marshaller_control_script")
-
-[node name="SignalInput" type="Node" parent="World/EntityRoot/Marshaller" groups=["signal_input"]]
-script = ExtResource("6_signal_input_script")
 
 [node name="Aircraft" type="Node3D" parent="World/EntityRoot" groups=["aircraft"]]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
