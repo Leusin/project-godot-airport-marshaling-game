@@ -7,11 +7,11 @@
 | # | 파일 | 흐름 단계 |
 |---|---|---|
 | 1 | `core/main_game/Main.tscn` | 씬 골격 (계층/그룹/Process Mode) |
-| 2 | `gameplay/marshaller/move_input.gd` | 이동 입력 |
-| 3 | `gameplay/marshaller/signal_input.gd` | 수신호 입력 |
+| 2 | `gameplay/input/move_input.gd` | 이동 입력 |
+| 3 | `gameplay/input/signal_input.gd` | 수신호 입력 |
 | 4 | `gameplay/aircraft/aircraft_vision_cone.gd` | 시야 판정 |
 | 5 | **`gameplay/aircraft/aircraft_fsm.gd`** | **신호 해석 (게임의 두뇌)** |
-| 6 | `gameplay/aircraft/aircraft.gd` | 물리 이동 |
+| 6 | `gameplay/aircraft/aircraft.gd` | 설정·명령 (이동은 `aircraft_control.gd`) |
 | 7 | `gameplay/aircraft/aircraft_collision.gd` | 충돌/도착 판정 |
 | 8 | `core/main_game/game_manager.gd` | 게임오버/성공 |
 | 9 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |

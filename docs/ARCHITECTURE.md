@@ -12,10 +12,11 @@ assets/                     아트, 사운드, 폰트 등 게임 에셋
 src/
   core/
     main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
-    utils/                  여러 노드가 공유하는 재사용 스크립트 (screen_bounds.gd)
+    utils/                  여러 노드가 공유하는 재사용 스크립트 (scene_query.gd, collision_2d.gd 등)
   gameplay/
-    aircraft/               비행기 로직 (이동/FSM/시야/충돌)
-    marshaller/             마샬러 로직 (이동/입력/수신호)
+    input/                  입력 전담 (이동키/수신호 → 값 변환, 특정 엔티티 비의존)
+    aircraft/               비행기 로직 (설정·명령/이동/FSM/시야/충돌)
+    marshaller/             마샬러 로직 (설정/이동/스프라이트)
   ui/                       HUD (수신호 표시, 게임오버, 성공)
   debug/                    개발/디버그 도구 (시야 시각화, FPS/버전 HUD, 프로젝트 설정)
 tests/                      단위 테스트 (자체 경량 하네스, 애드온 없음)
@@ -38,12 +39,14 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 │  │  └─ ParkingSpot             [group: parking]
 │  ├─ EntityRoot                 핵심 요소
 │  │  ├─ Marshaller              [group: marshaller]
+│  │  │  ├─ MarshallerSprite
 │  │  │  ├─ MoveInput / SignalInput [group: signal_input]
-│  │  │  └─ MarshallerMesh
-│  │  └─ Aircraft
-│  │     ├─ AircraftMesh / NoseMarker
+│  │  │  └─ MarshallerControl     이동 실행
+│  │  └─ Aircraft                [group: aircraft]
+│  │     ├─ AircraftModel
+│  │     ├─ AircraftControl       이동 실행
 │  │     ├─ VisionCone / VisionConeVisual
-│  │     ├─ AircraftFSM
+│  │     ├─ AircraftFSM           [group: aircraft_fsm]
 │  │     └─ AircraftHitbox
 │  └─ EffectRoot                 임시 시각 효과 (향후)
 ├─ HudLayer (layer 10, Pausable) └─ HudRoot
@@ -61,16 +64,19 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 ## 주요 구성
 
 **마샬러**
-- `MarshallerController` — 이동만 담당 (WASD)
-- `MoveInput` — 이동 입력 전담
+- `Marshaller` — 설정(speed)·정체성 루트. 이동/입력/스프라이트 컴포넌트를 붙인다
+- `MarshallerControl` — 이동 실행 (MoveInput 방향 × speed로 부모 이동)
+
+**입력** (`gameplay/input/`, 특정 엔티티 비의존)
+- `MoveInput` — 이동 입력 전담 (WASD → XZ 방향)
 - `SignalInput` — 수신호 입력 전담. 방향키 -> 신호 타입(전진/정지/좌우회전) 변환만, 판정은 안 함.
-  모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값
-- `ScreenClamp` — (공용 컴포넌트) 부모를 화면 경계 안으로 클램프. 마샬러/비행기가 공유
+  모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값. 이동 신호 판별(`is_move_signal`) 제공
 
 **비행기**
-- `Aircraft` — 위치/속도/회전, 딜레이+관성 이동 로직
+- `Aircraft` — 설정·명령 루트. 수신호를 받아 내부 명령(Command)으로 번역(`issue_signal`)하고 딜레이(반응 지연)를 해소. 이동/시야/충돌 컴포넌트를 붙인다
+- `AircraftControl` — 이동 실행 (명령/설정을 읽어 속도 관성 + 회전 + 전진을 부모에 반영)
 - `AircraftVisionCone` — 정면 기준 70도 원뿔 판정, 마샬러가 원뿔 안에 있는지 bool만 반환
-- `AircraftFSM` — IDLE/MOVING/HESITATING/STOPPING 전이. 신호 + 시야 판정을 함께 받아 Aircraft에 명령 전달. 무신호는 멈칫 후 정지, STOP은 즉시 정지
+- `AircraftFSM` — IDLE/MOVING/HESITATING/STOPPING 전이만 담당. 신호 + 시야를 받아 Aircraft에 신호 전달(`issue_signal`). 무신호는 멈칫 후 정지, STOP은 즉시 정지
 - `AircraftCollision` — XZ 거리 기반으로 마샬러/장애물/주차지점 근접 판정 -> GameManager 통지
 
 **UI**
@@ -79,7 +85,7 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 **공유/판정**
 - `Obstacle` / `ParkingSpot` — 그룹(obstacle/parking)만 붙은 위치 마커. AircraftCollision이 거리로 판정
 - `GameManager` — 게임오버(비행기-장애물/사람) / A->B 도착 성공 처리 + 재시작
-- `ScreenBounds` / `ScreenClamp` / `SceneQuery` — 공용 유틸 (경계 계산 / 경계 클램프 / 그룹 단일 조회)
+- `SceneQuery` / `Collision2D` / `CollisionShapes` / `Countdown` — 공용 유틸 (그룹 단일 조회 `require_single` / OBB 겹침 SAT / 메쉬 AABB 반크기 / 프레임 카운트다운). `ScreenBounds`는 현재 테스트에서만 사용
 
 ## 더 볼 것
 
