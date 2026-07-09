@@ -5,9 +5,6 @@ extends MeshInstance3D
 const SEGMENTS := 24
 const VISUAL_HEIGHT := 0.05
 
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
 
 # 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).

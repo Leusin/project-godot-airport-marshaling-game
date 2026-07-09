@@ -9,11 +9,6 @@ extends Node
 ##   marshaller 그룹: 원형 히트박스로 판정 (사람은 사각형보다 원이 자연스러움) -> 게임 오버
 ##   obstacle 그룹: 사각형 겹침 -> 게임 오버
 
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const Collision2D = preload("res://src/core/utils/collision_2d.gd")
-const CollisionShapes = preload("res://src/core/utils/collision_shapes.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-
 ## 마샬러는 3D 모델이 아니라 빌보드 스프라이트라 메쉬 크기를 못 읽으므로 고정 반지름을 쓴다.
 const MARSHALLER_HIT_RADIUS := 0.45
 

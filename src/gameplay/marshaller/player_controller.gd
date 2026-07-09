@@ -3,10 +3,6 @@ extends Node
 ## possess한 Pawn의 상태로 라우팅한다(push). 언리얼의 PlayerController ↔ Pawn 관계.
 ## 이 노드만 AI 컨트롤러로 갈아끼우면 같은 Pawn을 코드가 조종할 수 있다(입력과 무관하게).
 
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-
 var _pawn: Node
 var _movement_input: Node
 var _signal_input: Node

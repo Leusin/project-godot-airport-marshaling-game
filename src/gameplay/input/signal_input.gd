@@ -1,11 +1,10 @@
+class_name SignalInput
 extends Node
 ## 마샬러 수신호 입력 전담(디바이스 계층). 키 이벤트에 반응해 현재 신호를 상태(hand_signal)로 보관하고,
 ## 바뀔 때 hand_signal_changed를 방출한다. 인식/판정은 하지 않는다.
 ## 유지(hold) 신호: 떼면 NONE. NONE(무신호)≠STOP(정지 명령) — 둘을 같게 볼지는 AircraftFSM이 판단.
 ## 엔진 정지(목 긋기) 확정은 "누르는 순간"만 의미 있는 단발성이라 shutdown_confirmed 시그널로 분리.
 ## 그룹 'signal_input'으로 조회된다. 신호 어휘(SignalType/is_move_signal)는 HandSignal 도메인에 있다.
-
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 
 signal hand_signal_changed(sig: HandSignal.SignalType)
 signal shutdown_confirmed

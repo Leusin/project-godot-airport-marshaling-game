@@ -1,3 +1,4 @@
+class_name TestLib
 extends RefCounted
 ## 경량 단위 테스트 헬퍼. 결과를 누적만 하고, 출력(콘솔/씬)은 러너가 담당한다.
 

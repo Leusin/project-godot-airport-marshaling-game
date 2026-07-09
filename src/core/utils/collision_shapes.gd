@@ -1,3 +1,4 @@
+class_name CollisionShapes
 extends RefCounted
 ## 노드의 보이는 모델(첫 MeshInstance3D의 메쉬 AABB)에서 XZ 충돌 사각형 반크기를 뽑는다.
 ## 충돌 판정(aircraft_collision)과 디버그 시각화(collision_debug_visual)가 같은 소스를 써서

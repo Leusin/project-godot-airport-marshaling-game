@@ -3,15 +3,6 @@ extends Control
 ##  - 창 모드(에디터 F6): 결과를 씬 화면(RichTextLabel)에 색상으로 렌더한다.
 ##  - 헤드리스(run_tests.ps1 / CI): 콘솔에 출력하고 실패 개수를 종료 코드로 반환한다.
 
-const TestLib := preload("res://tests/test_lib.gd")
-const ScreenBounds := preload("res://src/core/utils/screen_bounds.gd")
-const Collision2D := preload("res://src/core/utils/collision_2d.gd")
-const CountdownScript := preload("res://src/core/utils/countdown.gd")
-const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
-const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
-const SignalInputScript := preload("res://src/gameplay/input/signal_input.gd")
-const HandSignal := preload("res://src/gameplay/hand_signal.gd")
-
 @onready var _report: RichTextLabel = $Report
 
 func _ready() -> void:
@@ -73,7 +64,7 @@ func _test_screen_bounds(suite: TestLib) -> void:
 # countdown: 프레임 폴링 카운트다운 (딜레이/멈칫 타이머의 공용 구현)
 func _test_countdown(suite: TestLib) -> void:
 	suite.start("countdown")
-	var countdown := CountdownScript.new()
+	var countdown := Countdown.new()
 	suite.check(not countdown.is_running(), "초기 상태: 안 돎")
 	suite.check(not countdown.tick(0.1), "안 돌 때 tick → false")
 
@@ -136,7 +127,7 @@ func _test_vision_cone(suite: TestLib) -> void:
 	add_child(aircraft)
 	aircraft.global_position = Vector3.ZERO
 
-	var vision_cone := VisionConeScript.new()
+	var vision_cone := AircraftVisionCone.new()
 	vision_cone.half_angle_degrees = 35.0
 	vision_cone.view_radius = 10.0
 	aircraft.add_child(vision_cone)
@@ -158,7 +149,7 @@ func _test_vision_cone(suite: TestLib) -> void:
 # signal_input: 이벤트 기반 수신호 — 키 이벤트에 반응해 hand_signal 갱신 + 시그널 방출
 func _test_signal_input(suite: TestLib) -> void:
 	suite.start("signal_input")
-	var si := SignalInputScript.new()
+	var si := SignalInput.new()
 	add_child(si)
 
 	suite.check_eq(si.get_signal(), HandSignal.SignalType.NONE, "초기 상태 NONE")
@@ -205,43 +196,43 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	var fake_aircraft := FakeAircraft.new()
 	add_child(fake_aircraft)
 
-	var fsm := FsmScript.new()
+	var fsm := AircraftFSM.new()
 	fsm.hesitate_duration = 1.0
 	fake_aircraft.add_child(fsm)  # 자식 추가 시 fsm._ready 실행 → aircraft = get_parent()
 
 	fake_aircraft.in_view = true
 
-	suite.check_eq(fsm._state, FsmScript.State.IDLE, "초기 상태 IDLE")
+	suite.check_eq(fsm._state, AircraftFSM.State.IDLE, "초기 상태 IDLE")
 
 	# ADVANCE → MOVING + 비행기에 ADVANCE 명령
 	fake_aircraft.received_sig = HandSignal.SignalType.ADVANCE
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.MOVING, "ADVANCE → MOVING")
+	suite.check_eq(fsm._state, AircraftFSM.State.MOVING, "ADVANCE → MOVING")
 	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.ADVANCE, "ADVANCE 신호 전달")
 
 	# 무신호(NONE) → HESITATING, 마지막 이동 신호 유지
 	fake_aircraft.received_sig = HandSignal.SignalType.NONE
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.HESITATING, "MOVING + NONE → HESITATING(멈칫)")
+	suite.check_eq(fsm._state, AircraftFSM.State.HESITATING, "MOVING + NONE → HESITATING(멈칫)")
 	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.ADVANCE, "멈칫 중 이동 유지")
 
 	# 멈칫 시간 경과 → STOPPING
 	fsm._process(1.0)
-	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "멈칫 시간 경과 → STOPPING")
+	suite.check_eq(fsm._state, AircraftFSM.State.STOPPING, "멈칫 시간 경과 → STOPPING")
 	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.STOP, "STOPPING 시 STOP 신호")
 
 	# 속도 0 → IDLE 복귀
 	fake_aircraft.speed = 0.0
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.IDLE, "정지 완료 → IDLE")
+	suite.check_eq(fsm._state, AircraftFSM.State.IDLE, "정지 완료 → IDLE")
 
 	# STOP 신호는 멈칫 없이 즉시 STOPPING
 	fake_aircraft.received_sig = HandSignal.SignalType.ADVANCE
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.MOVING, "재이동 → MOVING")
+	suite.check_eq(fsm._state, AircraftFSM.State.MOVING, "재이동 → MOVING")
 	fake_aircraft.received_sig = HandSignal.SignalType.STOP
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "MOVING + STOP → 즉시 STOPPING(멈칫 없음)")
+	suite.check_eq(fsm._state, AircraftFSM.State.STOPPING, "MOVING + STOP → 즉시 STOPPING(멈칫 없음)")
 
 	# 시야 밖(이동 중)은 멈칫 없이 즉시 STOPPING (유도자를 놓치면 지체 없이 정지)
 	fake_aircraft.speed = 0.0
@@ -250,13 +241,13 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	fsm._process(0.1)  # IDLE → MOVING
 	fake_aircraft.in_view = false
 	fsm._process(0.1)
-	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "시야 밖(이동 중) → 즉시 STOPPING")
+	suite.check_eq(fsm._state, AircraftFSM.State.STOPPING, "시야 밖(이동 중) → 즉시 STOPPING")
 
 	# 시야 밖에서는 이동 신호가 있어도 IDLE에서 출발하지 않음
 	fake_aircraft.speed = 0.0
 	fsm._process(0.1)  # STOPPING → IDLE
 	fsm._process(0.1)  # 시야 밖 + ADVANCE 여전히 → 그대로 IDLE
-	suite.check_eq(fsm._state, FsmScript.State.IDLE, "시야 밖에서는 출발하지 않음")
+	suite.check_eq(fsm._state, AircraftFSM.State.IDLE, "시야 밖에서는 출발하지 않음")
 
 	fake_aircraft.queue_free()
 
@@ -264,7 +255,6 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 ## 실제 Aircraft 대역. FSM은 이 노드의 received_signal()/sees_marshaller()/get_speed()만 읽고,
 ## issue_signal()으로 명령을 되돌려준다. 시야 밖이면 received_signal은 NONE (실제 Aircraft와 동일 게이팅).
 class FakeAircraft extends Node3D:
-	const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 	var last_signal: int = -1
 	var speed: float = 0.0
 	var received_sig: int = HandSignal.SignalType.NONE

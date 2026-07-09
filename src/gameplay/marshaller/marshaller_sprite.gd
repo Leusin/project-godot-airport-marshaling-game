@@ -5,10 +5,6 @@ extends Sprite3D
 ## 확정 버튼(스페이스)을 누른 직후의 짧은 유예 구간에만, 평소 신호와 무관하게
 ## 엔진 정지(확정) 포즈로 덮어쓴다 (누르기 전 대기 중에는 평소 신호 포즈 유지).
 
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-
 const ICON_PATHS := {
 	HandSignal.SignalType.NONE: "res://assets/sprites/marshaller/signal_none.png",
 	HandSignal.SignalType.ADVANCE: "res://assets/sprites/marshaller/signal_advance.png",

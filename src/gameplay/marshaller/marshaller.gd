@@ -3,8 +3,6 @@ extends Node3D
 ## 입력은 전혀 모른다 — PlayerController가 possess해 set_*()로 상태를 밀어넣고,
 ## 자식 컴포넌트(MarshallerMovement/MarshallerSprite)가 그 상태를 읽는다 (Aircraft가 command를 보관하는 것과 대칭).
 
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-
 signal move_intent_changed(direction: Vector3)
 signal hand_signal_changed(sig: HandSignal.SignalType)
 

@@ -1,3 +1,4 @@
+class_name AircraftFSM
 extends Node
 ## 비행기 신호 해석 FSM (비행기의 brain).
 ## IDLE -> MOVING -> HESITATING -> STOPPING -> IDLE 전이.
@@ -9,9 +10,6 @@ extends Node
 ## 입력원은 SignalInput/마샬러/시야를 직접 보지 않고, 부모 Aircraft가 "받은 신호"를 읽는다.
 ## (Aircraft가 자기 시야로 마샬러를 관찰해 received_signal/sees_marshaller로 제공)
 ## 신호 어휘(SignalType/is_move_signal)는 입력 장치가 아니라 HandSignal 도메인에서 가져온다.
-
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-const CountdownScript = preload("res://src/core/utils/countdown.gd")
 
 ## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
 const STOP_SPEED_EPSILON := 0.05
@@ -28,7 +26,7 @@ enum State {
 @onready var aircraft: Node3D = get_parent()
 
 var _state: State = State.IDLE
-var _hesitate := CountdownScript.new()
+var _hesitate := Countdown.new()
 var _last_move_signal: HandSignal.SignalType = HandSignal.SignalType.ADVANCE
 
 func _process(delta: float) -> void:

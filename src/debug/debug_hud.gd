@@ -3,10 +3,6 @@ extends Control
 ## DebugLayer(layer 128, Process Mode Always) 아래라 일시정지 중에도 갱신된다.
 ## 개발 빌드에서는 ` (백틱) 키로 껐다 켤 수 있고, 릴리스 빌드에서는 아예 숨긴다.
 
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-
 const RIGHT_MARGIN := 12.0
 const TOP_MARGIN := 24.0
 const LINE_HEIGHT := 20.0

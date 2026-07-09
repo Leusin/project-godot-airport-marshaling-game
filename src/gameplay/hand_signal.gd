@@ -1,3 +1,4 @@
+class_name HandSignal
 extends RefCounted
 ## 마샬링 수신호 도메인. 수신호의 종류(SignalType)와 그 성질(is_move_signal)만 정의한다.
 ## 입력 장치(SignalInput)가 아니라 "신호 자체의 어휘"이므로 여기 둔다 —

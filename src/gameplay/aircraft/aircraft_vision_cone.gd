@@ -1,3 +1,4 @@
+class_name AircraftVisionCone
 extends Node
 ## 비행기 정면 기준 70도 시야 원뿔 판정. 마샬러가 원뿔 안에 있는지 bool만 반환한다.
 ## 판정만 담당하며 상태를 갖지 않는다 (FSM/신호 해석은 AircraftFSM에서 처리).

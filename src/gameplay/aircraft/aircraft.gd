@@ -1,13 +1,9 @@
+class_name Aircraft
 extends Node3D
 ## 비행기 Pawn. 정체성/설정과 명령 인터페이스를 관리하고, 자기 시야로 마샬러를 관찰해
 ## "받은 수신호"를 제공한다. 실제 움직임(속도 관성·회전·전진)은 자식 AircraftMovement가 담당한다.
 ## 언제 어떤 신호를 보낼지(상태 전이)는 AircraftFSM이 판단하고, 신호↔명령 번역은
 ## 비행기의 구현 세부사항이라 여기서 처리한다 (FSM은 받은 신호만 읽고 명령만 넘긴다).
-
-const CountdownScript = preload("res://src/core/utils/countdown.gd")
-const HandSignal = preload("res://src/gameplay/hand_signal.gd")
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
 
 enum Command { STOP, ADVANCE, TURN_LEFT, TURN_RIGHT }
 
@@ -24,7 +20,7 @@ var _marshaller: Node3D
 
 var _active_command: Command = Command.STOP
 var _pending_command: Command = Command.STOP
-var _delay := CountdownScript.new()
+var _delay := Countdown.new()
 
 func _ready() -> void:
 	# 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).

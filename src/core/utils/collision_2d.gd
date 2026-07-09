@@ -1,3 +1,4 @@
+class_name Collision2D
 extends RefCounted
 ## XZ 평면 2D 도형 겹침 판정 (탑다운 충돌용).
 ## OBB(회전 사각형)는 center, half_extents(가로반/세로반), forward(세로축 단위벡터)로 표현한다.

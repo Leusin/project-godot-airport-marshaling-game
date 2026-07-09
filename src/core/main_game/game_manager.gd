@@ -2,10 +2,6 @@ extends Node
 ## 게임 전체 상태 관리. 충돌 -> 게임 오버 / 주차 완료(확정 버튼) -> 유도 성공.
 ## HUD 참조는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-const CountdownScript = preload("res://src/core/utils/countdown.gd")
-
 ## 확정 버튼을 누른 뒤 실제 성공 처리(HUD 표시)까지의 유예 시간.
 ## 마샬러의 엔진정지 포즈가 잠깐 보인 뒤 성공 HUD가 뜨도록 하는 연출용 지연.
 const SHUTDOWN_CONFIRM_DELAY := 1.0
@@ -24,7 +20,7 @@ var is_awaiting_shutdown_confirm: bool = false
 ## 마샬러 스프라이트가 이 구간에서만 엔진정지 포즈를 보여준다.
 var is_confirming_shutdown: bool = false
 
-var _confirm_delay := CountdownScript.new()
+var _confirm_delay := Countdown.new()
 
 func set_awaiting_shutdown_confirm(value: bool) -> void:
 	is_awaiting_shutdown_confirm = value

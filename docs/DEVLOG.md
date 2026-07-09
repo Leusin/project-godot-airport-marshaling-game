@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-09 [결정] 스크립트 참조를 `preload()` 상수→`class_name` 전역으로 통일 — 클래스처럼 쓰이던 12개 스크립트(SceneQuery/GameGroups/HandSignal/Countdown/Collision2D/CollisionShapes/ScreenBounds/TestLib/Aircraft/AircraftFSM/AircraftVisionCone/SignalInput)에 `class_name` 선언, 모든 `const X = preload(...)` 제거하고 호출부를 전역 이름으로 변경. 별칭이 파일명과 달랐던 것(CountdownScript→Countdown, AircraftScript→Aircraft, FsmScript→AircraftFSM, VisionConeScript→AircraftVisionCone, SignalInputScript→SignalInput)만 호출부 개명. 상속/파일명/동작 불변, 이름 충돌 없음(오토로드 0). 45/45 테스트 통과.
+
 - 2026-07-09 [결정] 수신호 어휘(SignalType/is_move_signal)를 `signal_input.gd`→`hand_signal.gd`(HandSignal 도메인)로 추출 — FSM/Aircraft/Marshaller/Sprite 등 게임플레이 로직이 enum 하나 때문에 입력 장치 스크립트를 preload하던 의존을 끊음. 이제 입력·Pawn·표시·판단이 모두 중립 도메인을 공유하고, 입력 노드를 실제로 읽는 곳(HUD/테스트)만 `signal_input.gd`를 참조. HUD의 노드 타입은 `Node`로 완화. 45/45 테스트 통과.
 
 - 2026-07-09 [결정] 비행기도 Controller/Pawn으로 정리 — FSM이 `SignalInput`을 직접 보던 것을, Aircraft가 자기 시야로 마샬러를 관찰해 "받은 신호"(`received_signal()`/`sees_marshaller()`, 시야 밖이면 NONE)를 제공하고 FSM은 그것만 읽어 상태 전이하도록 변경. 이제 FSM(brain)은 Aircraft만 바라보고(마샬러/시야/입력 직접 참조 제거), Aircraft(Pawn)가 명령을 보유, `AircraftControl`→`AircraftMovement` 개명(명령=FSM 결정을 읽어 이동). 물리적으로도 "조종사가 마샬러를 본다"에 부합. FSM 단위테스트는 fake Aircraft가 received_signal/sees_marshaller를 제공하도록 갱신(45/45 통과), 미사용 fake_signal_input 제거.

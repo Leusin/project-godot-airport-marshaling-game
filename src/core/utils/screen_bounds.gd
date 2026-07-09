@@ -1,3 +1,4 @@
+class_name ScreenBounds
 extends RefCounted
 ## 탑다운 카메라의 실제 가시 영역을 계산하는 공용 유틸리티.
 

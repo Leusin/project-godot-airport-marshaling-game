@@ -4,10 +4,6 @@ extends MeshInstance3D
 ##   비행기 = 회전하는 사각형(시안), 주차 = 초록, 장애물/마샬러(위험) = 빨강.
 ## 개발 빌드 전용. ` (백틱 = toggle_debug)로 껐다 켤 수 있다.
 
-const CollisionShapes = preload("res://src/core/utils/collision_shapes.gd")
-const Collision2D = preload("res://src/core/utils/collision_2d.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
-
 const DRAW_HEIGHT := 0.08
 const AIRCRAFT_COLOR := Color(0.2, 0.9, 1.0)
 const GOAL_COLOR := Color(0.2, 1.0, 0.3)
