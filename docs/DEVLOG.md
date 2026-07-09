@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-09 [결정] 마샬러 입력/이동을 Controller/Pawn(언리얼 possess)으로 분리 — 이동 컴포넌트가 전역 입력을 당겨오던(pull) 구조를, 컨트롤러가 Pawn에 의도를 밀어넣는(push) 구조로 뒤집음. 신규 `PlayerController`가 `MovementInput`(개명: MoveInput)을 possess한 `Marshaller`로 라우팅하고, Pawn은 `move_intent`만 보유(입력 무지)해 `move_intent_changed`로 자식 `MarshallerMovement`(개명: MarshallerControl)를 깨운다. 전 구간 이벤트 기반(시그널 2홉), 위치 적분은 의도≠0일 때만 물리처리. AI 조종 교체 지점이 PlayerController 하나로 국소화됨. `MarshallerController`라는 이름은 이동 컴포넌트(Control)와 혼동돼 쓰지 않음.
+
 - 2026-07-08 [결정] 입력 처리를 폴링→이벤트(`_unhandled_input`) — 입력 노드가 이벤트로 현재 상태를 보관·방출한다. 연속 입력(이동/유지 신호)은 소비자가 캐시(move_direction/hand_signal)를 매 프레임 읽고, 단발 입력(엔진정지 확정)은 shutdown_confirmed 시그널로 받는다. `get_signal()`이 캐시를 반환해 기존 폴링 소비자(FSM/HUD/스프라이트)는 무변경. 입력은 특정 엔티티 비의존이라 Systems/Input에 둠. 물리프레임 `is_action_just_pressed`의 단발입력 유실/중복도 해소.
 
 - 2026-07-08 [결정] 엔티티 루트/이동 분리 — 루트(Aircraft/Marshaller)는 설정·정체성·명령, 실제 이동은 자식 Control 컴포넌트(AircraftControl/MarshallerControl). 부모가 먼저 명령을 해소한 뒤 자식이 움직여 충돌 판정보다 앞서 위치가 반영됨. 외부 인터페이스(issue_signal/get_speed)는 루트에 유지해 FSM/충돌 호출부 불변.

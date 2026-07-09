@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller.gd" id="1_marshaller_script"]
-[ext_resource type="Script" path="res://src/gameplay/input/move_input.gd" id="2_move_input_script"]
+[ext_resource type="Script" path="res://src/gameplay/input/movement_input.gd" id="2_movement_input_script"]
 [ext_resource type="Script" path="res://src/gameplay/aircraft/aircraft_vision_cone.gd" id="3_vision_cone_script"]
 [ext_resource type="Script" path="res://src/debug/vision_cone_debug_visual.gd" id="4_vision_cone_visual_script"]
 [ext_resource type="Script" path="res://src/gameplay/aircraft/aircraft.gd" id="5_aircraft_script"]
@@ -18,7 +18,8 @@
 [ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_sprite.gd" id="17_marshaller_sprite_script"]
 [ext_resource type="Script" path="res://src/core/main_game/level_lighting.gd" id="19_level_lighting_script"]
 [ext_resource type="Script" path="res://src/gameplay/aircraft/aircraft_control.gd" id="20_aircraft_control_script"]
-[ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_control.gd" id="21_marshaller_control_script"]
+[ext_resource type="Script" path="res://src/gameplay/marshaller/marshaller_movement.gd" id="21_marshaller_movement_script"]
+[ext_resource type="Script" path="res://src/gameplay/marshaller/player_controller.gd" id="22_player_controller_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
 size = Vector3(1.5, 1.0, 1.5)
@@ -48,11 +49,14 @@ script = ExtResource("9_game_manager_script")
 
 [node name="Input" type="Node" parent="Systems"]
 
-[node name="MoveInput" type="Node" parent="Systems/Input" groups=["move_input"]]
-script = ExtResource("2_move_input_script")
+[node name="MovementInput" type="Node" parent="Systems/Input" groups=["movement_input"]]
+script = ExtResource("2_movement_input_script")
 
 [node name="SignalInput" type="Node" parent="Systems/Input" groups=["signal_input"]]
 script = ExtResource("6_signal_input_script")
+
+[node name="PlayerController" type="Node" parent="Systems"]
+script = ExtResource("22_player_controller_script")
 
 [node name="World" type="Node3D" parent="."]
 process_mode = 1
@@ -103,8 +107,8 @@ billboard = 1
 texture_filter = 0
 script = ExtResource("17_marshaller_sprite_script")
 
-[node name="MarshallerControl" type="Node" parent="World/EntityRoot/Marshaller"]
-script = ExtResource("21_marshaller_control_script")
+[node name="MarshallerMovement" type="Node" parent="World/EntityRoot/Marshaller"]
+script = ExtResource("21_marshaller_movement_script")
 
 [node name="Aircraft" type="Node3D" parent="World/EntityRoot" groups=["aircraft"]]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
