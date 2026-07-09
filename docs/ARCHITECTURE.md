@@ -47,9 +47,9 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 │  │  │  └─ MarshallerMovement    이동 실행 (Pawn 의도만 읽음)
 │  │  └─ Aircraft                [group: aircraft]
 │  │     ├─ AircraftModel
-│  │     ├─ AircraftControl       이동 실행
+│  │     ├─ AircraftMovement      이동 실행 (명령=FSM 결정)
 │  │     ├─ VisionCone / VisionConeVisual
-│  │     ├─ AircraftFSM           [group: aircraft_fsm]
+│  │     ├─ AircraftFSM           [group: aircraft_fsm]  Aircraft가 받은 신호로 상태 전이
 │  │     └─ AircraftHitbox
 │  └─ EffectRoot                 임시 시각 효과 (향후)
 ├─ HudLayer (layer 10, Pausable) └─ HudRoot
@@ -77,11 +77,11 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 - `SignalInput` — 수신호 입력 전담. `_unhandled_input`으로 현재 신호를 상태로 보관(`get_signal()`은 캐시 반환)하고 바뀔 때 `hand_signal_changed` 방출. 엔진정지 확정은 단발 `shutdown_confirmed` 시그널.
   모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값. 이동 신호 판별(`is_move_signal`) 제공
 
-**비행기**
-- `Aircraft` — 설정·명령 루트. 수신호를 받아 내부 명령(Command)으로 번역(`issue_signal`)하고 딜레이(반응 지연)를 해소. 이동/시야/충돌 컴포넌트를 붙인다
-- `AircraftControl` — 이동 실행 (명령/설정을 읽어 속도 관성 + 회전 + 전진을 부모에 반영)
-- `AircraftVisionCone` — 정면 기준 70도 원뿔 판정, 마샬러가 원뿔 안에 있는지 bool만 반환
-- `AircraftFSM` — IDLE/MOVING/HESITATING/STOPPING 전이만 담당. 신호 + 시야를 받아 Aircraft에 신호 전달(`issue_signal`). 무신호는 멈칫 후 정지, STOP은 즉시 정지
+**비행기 (Controller/Pawn — brain은 FSM)**
+- `Aircraft` — Pawn. 설정·명령 루트. 자기 시야로 **마샬러를 관찰해 "받은 수신호"**(`received_signal()`/`sees_marshaller()`, 시야 밖이면 NONE)를 제공하고, 수신호를 내부 명령(Command)으로 번역(`issue_signal`)해 딜레이(반응 지연)를 해소. 이동/시야/충돌 컴포넌트를 붙인다
+- `AircraftMovement` — 이동 실행(MovementComponent). 명령(=FSM이 결정한 것)/설정을 읽어 속도 관성 + 회전 + 전진을 부모에 반영
+- `AircraftVisionCone` — 정면 기준 70도 원뿔 판정, 마샬러가 원뿔 안에 있는지 bool만 반환 (Aircraft가 `sees_marshaller`에서 사용)
+- `AircraftFSM` — 비행기의 brain. **Aircraft가 받은 신호 + 시야를 읽어**(SignalInput을 직접 보지 않음) IDLE/MOVING/HESITATING/STOPPING 상태 전이 후 Aircraft에 명령 전달(`issue_signal`). 무신호는 멈칫 후 정지, STOP은 즉시 정지, 시야 밖은 즉시 정지
 - `AircraftCollision` — XZ 거리 기반으로 마샬러/장애물/주차지점 근접 판정 -> GameManager 통지
 
 **UI**

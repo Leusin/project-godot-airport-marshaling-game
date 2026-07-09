@@ -10,8 +10,6 @@ const CountdownScript := preload("res://src/core/utils/countdown.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
 const SignalInputScript := preload("res://src/gameplay/input/signal_input.gd")
-const GameGroups := preload("res://src/core/game_groups.gd")
-const FakeSignalInput := preload("res://tests/fakes/fake_signal_input.gd")
 
 @onready var _report: RichTextLabel = $Report
 
@@ -198,40 +196,30 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	return event
 
 # ─────────────────────────────────────────────────────────
-# aircraft_fsm: 신호 해석 상태 전이 (페이크 비행기/시야/수신호로 구동)
+# aircraft_fsm: 신호 해석 상태 전이. FSM은 부모 Aircraft가 "받은 신호"/시야만 읽으므로
+# 페이크 Aircraft가 received_signal()/sees_marshaller()를 제공한다 (시야 밖이면 received=NONE).
 func _test_aircraft_fsm(suite: TestLib) -> void:
 	suite.start("aircraft_fsm")
 
-	var marshaller := Node3D.new()
-	marshaller.add_to_group(GameGroups.MARSHALLER)
-	add_child(marshaller)
-
-	var fake_signal := FakeSignalInput.new()
-	fake_signal.add_to_group(GameGroups.SIGNAL_INPUT)
-	add_child(fake_signal)
-
 	var fake_aircraft := FakeAircraft.new()
 	add_child(fake_aircraft)
-	var fake_vision_cone := FakeVisionCone.new()
-	fake_vision_cone.name = "VisionCone"
-	fake_aircraft.add_child(fake_vision_cone)
 
 	var fsm := FsmScript.new()
 	fsm.hesitate_duration = 1.0
-	fake_aircraft.add_child(fsm)  # 자식 추가 시 fsm._ready 실행 → 그룹에서 marshaller/signal_input 획득
+	fake_aircraft.add_child(fsm)  # 자식 추가 시 fsm._ready 실행 → aircraft = get_parent()
 
-	fake_vision_cone.in_view = true
+	fake_aircraft.in_view = true
 
 	suite.check_eq(fsm._state, FsmScript.State.IDLE, "초기 상태 IDLE")
 
 	# ADVANCE → MOVING + 비행기에 ADVANCE 명령
-	fake_signal.sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.MOVING, "ADVANCE → MOVING")
 	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "ADVANCE 신호 전달")
 
 	# 무신호(NONE) → HESITATING, 마지막 이동 신호 유지
-	fake_signal.sig = SignalInputScript.SignalType.NONE
+	fake_aircraft.received_sig = SignalInputScript.SignalType.NONE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.HESITATING, "MOVING + NONE → HESITATING(멈칫)")
 	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "멈칫 중 이동 유지")
@@ -247,19 +235,19 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	suite.check_eq(fsm._state, FsmScript.State.IDLE, "정지 완료 → IDLE")
 
 	# STOP 신호는 멈칫 없이 즉시 STOPPING
-	fake_signal.sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.MOVING, "재이동 → MOVING")
-	fake_signal.sig = SignalInputScript.SignalType.STOP
+	fake_aircraft.received_sig = SignalInputScript.SignalType.STOP
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "MOVING + STOP → 즉시 STOPPING(멈칫 없음)")
 
 	# 시야 밖(이동 중)은 멈칫 없이 즉시 STOPPING (유도자를 놓치면 지체 없이 정지)
 	fake_aircraft.speed = 0.0
 	fsm._process(0.1)  # STOPPING → IDLE
-	fake_signal.sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
 	fsm._process(0.1)  # IDLE → MOVING
-	fake_vision_cone.in_view = false
+	fake_aircraft.in_view = false
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "시야 밖(이동 중) → 즉시 STOPPING")
 
@@ -269,20 +257,22 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	fsm._process(0.1)  # 시야 밖 + ADVANCE 여전히 → 그대로 IDLE
 	suite.check_eq(fsm._state, FsmScript.State.IDLE, "시야 밖에서는 출발하지 않음")
 
-	marshaller.queue_free()
-	fake_signal.queue_free()
 	fake_aircraft.queue_free()
 
 # ── 페이크 노드 ────────────────────────────────────────────
+## 실제 Aircraft 대역. FSM은 이 노드의 received_signal()/sees_marshaller()/get_speed()만 읽고,
+## issue_signal()으로 명령을 되돌려준다. 시야 밖이면 received_signal은 NONE (실제 Aircraft와 동일 게이팅).
 class FakeAircraft extends Node3D:
+	const SignalTypes = preload("res://src/gameplay/input/signal_input.gd")
 	var last_signal: int = -1
 	var speed: float = 0.0
+	var received_sig: int = SignalTypes.SignalType.NONE
+	var in_view: bool = true
 	func issue_signal(sig: int) -> void:
 		last_signal = sig
 	func get_speed() -> float:
 		return speed
-
-class FakeVisionCone extends Node:
-	var in_view: bool = true
-	func is_point_in_view(_point: Vector3) -> bool:
+	func sees_marshaller() -> bool:
 		return in_view
+	func received_signal() -> int:
+		return received_sig if in_view else SignalTypes.SignalType.NONE

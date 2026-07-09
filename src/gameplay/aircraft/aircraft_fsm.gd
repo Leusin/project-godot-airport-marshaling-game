@@ -1,15 +1,16 @@
 extends Node
-## 비행기 신호 해석 FSM.
+## 비행기 신호 해석 FSM (비행기의 brain).
 ## IDLE -> MOVING -> HESITATING -> STOPPING -> IDLE 전이.
 ## NONE(무신호): 이동 중이면 hesitate_duration만큼 멈칫(계속 이동)하다가 정지.
 ## STOP(명확한 정지): 즉시 정지 시작. NONE과 달리 멈칫 없음.
 ## 시야 밖: 마샬러를 놓치면 즉시 STOPPING (in-view 무신호의 멈칫보다 엄격 — 지체 없이 정지).
 ##   또한 IDLE에서는 시야 밖이면 이동 신호를 받아도 출발하지 않는다.
+##
+## 입력원은 SignalInput/마샬러/시야를 직접 보지 않고, 부모 Aircraft가 "받은 신호"를 읽는다.
+## (Aircraft가 자기 시야로 마샬러를 관찰해 received_signal/sees_marshaller로 제공)
 
 const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
-const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
-const GameGroups = preload("res://src/core/game_groups.gd")
 
 ## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
 const STOP_SPEED_EPSILON := 0.05
@@ -24,26 +25,14 @@ enum State {
 @export var hesitate_duration: float = 1.0
 
 @onready var aircraft: Node3D = get_parent()
-@onready var vision_cone: Node = get_parent().get_node("VisionCone")
-
-# 마샬러/수신호는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
-var marshaller: Node3D
-var signal_input: SignalInputScript
-
-func _ready() -> void:
-	marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
-	signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
-	# 필수 참조가 없으면 _process에서 크래시하는 대신 조용히 비활성화 (경고는 위에서 출력됨).
-	if marshaller == null or signal_input == null:
-		set_process(false)
 
 var _state: State = State.IDLE
 var _hesitate := CountdownScript.new()
 var _last_move_signal: SignalInputScript.SignalType = SignalInputScript.SignalType.ADVANCE
 
 func _process(delta: float) -> void:
-	var in_view: bool = vision_cone.is_point_in_view(marshaller.global_position)
-	var hand_signal: SignalInputScript.SignalType = signal_input.get_signal() if in_view else SignalInputScript.SignalType.NONE
+	var in_view: bool = aircraft.sees_marshaller()
+	var hand_signal: SignalInputScript.SignalType = aircraft.received_signal()
 
 	match _state:
 		State.IDLE:
