@@ -1,3 +1,4 @@
+class_name Marshaller
 extends Node3D
 ## 마샬러 Pawn. 정체성/설정(speed)과 "명령받은 상태(이동 의도 move_intent, 수신호 hand_signal)"만 보유한다.
 ## 입력은 전혀 모른다 — PlayerController가 possess해 set_*()로 상태를 밀어넣고,
