@@ -10,8 +10,6 @@ const FONT_SIZE := 16
 const TEXT_COLOR := Color(0.9, 0.9, 0.95, 0.85)
 
 var _version := "0.0.0"
-var _signal_input: Node
-var _aircraft_fsm: Node
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -24,9 +22,6 @@ func _ready() -> void:
 		set_process_input(false)
 		return
 
-	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
-	_aircraft_fsm = SceneQuery.require_single(GameGroups.AIRCRAFT_FSM)
-
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		visible = not visible
@@ -38,16 +33,9 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	var lines := PackedStringArray()
 	lines.append("v%s   %d FPS" % [_version, Engine.get_frames_per_second()])
-	if _aircraft_fsm != null:
-		lines.append("FSM: %s" % _aircraft_fsm.state_name())
-	if _signal_input != null:
-		lines.append("SIGNAL: %s" % _current_signal_name())
-
+	
 	var font := ThemeDB.fallback_font
 	for index in lines.size():
 		var baseline := TOP_MARGIN + index * LINE_HEIGHT
 		draw_string(font, Vector2(0.0, baseline), lines[index],
 			HORIZONTAL_ALIGNMENT_RIGHT, size.x - RIGHT_MARGIN, FONT_SIZE, TEXT_COLOR)
-
-func _current_signal_name() -> String:
-	return HandSignal.SignalType.keys()[_signal_input.get_signal()]

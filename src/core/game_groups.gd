@@ -4,10 +4,15 @@ extends RefCounted
 ## 조용한 연결 실패를 막는다. (.tscn 의 groups=[...] 는 코드에서 참조할 수 없어 문자열 그대로 두지만,
 ## 코드 쪽 조회는 모두 이 상수를 쓴다.)
 
-const MARSHALLER := &"marshaller"
+# SYSTEM
+const GAME_MANAGER := &"game_manager"
 const SIGNAL_INPUT := &"signal_input"
 const MOVEMENT_INPUT := &"movement_input"
-const AIRCRAFT_FSM := &"aircraft_fsm"
-const GAME_MANAGER := &"game_manager"
+
+# ENTITY
+const MARSHALLER := &"marshaller"
+const AIRCRAFT := &"aircraft"
+
+# HUD LAYER
 const GAME_OVER_HUD := &"game_over_hud"
 const SUCCESS_HUD := &"success_hud"

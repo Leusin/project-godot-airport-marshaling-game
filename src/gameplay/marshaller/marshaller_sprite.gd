@@ -14,13 +14,13 @@ const ICON_PATHS := {
 }
 const SHUTDOWN_ICON_PATH := "res://assets/sprites/marshaller/signal_shutdown.png"
 
-var _marshaller: Node
+var _marshaller: Marshaller
 var _game_manager: Node
 var _textures: Dictionary = {}
 var _shutdown_texture: Texture2D
 
 func _ready() -> void:
-	_marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
+	_marshaller = get_parent_node_3d()
 	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
 	for sig in ICON_PATHS:
 		_textures[sig] = load(ICON_PATHS[sig])
