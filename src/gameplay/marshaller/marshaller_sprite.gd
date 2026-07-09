@@ -5,16 +5,16 @@ extends Sprite3D
 ## 확정 버튼(스페이스)을 누른 직후의 짧은 유예 구간에만, 평소 신호와 무관하게
 ## 엔진 정지(확정) 포즈로 덮어쓴다 (누르기 전 대기 중에는 평소 신호 포즈 유지).
 
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 
 const ICON_PATHS := {
-	SignalInputScript.SignalType.NONE: "res://assets/sprites/marshaller/signal_none.png",
-	SignalInputScript.SignalType.ADVANCE: "res://assets/sprites/marshaller/signal_advance.png",
-	SignalInputScript.SignalType.STOP: "res://assets/sprites/marshaller/signal_stop.png",
-	SignalInputScript.SignalType.TURN_LEFT: "res://assets/sprites/marshaller/signal_turn_left.png",
-	SignalInputScript.SignalType.TURN_RIGHT: "res://assets/sprites/marshaller/signal_turn_right.png",
+	HandSignal.SignalType.NONE: "res://assets/sprites/marshaller/signal_none.png",
+	HandSignal.SignalType.ADVANCE: "res://assets/sprites/marshaller/signal_advance.png",
+	HandSignal.SignalType.STOP: "res://assets/sprites/marshaller/signal_stop.png",
+	HandSignal.SignalType.TURN_LEFT: "res://assets/sprites/marshaller/signal_turn_left.png",
+	HandSignal.SignalType.TURN_RIGHT: "res://assets/sprites/marshaller/signal_turn_right.png",
 }
 const SHUTDOWN_ICON_PATH := "res://assets/sprites/marshaller/signal_shutdown.png"
 
@@ -29,7 +29,7 @@ func _ready() -> void:
 	for sig in ICON_PATHS:
 		_textures[sig] = load(ICON_PATHS[sig])
 	_shutdown_texture = load(SHUTDOWN_ICON_PATH)
-	texture = _textures[SignalInputScript.SignalType.NONE]
+	texture = _textures[HandSignal.SignalType.NONE]
 
 func _process(_delta: float) -> void:
 	if _marshaller == null:
@@ -40,7 +40,7 @@ func _process(_delta: float) -> void:
 			texture = _shutdown_texture
 		return
 
-	var current: SignalInputScript.SignalType = _marshaller.hand_signal
+	var current: HandSignal.SignalType = _marshaller.hand_signal
 	var tex: Texture2D = _textures.get(current)
 	if tex != null and tex != texture:
 		texture = tex

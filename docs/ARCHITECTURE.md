@@ -14,6 +14,7 @@ src/
     main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
     utils/                  여러 노드가 공유하는 재사용 스크립트 (scene_query.gd, collision_2d.gd 등)
   gameplay/
+    hand_signal.gd          수신호 도메인 (SignalType/is_move_signal, 입력·Pawn·표시·FSM 공유)
     input/                  입력 전담 (이동키/수신호 → 값 변환, 특정 엔티티 비의존)
     aircraft/               비행기 로직 (설정·명령/이동/FSM/시야/충돌)
     marshaller/             마샬러 로직 (설정/이동/스프라이트)
@@ -72,10 +73,13 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 - `MarshallerSprite` — 시각화. Pawn의 `hand_signal`(+ GameManager의 확정 유예)을 읽어 텍스처를 바꾼다. 입력(SignalInput)을 직접 보지 않음
 - `PlayerController` — Marshaller를 possess(그룹 조회). `MovementInput`/`SignalInput`의 시그널을 받아 Pawn의 `set_move_intent()`/`set_hand_signal()`로 push. 이 노드만 AI 컨트롤러로 갈아끼우면 같은 Pawn을 코드가 조종 (씬에서는 `Systems` 아래)
 
+**신호 도메인**
+- `HandSignal` (`gameplay/hand_signal.gd`) — 수신호 어휘. `enum SignalType`(NONE/ADVANCE/STOP/TURN_LEFT/TURN_RIGHT)과 성질 판별(`is_move_signal`)만 정의. 입력 장치가 아니라 신호 자체의 것이라, 입력(SignalInput)·Pawn(Marshaller/Aircraft)·표시(HUD/Sprite)·판단(FSM)이 모두 이걸 공유한다 (게임플레이 로직이 입력 스크립트에 의존하지 않도록 분리)
+
 **입력** (`gameplay/input/`, 씬에서는 `Systems/Input` 아래 · 특정 엔티티 비의존 · 이벤트 기반 · 디바이스 계층)
 - `MovementInput` — 이동 입력 전담. `_unhandled_input`으로 방향을 재계산해 바뀔 때 `move_direction_changed` 방출(캐시 `move_direction`도 유지) [group: movement_input]
-- `SignalInput` — 수신호 입력 전담. `_unhandled_input`으로 현재 신호를 상태로 보관(`get_signal()`은 캐시 반환)하고 바뀔 때 `hand_signal_changed` 방출. 엔진정지 확정은 단발 `shutdown_confirmed` 시그널.
-  모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값. 이동 신호 판별(`is_move_signal`) 제공
+- `SignalInput` — 수신호 입력 전담. `_unhandled_input`으로 현재 신호(`HandSignal.SignalType`)를 상태로 보관(`get_signal()`은 캐시 반환)하고 바뀔 때 `hand_signal_changed` 방출. 엔진정지 확정은 단발 `shutdown_confirmed` 시그널.
+  모두 hold-to-move. 키를 떼면 NONE(무신호) — NONE과 STOP은 별개 값
 
 **비행기 (Controller/Pawn — brain은 FSM)**
 - `Aircraft` — Pawn. 설정·명령 루트. 자기 시야로 **마샬러를 관찰해 "받은 수신호"**(`received_signal()`/`sees_marshaller()`, 시야 밖이면 NONE)를 제공하고, 수신호를 내부 명령(Command)으로 번역(`issue_signal`)해 딜레이(반응 지연)를 해소. 이동/시야/충돌 컴포넌트를 붙인다

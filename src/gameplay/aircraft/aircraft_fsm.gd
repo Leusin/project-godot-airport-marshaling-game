@@ -8,8 +8,9 @@ extends Node
 ##
 ## 입력원은 SignalInput/마샬러/시야를 직접 보지 않고, 부모 Aircraft가 "받은 신호"를 읽는다.
 ## (Aircraft가 자기 시야로 마샬러를 관찰해 received_signal/sees_marshaller로 제공)
+## 신호 어휘(SignalType/is_move_signal)는 입력 장치가 아니라 HandSignal 도메인에서 가져온다.
 
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
 
 ## 이 속도 미만이면 "정지 완료"로 보고 STOPPING -> IDLE 전이.
@@ -28,11 +29,11 @@ enum State {
 
 var _state: State = State.IDLE
 var _hesitate := CountdownScript.new()
-var _last_move_signal: SignalInputScript.SignalType = SignalInputScript.SignalType.ADVANCE
+var _last_move_signal: HandSignal.SignalType = HandSignal.SignalType.ADVANCE
 
 func _process(delta: float) -> void:
 	var in_view: bool = aircraft.sees_marshaller()
-	var hand_signal: SignalInputScript.SignalType = aircraft.received_signal()
+	var hand_signal: HandSignal.SignalType = aircraft.received_signal()
 
 	match _state:
 		State.IDLE:
@@ -48,29 +49,29 @@ func _process(delta: float) -> void:
 func state_name() -> String:
 	return State.keys()[_state]
 
-func _process_idle(hand_signal: SignalInputScript.SignalType) -> void:
-	aircraft.issue_signal(SignalInputScript.SignalType.STOP)
-	if SignalInputScript.is_move_signal(hand_signal):
+func _process_idle(hand_signal: HandSignal.SignalType) -> void:
+	aircraft.issue_signal(HandSignal.SignalType.STOP)
+	if HandSignal.is_move_signal(hand_signal):
 		_last_move_signal = hand_signal
 		_enter_moving()
 
-func _process_moving(hand_signal: SignalInputScript.SignalType, in_view: bool) -> void:
-	if not in_view or hand_signal == SignalInputScript.SignalType.STOP:
+func _process_moving(hand_signal: HandSignal.SignalType, in_view: bool) -> void:
+	if not in_view or hand_signal == HandSignal.SignalType.STOP:
 		_enter_stopping()
 		return
-	if hand_signal == SignalInputScript.SignalType.NONE:
+	if hand_signal == HandSignal.SignalType.NONE:
 		_enter_hesitating()
 		return
 	_last_move_signal = hand_signal
 	aircraft.issue_signal(hand_signal)
 
-func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: bool, delta: float) -> void:
+func _process_hesitating(hand_signal: HandSignal.SignalType, in_view: bool, delta: float) -> void:
 	aircraft.issue_signal(_last_move_signal)
 
-	if not in_view or hand_signal == SignalInputScript.SignalType.STOP:
+	if not in_view or hand_signal == HandSignal.SignalType.STOP:
 		_enter_stopping()
 		return
-	if SignalInputScript.is_move_signal(hand_signal):
+	if HandSignal.is_move_signal(hand_signal):
 		_last_move_signal = hand_signal
 		_state = State.MOVING
 		return
@@ -78,9 +79,9 @@ func _process_hesitating(hand_signal: SignalInputScript.SignalType, in_view: boo
 	if _hesitate.tick(delta):
 		_enter_stopping()
 
-func _process_stopping(hand_signal: SignalInputScript.SignalType) -> void:
-	aircraft.issue_signal(SignalInputScript.SignalType.STOP)
-	if SignalInputScript.is_move_signal(hand_signal):
+func _process_stopping(hand_signal: HandSignal.SignalType) -> void:
+	aircraft.issue_signal(HandSignal.SignalType.STOP)
+	if HandSignal.is_move_signal(hand_signal):
 		_last_move_signal = hand_signal
 		_enter_moving()
 		return
@@ -97,4 +98,4 @@ func _enter_hesitating() -> void:
 
 func _enter_stopping() -> void:
 	_state = State.STOPPING
-	aircraft.issue_signal(SignalInputScript.SignalType.STOP)
+	aircraft.issue_signal(HandSignal.SignalType.STOP)

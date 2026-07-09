@@ -5,7 +5,7 @@ extends Control
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 
 const RIGHT_MARGIN := 12.0
 const TOP_MARGIN := 24.0
@@ -14,7 +14,7 @@ const FONT_SIZE := 16
 const TEXT_COLOR := Color(0.9, 0.9, 0.95, 0.85)
 
 var _version := "0.0.0"
-var _signal_input: SignalInputScript
+var _signal_input: Node
 var _aircraft_fsm: Node
 
 func _ready() -> void:
@@ -54,4 +54,4 @@ func _draw() -> void:
 			HORIZONTAL_ALIGNMENT_RIGHT, size.x - RIGHT_MARGIN, FONT_SIZE, TEXT_COLOR)
 
 func _current_signal_name() -> String:
-	return SignalInputScript.SignalType.keys()[_signal_input.get_signal()]
+	return HandSignal.SignalType.keys()[_signal_input.get_signal()]

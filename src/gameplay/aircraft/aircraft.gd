@@ -5,7 +5,7 @@ extends Node3D
 ## 비행기의 구현 세부사항이라 여기서 처리한다 (FSM은 받은 신호만 읽고 명령만 넘긴다).
 
 const CountdownScript = preload("res://src/core/utils/countdown.gd")
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 
@@ -36,9 +36,9 @@ func sees_marshaller() -> bool:
 
 ## 비행기가 지금 마샬러로부터 "받은" 수신호. 시야 밖이면 못 받으므로 NONE.
 ## FSM은 SignalInput을 직접 보지 않고 이 값을 읽어 상태를 갱신한다.
-func received_signal() -> SignalInputScript.SignalType:
+func received_signal() -> HandSignal.SignalType:
 	if not sees_marshaller():
-		return SignalInputScript.SignalType.NONE
+		return HandSignal.SignalType.NONE
 	return _marshaller.hand_signal
 
 ## 딜레이가 지나 실제로 반영 중인 명령. 움직임 담당(AircraftMovement)이 매 프레임 읽는다.
@@ -51,14 +51,14 @@ func get_speed() -> float:
 
 ## 수신호를 받아 내부 명령으로 번역해 예약한다. 외부(FSM)는 신호만 넘기고,
 ## 신호가 어떤 물리 명령이 되는지는 비행기가 안다.
-func issue_signal(sig: SignalInputScript.SignalType) -> void:
+func issue_signal(sig: HandSignal.SignalType) -> void:
 	_issue_command(_command_from_signal(sig))
 
-func _command_from_signal(sig: SignalInputScript.SignalType) -> Command:
+func _command_from_signal(sig: HandSignal.SignalType) -> Command:
 	match sig:
-		SignalInputScript.SignalType.ADVANCE: return Command.ADVANCE
-		SignalInputScript.SignalType.TURN_LEFT: return Command.TURN_LEFT
-		SignalInputScript.SignalType.TURN_RIGHT: return Command.TURN_RIGHT
+		HandSignal.SignalType.ADVANCE: return Command.ADVANCE
+		HandSignal.SignalType.TURN_LEFT: return Command.TURN_LEFT
+		HandSignal.SignalType.TURN_RIGHT: return Command.TURN_RIGHT
 		_: return Command.STOP
 
 func _issue_command(command: Command) -> void:

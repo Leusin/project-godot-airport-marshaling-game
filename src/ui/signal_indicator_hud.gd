@@ -5,7 +5,7 @@ extends Control
 ##   - 비행기가 주차존에 완전히 들어와 확정 대기 상태면: 목록 대신 확정(엔진 정지) 아이콘 하나만 표시
 ## 아이콘은 제공받은 마샬링 수신호 참고 이미지를 그대로 잘라 쓴다 (assets/sprites/hud_icons/).
 
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
 
@@ -17,22 +17,22 @@ const CONFIRM_ICON_SIZE := 110.0
 
 # 하단에 나열할 순서 (게임플레이에서 실제로 가능한 신호)
 const ROW_SIGNALS: Array = [
-	SignalInputScript.SignalType.NONE,
-	SignalInputScript.SignalType.ADVANCE,
-	SignalInputScript.SignalType.STOP,
-	SignalInputScript.SignalType.TURN_LEFT,
-	SignalInputScript.SignalType.TURN_RIGHT,
+	HandSignal.SignalType.NONE,
+	HandSignal.SignalType.ADVANCE,
+	HandSignal.SignalType.STOP,
+	HandSignal.SignalType.TURN_LEFT,
+	HandSignal.SignalType.TURN_RIGHT,
 ]
 const ICON_PATHS := {
-	SignalInputScript.SignalType.NONE: "res://assets/sprites/hud_icons/signal_none.png",
-	SignalInputScript.SignalType.ADVANCE: "res://assets/sprites/hud_icons/signal_advance.png",
-	SignalInputScript.SignalType.STOP: "res://assets/sprites/hud_icons/signal_stop.png",
-	SignalInputScript.SignalType.TURN_LEFT: "res://assets/sprites/hud_icons/signal_turn_left.png",
-	SignalInputScript.SignalType.TURN_RIGHT: "res://assets/sprites/hud_icons/signal_turn_right.png",
+	HandSignal.SignalType.NONE: "res://assets/sprites/hud_icons/signal_none.png",
+	HandSignal.SignalType.ADVANCE: "res://assets/sprites/hud_icons/signal_advance.png",
+	HandSignal.SignalType.STOP: "res://assets/sprites/hud_icons/signal_stop.png",
+	HandSignal.SignalType.TURN_LEFT: "res://assets/sprites/hud_icons/signal_turn_left.png",
+	HandSignal.SignalType.TURN_RIGHT: "res://assets/sprites/hud_icons/signal_turn_right.png",
 }
 const CONFIRM_ICON_PATH := "res://assets/sprites/hud_icons/signal_shutdown.png"
 
-var _signal_input: SignalInputScript
+var _signal_input: Node
 var _game_manager: Node
 var _textures: Dictionary = {}
 var _confirm_texture: Texture2D
@@ -55,14 +55,14 @@ func _draw() -> void:
 		_draw_confirm_prompt()
 		return
 
-	var current: SignalInputScript.SignalType = _signal_input.get_signal()
+	var current: HandSignal.SignalType = _signal_input.get_signal()
 
 	# 하단 중앙: 가능한 모든 신호를 가로로 나열, 현재 신호만 강조 (화면 정중앙은 시야를 가려 하단으로 배치)
 	var total_width := ROW_SIGNALS.size() * ROW_ICON_SIZE + (ROW_SIGNALS.size() - 1) * ROW_GAP
 	var start_x := size.x / 2.0 - total_width / 2.0
 	var row_y := size.y - ROW_ICON_SIZE - ROW_BOTTOM_MARGIN
 	for i in ROW_SIGNALS.size():
-		var sig: SignalInputScript.SignalType = ROW_SIGNALS[i]
+		var sig: HandSignal.SignalType = ROW_SIGNALS[i]
 		var is_active := sig == current
 		var icon_rect := Rect2(start_x + i * (ROW_ICON_SIZE + ROW_GAP), row_y, ROW_ICON_SIZE, ROW_ICON_SIZE)
 		if is_active:

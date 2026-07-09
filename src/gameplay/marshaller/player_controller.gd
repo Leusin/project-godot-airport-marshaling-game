@@ -5,7 +5,7 @@ extends Node
 
 const SceneQuery = preload("res://src/core/utils/scene_query.gd")
 const GameGroups = preload("res://src/core/game_groups.gd")
-const SignalInputScript = preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 
 var _pawn: Node
 var _movement_input: Node
@@ -32,5 +32,5 @@ func _ready() -> void:
 func _on_move_direction_changed(direction: Vector3) -> void:
 	_pawn.set_move_intent(direction)
 
-func _on_hand_signal_changed(sig: SignalInputScript.SignalType) -> void:
+func _on_hand_signal_changed(sig: HandSignal.SignalType) -> void:
 	_pawn.set_hand_signal(sig)

@@ -10,6 +10,7 @@ const CountdownScript := preload("res://src/core/utils/countdown.gd")
 const VisionConeScript := preload("res://src/gameplay/aircraft/aircraft_vision_cone.gd")
 const FsmScript := preload("res://src/gameplay/aircraft/aircraft_fsm.gd")
 const SignalInputScript := preload("res://src/gameplay/input/signal_input.gd")
+const HandSignal := preload("res://src/gameplay/hand_signal.gd")
 
 @onready var _report: RichTextLabel = $Report
 
@@ -160,7 +161,7 @@ func _test_signal_input(suite: TestLib) -> void:
 	var si := SignalInputScript.new()
 	add_child(si)
 
-	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "초기 상태 NONE")
+	suite.check_eq(si.get_signal(), HandSignal.SignalType.NONE, "초기 상태 NONE")
 
 	var changes: Array = []
 	si.hand_signal_changed.connect(func(s): changes.append(s))
@@ -168,7 +169,7 @@ func _test_signal_input(suite: TestLib) -> void:
 	# ADVANCE 누름 → hand_signal 갱신 + 시그널 1회
 	Input.action_press("signal_advance")
 	si._unhandled_input(_action_event("signal_advance", true))
-	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.ADVANCE, "ADVANCE 누름 → ADVANCE")
+	suite.check_eq(si.get_signal(), HandSignal.SignalType.ADVANCE, "ADVANCE 누름 → ADVANCE")
 	suite.check(changes.size() == 1, "바뀌면 hand_signal_changed 1회 방출")
 
 	# 같은 상태의 이벤트가 또 와도 재방출 안 함
@@ -178,14 +179,14 @@ func _test_signal_input(suite: TestLib) -> void:
 	# 뗌 → NONE
 	Input.action_release("signal_advance")
 	si._unhandled_input(_action_event("signal_advance", false))
-	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "뗌 → NONE")
+	suite.check_eq(si.get_signal(), HandSignal.SignalType.NONE, "뗌 → NONE")
 
 	# 엔진정지 확정은 hand_signal과 무관한 단발 시그널
 	var confirms: Array = []
 	si.shutdown_confirmed.connect(func(): confirms.append(true))
 	si._unhandled_input(_action_event("signal_shutdown", true))
 	suite.check(confirms.size() == 1, "signal_shutdown 누름 → shutdown_confirmed 1회")
-	suite.check_eq(si.get_signal(), SignalInputScript.SignalType.NONE, "확정은 hand_signal 안 바꿈")
+	suite.check_eq(si.get_signal(), HandSignal.SignalType.NONE, "확정은 hand_signal 안 바꿈")
 
 	si.queue_free()
 
@@ -213,21 +214,21 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	suite.check_eq(fsm._state, FsmScript.State.IDLE, "초기 상태 IDLE")
 
 	# ADVANCE → MOVING + 비행기에 ADVANCE 명령
-	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = HandSignal.SignalType.ADVANCE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.MOVING, "ADVANCE → MOVING")
-	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "ADVANCE 신호 전달")
+	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.ADVANCE, "ADVANCE 신호 전달")
 
 	# 무신호(NONE) → HESITATING, 마지막 이동 신호 유지
-	fake_aircraft.received_sig = SignalInputScript.SignalType.NONE
+	fake_aircraft.received_sig = HandSignal.SignalType.NONE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.HESITATING, "MOVING + NONE → HESITATING(멈칫)")
-	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.ADVANCE, "멈칫 중 이동 유지")
+	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.ADVANCE, "멈칫 중 이동 유지")
 
 	# 멈칫 시간 경과 → STOPPING
 	fsm._process(1.0)
 	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "멈칫 시간 경과 → STOPPING")
-	suite.check_eq(fake_aircraft.last_signal, SignalInputScript.SignalType.STOP, "STOPPING 시 STOP 신호")
+	suite.check_eq(fake_aircraft.last_signal, HandSignal.SignalType.STOP, "STOPPING 시 STOP 신호")
 
 	# 속도 0 → IDLE 복귀
 	fake_aircraft.speed = 0.0
@@ -235,17 +236,17 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 	suite.check_eq(fsm._state, FsmScript.State.IDLE, "정지 완료 → IDLE")
 
 	# STOP 신호는 멈칫 없이 즉시 STOPPING
-	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = HandSignal.SignalType.ADVANCE
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.MOVING, "재이동 → MOVING")
-	fake_aircraft.received_sig = SignalInputScript.SignalType.STOP
+	fake_aircraft.received_sig = HandSignal.SignalType.STOP
 	fsm._process(0.1)
 	suite.check_eq(fsm._state, FsmScript.State.STOPPING, "MOVING + STOP → 즉시 STOPPING(멈칫 없음)")
 
 	# 시야 밖(이동 중)은 멈칫 없이 즉시 STOPPING (유도자를 놓치면 지체 없이 정지)
 	fake_aircraft.speed = 0.0
 	fsm._process(0.1)  # STOPPING → IDLE
-	fake_aircraft.received_sig = SignalInputScript.SignalType.ADVANCE
+	fake_aircraft.received_sig = HandSignal.SignalType.ADVANCE
 	fsm._process(0.1)  # IDLE → MOVING
 	fake_aircraft.in_view = false
 	fsm._process(0.1)
@@ -263,10 +264,10 @@ func _test_aircraft_fsm(suite: TestLib) -> void:
 ## 실제 Aircraft 대역. FSM은 이 노드의 received_signal()/sees_marshaller()/get_speed()만 읽고,
 ## issue_signal()으로 명령을 되돌려준다. 시야 밖이면 received_signal은 NONE (실제 Aircraft와 동일 게이팅).
 class FakeAircraft extends Node3D:
-	const SignalTypes = preload("res://src/gameplay/input/signal_input.gd")
+	const HandSignal = preload("res://src/gameplay/hand_signal.gd")
 	var last_signal: int = -1
 	var speed: float = 0.0
-	var received_sig: int = SignalTypes.SignalType.NONE
+	var received_sig: int = HandSignal.SignalType.NONE
 	var in_view: bool = true
 	func issue_signal(sig: int) -> void:
 		last_signal = sig
@@ -275,4 +276,4 @@ class FakeAircraft extends Node3D:
 	func sees_marshaller() -> bool:
 		return in_view
 	func received_signal() -> int:
-		return received_sig if in_view else SignalTypes.SignalType.NONE
+		return received_sig if in_view else HandSignal.SignalType.NONE
