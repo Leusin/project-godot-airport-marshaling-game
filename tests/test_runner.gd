@@ -9,7 +9,6 @@ func _ready() -> void:
 	var suite := TestLib.new()
 	_test_screen_bounds(suite)
 	_test_countdown(suite)
-	_test_collision_2d(suite)
 	_test_vision_cone(suite)
 	_test_signal_input(suite)
 	_test_aircraft_fsm(suite)
@@ -79,45 +78,6 @@ func _test_countdown(suite: TestLib) -> void:
 	countdown.start(1.0)
 	countdown.stop()
 	suite.check(not countdown.is_running(), "stop() → 즉시 멈춤")
-
-# ─────────────────────────────────────────────────────────
-# collision_2d: 모델 크기 기반 OBB/원 겹침 판정 (SAT). 회전이 결과를 바꾸는지 확인.
-func _test_collision_2d(suite: TestLib) -> void:
-	suite.start("collision_2d")
-	var forward_z := Vector2(0.0, 1.0)
-
-	suite.check(Collision2D.obb_overlap(Vector2.ZERO, Vector2(1, 1), forward_z, Vector2.ZERO, Vector2(1, 1), forward_z),
-		"같은 위치 → 겹침")
-	suite.check(not Collision2D.obb_overlap(Vector2.ZERO, Vector2(1, 1), forward_z, Vector2(5, 0), Vector2(1, 1), forward_z),
-		"멀리 → 안 겹침")
-
-	# 2×3 비행기 코앞 2.0 지점의 0.75×0.75 장애물: 정면이면 닿고, 옆으로 돌면 안 닿음
-	var plane_half_extents := Vector2(1.0, 1.5)
-	var obstacle_center := Vector2(0.0, 2.0)
-	var obstacle_half_extents := Vector2(0.75, 0.75)
-	suite.check(Collision2D.obb_overlap(Vector2.ZERO, plane_half_extents, Vector2(0, 1), obstacle_center, obstacle_half_extents, forward_z),
-		"정면이 장애물 향함 → 겹침")
-	suite.check(not Collision2D.obb_overlap(Vector2.ZERO, plane_half_extents, Vector2(1, 0), obstacle_center, obstacle_half_extents, forward_z),
-		"옆으로 돌면 → 안 겹침 (회전 반영)")
-
-	suite.check(Collision2D.obb_circle_overlap(Vector2.ZERO, Vector2(1, 1), forward_z, Vector2(1.2, 0), 0.3),
-		"원이 모서리 근처 → 겹침")
-	suite.check(not Collision2D.obb_circle_overlap(Vector2.ZERO, Vector2(1, 1), forward_z, Vector2(1.4, 0), 0.3),
-		"원이 멀면 → 안 겹침")
-
-	# obb_within_aabb: 완전 포함 판정 (주차 성공 조건)
-	var parking_center := Vector2(0, 0)
-	var parking_half := Vector2(1.5, 1.5)
-	suite.check(Collision2D.obb_within_aabb(Vector2.ZERO, Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
-		"작은 OBB가 완전히 안에 있음 → 포함")
-	suite.check(not Collision2D.obb_within_aabb(Vector2(1.0, 0), Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
-		"일부만 겹침(모서리가 밖) → 비포함")
-	suite.check(not Collision2D.obb_within_aabb(Vector2(5.0, 5.0), Vector2(1.0, 1.2), forward_z, parking_center, parking_half),
-		"완전히 밖 → 비포함")
-	# 45도 회전하면 대각선 폭이 늘어나 같은 위치라도 밖으로 삐져나올 수 있음 (회전 반영 확인)
-	var diag := Vector2(1, 1).normalized()
-	suite.check(not Collision2D.obb_within_aabb(Vector2.ZERO, Vector2(1.0, 1.2), diag, parking_center, parking_half),
-		"45도 회전 시 대각선 폭 초과 → 비포함")
 
 # ─────────────────────────────────────────────────────────
 # vision_cone: 정면(-Z) 기준 좌우 half_angle + 반경 판정 (상태 없는 기하)

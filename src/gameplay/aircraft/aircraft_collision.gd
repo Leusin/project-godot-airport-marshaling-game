@@ -1,86 +1,59 @@
-extends Node
-## 비행기 충돌/도착 감지. 매 물리 프레임, 보이는 모델 크기(메쉬 AABB) 기준으로 겹침을 본다.
-## (Node3D 부모를 직접 이동시키는 구조에서 Area3D entered 시그널이 불안정해 직접 판정한다.)
-## 비행기는 회전하는 사각형(OBB), 대상은 축정렬 사각형으로 보고 SAT로 겹침 판정.
-## 대상은 씬 계층 경로가 아니라 그룹으로 찾는다 (트리 위치에 독립적, 다중 배치 지원).
-##   parking  그룹: 비행기가 완전히 들어오면(포함) 즉시 성공이 아니라 "확정 대기" 상태가 됨.
-##                  이 상태에서 마샬러가 확정 버튼(스페이스)을 누르면 GameManager가 짧은 유예
-##                  뒤에 실제 성공 처리를 한다 (연출: 엔진정지 포즈 → 성공 HUD).
-##   marshaller 그룹: 원형 히트박스로 판정 (사람은 사각형보다 원이 자연스러움) -> 게임 오버
-##   obstacle 그룹: 사각형 겹침 -> 게임 오버
+extends Area3D
+## 비행기 충돌/도착 감지. Godot Area3D 겹침으로 판정한다 (커스텀 OBB/SAT 제거).
+## 모든 콜리전 도형을 Y로 길게(tall) 만들어 세로는 항상 겹치므로, 실질적으로 XZ 평면 판정 =
+## 기존 탑다운 방식과 동일하고 도형의 Y 정렬 튜닝이 필요 없다.
+## - hazard 레이어(장애물·마샬러) 진입 → 게임오버 (area_entered)
+## - parking 레이어: 겹치는 동안 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses) 확정 대기
+## shutdown_confirmed(스페이스) 이벤트는 확정 대기 상태에서만 성공 유예를 시작한다.
 
-## 마샬러는 3D 모델이 아니라 빌보드 스프라이트라 메쉬 크기를 못 읽으므로 고정 반지름을 쓴다.
-const MARSHALLER_HIT_RADIUS := 0.45
-
-@onready var _aircraft: Node3D = get_parent()
+## 콜리전 레이어 번호 (1=aircraft, 2=hazard, 3=parking).
+const LAYER_HAZARD := 2
+const LAYER_PARKING := 3
 
 var _game_manager: Node
 var _signal_input: Node
-var _self_half_extents := Vector2.ZERO  # 비행기 XZ 반크기 (메쉬에서 읽음)
-var _is_parked: bool = false  # 확정 대기(주차 완전 진입) 상태. shutdown_confirmed 처리에서 참조.
+var _parking_areas: Array[Area3D] = []  # 현재 겹치는 주차 Area3D들
+var _is_parked := false
 
 func _ready() -> void:
 	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
 	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
-	_self_half_extents = CollisionShapes.half_extents_xz(_aircraft)
+	area_entered.connect(_on_area_entered)
+	area_exited.connect(_on_area_exited)
 	# 엔진정지 확정은 폴링이 아니라 이벤트로 받는다 (물리프레임 just_pressed 유실/중복 방지).
 	if _signal_input != null:
-		_signal_input.connect("shutdown_confirmed", _on_shutdown_confirmed)
-	# GameManager가 없으면 판정할 대상이 없으므로 물리 처리를 끈다 (경고는 위에서 출력됨).
+		_signal_input.shutdown_confirmed.connect(_on_shutdown_confirmed)
+	# GameManager가 없으면 판정 통지할 곳이 없으므로 물리 처리를 끈다 (경고는 require_single이 출력).
 	set_physics_process(_game_manager != null)
 
+func _on_area_entered(area: Area3D) -> void:
+	if area.get_collision_layer_value(LAYER_HAZARD):
+		if _game_manager != null:
+			_game_manager.trigger_game_over()
+	elif area.get_collision_layer_value(LAYER_PARKING) and area not in _parking_areas:
+		_parking_areas.append(area)
+
+func _on_area_exited(area: Area3D) -> void:
+	_parking_areas.erase(area)
+
 func _physics_process(_delta: float) -> void:
-	var center := _to_xz(_aircraft.global_position)
-	var forward := _forward_xz(_aircraft)
-
-	var is_parked := false
-	for parking_spot in get_tree().get_nodes_in_group(GameGroups.PARKING):
-		if _fully_within(center, forward, parking_spot):
-			is_parked = true
+	var self_aabb := _world_aabb(self)
+	var parked := false
+	for area in _parking_areas:
+		if _world_aabb(area).encloses(self_aabb):
+			parked = true
 			break
-	_is_parked = is_parked
-	_game_manager.set_awaiting_shutdown_confirm(is_parked)
-
-	if is_parked:
-		return
-
-	for hazard in get_tree().get_nodes_in_group(GameGroups.MARSHALLER):
-		if _hits_marshaller(center, forward, hazard):
-			_game_manager.trigger_game_over()
-			return
-
-	for hazard in get_tree().get_nodes_in_group(GameGroups.OBSTACLE):
-		if _overlaps(center, forward, hazard):
-			_game_manager.trigger_game_over()
-			return
+	_is_parked = parked
+	_game_manager.set_awaiting_shutdown_confirm(parked)
 
 ## 확정 버튼 이벤트. 비행기가 주차존에 완전히 들어온 상태에서만 성공 유예를 시작한다.
 func _on_shutdown_confirmed() -> void:
 	if _is_parked:
 		_game_manager.begin_shutdown_confirm()
 
-## 비행기(OBB) vs 대상(축정렬 사각형) 겹침. 대상은 회전 안 한다고 보고 forward = +Z.
-func _overlaps(center: Vector2, forward: Vector2, target: Node3D) -> bool:
-	return Collision2D.obb_overlap(
-		center, _self_half_extents, forward,
-		_to_xz(target.global_position), CollisionShapes.half_extents_xz(target), Vector2(0.0, 1.0))
-
-## 비행기(OBB)가 마샬러(원)와 겹치는지.
-func _hits_marshaller(center: Vector2, forward: Vector2, marshaller: Node3D) -> bool:
-	return Collision2D.obb_circle_overlap(
-		center, _self_half_extents, forward, _to_xz(marshaller.global_position), MARSHALLER_HIT_RADIUS)
-
-## 비행기(OBB)가 대상(축정렬 사각형) 안에 완전히 들어와 있는지. 대상은 회전 안 한다고 봄.
-func _fully_within(center: Vector2, forward: Vector2, target: Node3D) -> bool:
-	return Collision2D.obb_within_aabb(
-		center, _self_half_extents, forward,
-		_to_xz(target.global_position), CollisionShapes.half_extents_xz(target))
-
-## Vector3의 x, z 만 뽑아 XZ 평면 좌표로.
-func _to_xz(world_position: Vector3) -> Vector2:
-	return Vector2(world_position.x, world_position.z)
-
-## 비행기 정면(-Z)을 XZ 평면 단위벡터로.
-func _forward_xz(node: Node3D) -> Vector2:
-	var forward := -node.global_transform.basis.z
-	return Vector2(forward.x, forward.z).normalized()
+## Area3D 첫 CollisionShape3D(BoxShape3D)의 월드 AABB. 회전은 감싸는 AABB로 반영된다.
+## (비행기 self / 주차존만 넘어오며 둘 다 BoxShape3D — hazard는 여기 안 옴)
+func _world_aabb(area: Area3D) -> AABB:
+	var cs := area.get_node("CollisionShape3D") as CollisionShape3D
+	var box := cs.shape as BoxShape3D
+	return cs.global_transform * AABB(-box.size * 0.5, box.size)

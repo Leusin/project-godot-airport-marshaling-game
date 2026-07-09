@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-09 [결정] 커스텀 충돌(OBB/SAT)을 Godot Area3D로 교체 — 매 프레임 SAT로 직접 판정하던 것을 Area3D `area_entered`/겹침으로 전환. 장애물·마샬러는 hazard 레이어 Area3D(진입 시 게임오버), 주차존은 parking 레이어 Area3D(겹치는 동안 비행기 AABB가 주차존 AABB에 `AABB.encloses`면 확정 대기). 모든 콜리전 도형을 Y로 길게 만들어 세로는 항상 겹치게 → 실질 XZ 판정이라 기존 탑다운 동작 유지 + 도형 Y 정렬 튜닝 불필요. 대상 분류는 그룹 대신 콜리전 레이어(1=aircraft/2=hazard/3=parking). `collision_2d.gd`/`collision_shapes.gd`/`collision_debug_visual.gd`(Godot가 도형을 직접 렌더)와 그 단위테스트, GameGroups의 obstacle/parking/aircraft 상수 제거. 도형 크기는 에디터에서 튜닝 필요, 충돌 동작은 인게임 플레이테스트 필요.
+
 - 2026-07-09 [결정] 스크립트 참조를 `preload()` 상수→`class_name` 전역으로 통일 — 클래스처럼 쓰이던 12개 스크립트(SceneQuery/GameGroups/HandSignal/Countdown/Collision2D/CollisionShapes/ScreenBounds/TestLib/Aircraft/AircraftFSM/AircraftVisionCone/SignalInput)에 `class_name` 선언, 모든 `const X = preload(...)` 제거하고 호출부를 전역 이름으로 변경. 별칭이 파일명과 달랐던 것(CountdownScript→Countdown, AircraftScript→Aircraft, FsmScript→AircraftFSM, VisionConeScript→AircraftVisionCone, SignalInputScript→SignalInput)만 호출부 개명. 상속/파일명/동작 불변, 이름 충돌 없음(오토로드 0). 45/45 테스트 통과.
 
 - 2026-07-09 [결정] 수신호 어휘(SignalType/is_move_signal)를 `signal_input.gd`→`hand_signal.gd`(HandSignal 도메인)로 추출 — FSM/Aircraft/Marshaller/Sprite 등 게임플레이 로직이 enum 하나 때문에 입력 장치 스크립트를 preload하던 의존을 끊음. 이제 입력·Pawn·표시·판단이 모두 중립 도메인을 공유하고, 입력 노드를 실제로 읽는 곳(HUD/테스트)만 `signal_input.gd`를 참조. HUD의 노드 타입은 `Node`로 완화. 45/45 테스트 통과.

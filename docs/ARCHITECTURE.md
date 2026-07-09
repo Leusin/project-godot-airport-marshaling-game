@@ -12,7 +12,7 @@ assets/                     아트, 사운드, 폰트 등 게임 에셋
 src/
   core/
     main_game/              메인 씬 + 게임 진행 관리 (Main.tscn, game_manager.gd)
-    utils/                  여러 노드가 공유하는 재사용 스크립트 (scene_query.gd, collision_2d.gd 등)
+    utils/                  여러 노드가 공유하는 재사용 스크립트 (scene_query.gd, countdown.gd 등)
   gameplay/
     hand_signal.gd          수신호 도메인 (SignalType/is_move_signal, 입력·Pawn·표시·FSM 공유)
     input/                  입력 전담 (이동키/수신호 → 값 변환, 특정 엔티티 비의존)
@@ -40,18 +40,19 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 │  ├─ TopDownCamera              직교 탑다운 카메라
 │  ├─ LevelRoot                  배경 요소
 │  │  ├─ Ground
-│  │  ├─ Obstacle                [group: obstacle]
-│  │  └─ ParkingSpot             [group: parking]
+│  │  ├─ Obstacle → ObstacleArea (Area3D, layer=hazard)
+│  │  └─ ParkingSpot → ParkingArea (Area3D, layer=parking)
 │  ├─ EntityRoot                 핵심 요소
 │  │  ├─ Marshaller              [group: marshaller]  (Pawn)
 │  │  │  ├─ MarshallerSprite
-│  │  │  └─ MarshallerMovement    이동 실행 (Pawn 의도만 읽음)
-│  │  └─ Aircraft                [group: aircraft]
+│  │  │  ├─ MarshallerMovement    이동 실행 (Pawn 의도만 읽음)
+│  │  │  └─ MarshallerArea        (Area3D, layer=hazard, 원기둥)
+│  │  └─ Aircraft
 │  │     ├─ AircraftModel
 │  │     ├─ AircraftMovement      이동 실행 (명령=FSM 결정)
 │  │     ├─ VisionCone / VisionConeVisual
 │  │     ├─ AircraftFSM           [group: aircraft_fsm]  Aircraft가 받은 신호로 상태 전이
-│  │     └─ AircraftHitbox
+│  │     └─ AircraftHitbox        (Area3D, monitoring) → CollisionShape3D
 │  └─ EffectRoot                 임시 시각 효과 (향후)
 ├─ HudLayer (layer 10, Pausable) └─ HudRoot
 │     ├─ SignalIndicator
@@ -86,15 +87,15 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 - `AircraftMovement` — 이동 실행(MovementComponent). 명령(=FSM이 결정한 것)/설정을 읽어 속도 관성 + 회전 + 전진을 부모에 반영
 - `AircraftVisionCone` — 정면 기준 70도 원뿔 판정, 마샬러가 원뿔 안에 있는지 bool만 반환 (Aircraft가 `sees_marshaller`에서 사용)
 - `AircraftFSM` — 비행기의 brain. **Aircraft가 받은 신호 + 시야를 읽어**(SignalInput을 직접 보지 않음) IDLE/MOVING/HESITATING/STOPPING 상태 전이 후 Aircraft에 명령 전달(`issue_signal`). 무신호는 멈칫 후 정지, STOP은 즉시 정지, 시야 밖은 즉시 정지
-- `AircraftCollision` — XZ 거리 기반으로 마샬러/장애물/주차지점 근접 판정 -> GameManager 통지
+- `AircraftCollision` — 비행기 `AircraftHitbox`(Area3D) 스크립트. Godot Area3D 겹침으로 판정: hazard 레이어(장애물·마샬러) 진입 → 게임오버, parking 레이어는 겹치는 동안 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses) 확정 대기 → GameManager 통지. 모든 콜리전 도형을 Y로 길게 만들어 실질 XZ 판정
 
 **UI**
 - `SignalIndicatorHUD` — 마샬러가 현재 입력 중인 수신호를 화면에 아이콘으로 표시 (텍스처 없이 코드로 그림)
 
 **공유/판정**
-- `Obstacle` / `ParkingSpot` — 그룹(obstacle/parking)만 붙은 위치 마커. AircraftCollision이 거리로 판정
+- `Obstacle` / `ParkingSpot` — 위치 마커. 자식 `Area3D`+`CollisionShape3D`로 충돌 레이어(hazard/parking)를 부여, AircraftHitbox가 감지
 - `GameManager` — 게임오버(비행기-장애물/사람) / A->B 도착 성공 처리 + 재시작
-- `SceneQuery` / `Collision2D` / `CollisionShapes` / `Countdown` — 공용 유틸 (그룹 단일 조회 `require_single` / OBB 겹침 SAT / 메쉬 AABB 반크기 / 프레임 카운트다운). `ScreenBounds`는 현재 테스트에서만 사용
+- `SceneQuery` / `Countdown` — 공용 유틸 (그룹 단일 조회 `require_single` / 프레임 카운트다운). `ScreenBounds`는 현재 테스트에서만 사용. (충돌은 Godot Area3D로 이관 — 커스텀 `Collision2D`/`CollisionShapes` 제거)
 
 ## 더 볼 것
 
