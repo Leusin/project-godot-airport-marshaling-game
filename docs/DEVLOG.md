@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-09 [결정] 이동/FSM을 씬 자식 Node → RefCounted 헬퍼로 전환 — MarshallerMovement/AircraftMovement/AircraftFSM을 씬 노드에서 떼어내 소유 엔티티(Marshaller/Aircraft)가 코드로 들고 `_process`/`_physics_process`에서 직접 구동. FSM은 `update(in_view, 받은신호, speed, delta)` 후 `forward()`/`turn()`으로 이동 의도를 노출하고, Aircraft가 command_delay 뒤 AircraftMovement.update로 적용. 조회도 일부 그룹→부모참조(`get_parent_node_3d`)로. 교훈: HESITATING 진입 시 `_hesitate.start()` 누락 + `_last_move_signal` 무조건 대입으로 멈칫이 깨졌던 것을 테스트로 잡음 — RefCounted 전환 시 노드 수명주기(_ready)에 기대던 초기화가 사라지니 주의. 문서(ARCHITECTURE/scene_diagram)도 새 구조로 갱신.
+
 - 2026-07-09 [결정] 커스텀 충돌(OBB/SAT)을 Godot Area3D로 교체 — 매 프레임 SAT로 직접 판정하던 것을 Area3D `area_entered`/겹침으로 전환. 장애물·마샬러는 hazard 레이어 Area3D(진입 시 게임오버), 주차존은 parking 레이어 Area3D(겹치는 동안 비행기 AABB가 주차존 AABB에 `AABB.encloses`면 확정 대기). 모든 콜리전 도형을 Y로 길게 만들어 세로는 항상 겹치게 → 실질 XZ 판정이라 기존 탑다운 동작 유지 + 도형 Y 정렬 튜닝 불필요. 대상 분류는 그룹 대신 콜리전 레이어(1=aircraft/2=hazard/3=parking). `collision_2d.gd`/`collision_shapes.gd`/`collision_debug_visual.gd`(Godot가 도형을 직접 렌더)와 그 단위테스트, GameGroups의 obstacle/parking/aircraft 상수 제거. 도형 크기는 에디터에서 튜닝 필요, 충돌 동작은 인게임 플레이테스트 필요.
 
 - 2026-07-09 [결정] 스크립트 참조를 `preload()` 상수→`class_name` 전역으로 통일 — 클래스처럼 쓰이던 12개 스크립트(SceneQuery/GameGroups/HandSignal/Countdown/Collision2D/CollisionShapes/ScreenBounds/TestLib/Aircraft/AircraftFSM/AircraftVisionCone/SignalInput)에 `class_name` 선언, 모든 `const X = preload(...)` 제거하고 호출부를 전역 이름으로 변경. 별칭이 파일명과 달랐던 것(CountdownScript→Countdown, AircraftScript→Aircraft, FsmScript→AircraftFSM, VisionConeScript→AircraftVisionCone, SignalInputScript→SignalInput)만 호출부 개명. 상속/파일명/동작 불변, 이름 충돌 없음(오토로드 0). 45/45 테스트 통과.
