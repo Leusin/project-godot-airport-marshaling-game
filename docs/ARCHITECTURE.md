@@ -67,9 +67,10 @@ MainGame (Node)                  앱 루트. Process Mode = Always
 ## 주요 구성
 
 **마샬러 (Controller/Pawn 분리 — 언리얼 possess 모델)**
-- `Marshaller` — Pawn. 설정(speed) + 명령받은 이동 의도(move_intent)만 보유하고 입력은 전혀 모른다. 의도가 바뀌면 `move_intent_changed` 방출
+- `Marshaller` — Pawn. 설정(speed) + 명령받은 상태(이동 의도 `move_intent`, 수신호 `hand_signal`)만 보유하고 입력은 전혀 모른다. 상태가 바뀌면 각각 `move_intent_changed` / `hand_signal_changed` 방출
 - `MarshallerMovement` — 이동 실행(MovementComponent). Pawn의 `move_intent` × speed로 부모를 이동. 의도가 0이 아닐 때만 물리처리(이벤트 게이팅)
-- `PlayerController` — Marshaller를 possess(그룹 조회). `MovementInput`의 방향 시그널을 받아 Pawn의 `set_move_intent()`로 push. 이 노드만 AI 컨트롤러로 갈아끼우면 같은 Pawn을 코드가 조종 (씬에서는 `Systems` 아래)
+- `MarshallerSprite` — 시각화. Pawn의 `hand_signal`(+ GameManager의 확정 유예)을 읽어 텍스처를 바꾼다. 입력(SignalInput)을 직접 보지 않음
+- `PlayerController` — Marshaller를 possess(그룹 조회). `MovementInput`/`SignalInput`의 시그널을 받아 Pawn의 `set_move_intent()`/`set_hand_signal()`로 push. 이 노드만 AI 컨트롤러로 갈아끼우면 같은 Pawn을 코드가 조종 (씬에서는 `Systems` 아래)
 
 **입력** (`gameplay/input/`, 씬에서는 `Systems/Input` 아래 · 특정 엔티티 비의존 · 이벤트 기반 · 디바이스 계층)
 - `MovementInput` — 이동 입력 전담. `_unhandled_input`으로 방향을 재계산해 바뀔 때 `move_direction_changed` 방출(캐시 `move_direction`도 유지) [group: movement_input]

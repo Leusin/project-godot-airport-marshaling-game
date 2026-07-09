@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-09 [결정] 마샬러 수신호도 Controller/Pawn으로 통일 — 스프라이트가 `SignalInput`을 직접 보던 것을, `PlayerController`가 `SignalInput.hand_signal_changed`를 Pawn의 `set_hand_signal()`로 push하고 스프라이트는 Pawn의 `hand_signal`을 참조하도록 변경. 이제 Pawn이 이동·수신호 상태를 모두 보유(입력 무지)하고 컨트롤러가 모든 플레이어 입력을 라우팅. 입력 액션명은 StringName 상수(ACTION_*)로 분리(movement_input/signal_input). FSM/HUD는 여전히 SignalInput 직접 구독(범위 밖).
+
 - 2026-07-09 [결정] 마샬러 입력/이동을 Controller/Pawn(언리얼 possess)으로 분리 — 이동 컴포넌트가 전역 입력을 당겨오던(pull) 구조를, 컨트롤러가 Pawn에 의도를 밀어넣는(push) 구조로 뒤집음. 신규 `PlayerController`가 `MovementInput`(개명: MoveInput)을 possess한 `Marshaller`로 라우팅하고, Pawn은 `move_intent`만 보유(입력 무지)해 `move_intent_changed`로 자식 `MarshallerMovement`(개명: MarshallerControl)를 깨운다. 전 구간 이벤트 기반(시그널 2홉), 위치 적분은 의도≠0일 때만 물리처리. AI 조종 교체 지점이 PlayerController 하나로 국소화됨. `MarshallerController`라는 이름은 이동 컴포넌트(Control)와 혼동돼 쓰지 않음.
 
 - 2026-07-08 [결정] 입력 처리를 폴링→이벤트(`_unhandled_input`) — 입력 노드가 이벤트로 현재 상태를 보관·방출한다. 연속 입력(이동/유지 신호)은 소비자가 캐시(move_direction/hand_signal)를 매 프레임 읽고, 단발 입력(엔진정지 확정)은 shutdown_confirmed 시그널로 받는다. `get_signal()`이 캐시를 반환해 기존 폴링 소비자(FSM/HUD/스프라이트)는 무변경. 입력은 특정 엔티티 비의존이라 Systems/Input에 둠. 물리프레임 `is_action_just_pressed`의 단발입력 유실/중복도 해소.
