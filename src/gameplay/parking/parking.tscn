@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_parking"]
+size = Vector3(4.5, 0.05, 4.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_parking"]
+albedo_color = Color(0.1, 0.4, 0.85, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_parking"]
+size = Vector3(4.5, 6, 4.5)
+
+[node name="ParkingSpot" type="Node3D"]
+
+[node name="ParkingMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_parking")
+surface_material_override/0 = SubResource("StandardMaterial3D_parking")
+
+[node name="ParkingArea" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ParkingArea"]
+shape = SubResource("BoxShape3D_parking")

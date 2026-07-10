@@ -12,21 +12,13 @@
 [ext_resource type="PackedScene" uid="uid://cdk1g7glhd1ni" path="res://src/gameplay/marshaller/marshaller.tscn" id="21_marshaller"]
 [ext_resource type="Script" uid="uid://bp7k3xrawm2n" path="res://src/gameplay/marshaller/player_controller.gd" id="22_player_controller_script"]
 [ext_resource type="PackedScene" uid="uid://bg46yneanlcpr" path="res://src/gameplay/aircraft/aircraft.tscn" id="23_aircraft"]
+[ext_resource type="PackedScene" path="res://src/gameplay/parking/parking.tscn" id="24_parking"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(50, 50)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
 albedo_color = Color(0.2, 0.22, 0.25, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_parking"]
-size = Vector3(4.5, 0.05, 4.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_parking"]
-albedo_color = Color(0.1, 0.8, 0.2, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_parking"]
-size = Vector3(4.5, 6, 4.5)
 
 [node name="MainGame" type="Node" unique_id=366331269]
 process_mode = 3
@@ -74,19 +66,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 [node name="Obstacle" parent="World/LevelRoot" unique_id=409521720 instance=ExtResource("20_obstacle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 0)
 
-[node name="ParkingSpot" type="Node3D" parent="World/LevelRoot" unique_id=1572874921]
+[node name="ParkingSpot" parent="World/LevelRoot" instance=ExtResource("24_parking")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 3)
-
-[node name="ParkingMesh" type="MeshInstance3D" parent="World/LevelRoot/ParkingSpot" unique_id=2011948389]
-mesh = SubResource("BoxMesh_parking")
-surface_material_override/0 = SubResource("StandardMaterial3D_parking")
-
-[node name="ParkingArea" type="Area3D" parent="World/LevelRoot/ParkingSpot" unique_id=926063145]
-collision_layer = 4
-collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World/LevelRoot/ParkingSpot/ParkingArea" unique_id=349111802]
-shape = SubResource("BoxShape3D_parking")
 
 [node name="EntityRoot" type="Node3D" parent="World" unique_id=183132466]
 

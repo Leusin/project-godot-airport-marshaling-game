@@ -6,9 +6,6 @@ extends RefCounted
 ## - parking = Area3D. 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses) is_fully_parked()=true.
 ## 히트박스 mask=6(hazard+parking)이라 감지되는 바디는 전부 hazard, Area는 전부 주차존이다.
 
-## 콜리전 레이어 번호 (1=aircraft, 2=hazard, 3=parking, 4=solid).
-const LAYER_PARKING := 3
-
 ## hazard(장애물·마샬러) 진입 순간 방출. Aircraft가 게임오버로 연결한다.
 signal hazard_hit
 
@@ -37,7 +34,7 @@ func _on_body_entered(_body: Node3D) -> void:
 
 ## Area는 주차존만 넘어온다.
 func _on_area_entered(area: Area3D) -> void:
-	if area.get_collision_layer_value(LAYER_PARKING) and area not in _parking_areas:
+	if area.get_collision_layer_value(CollisionLayers.PARKING) and area not in _parking_areas:
 		_parking_areas.append(area)
 
 func _on_area_exited(area: Area3D) -> void:

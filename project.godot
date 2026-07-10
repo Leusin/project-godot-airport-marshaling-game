@@ -22,8 +22,16 @@ folder_colors={
 "res://src/gameplay/aircraft/": "gray",
 "res://src/gameplay/input/": "pink",
 "res://src/gameplay/marshaller/": "yellow",
-"res://src/gameplay/obstacle/": "orange"
+"res://src/gameplay/obstacle/": "orange",
+"res://src/gameplay/parking/": "blue"
 }
+
+[layer_names]
+
+3d_physics/layer_1="aircraft"
+3d_physics/layer_2="hazard"
+3d_physics/layer_3="parking"
+3d_physics/layer_4="solid"
 
 [input]
 
