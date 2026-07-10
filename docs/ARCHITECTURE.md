@@ -61,9 +61,8 @@ MainGame                         Process Mode = Always
 └─ HudLayer / PauseLayer / TransitionLayer / DebugLayer
 ```
 
-- **이동·FSM은 씬 노드가 아니다.** `Marshaller`가 `MarshallerMovement`를, `Aircraft`가 `AircraftFSM`·`AircraftMovement`를 코드로 소유한다.
+- 이동·FSM 등 헬퍼는 소유 엔티티가 코드로 들고 있다: `Marshaller`→`MarshallerMovement`, `Aircraft`→`AircraftFSM`·`AircraftMovement`.
 - 충돌 대상(`Obstacle`/`ParkingSpot`/`Marshaller`)은 자식 `Area3D`로 충돌 레이어(hazard/parking)를 갖고, `AircraftHitbox`가 감지한다.
-- 노드 찾기: 싱글턴은 그룹 조회(`SceneQuery.require_single`), 부모-자식은 직접(`get_parent_node_3d()`), 유틸·헬퍼는 `class_name` 전역.
 
 ## 컴포넌트
 
