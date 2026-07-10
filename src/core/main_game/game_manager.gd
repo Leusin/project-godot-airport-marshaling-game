@@ -3,8 +3,7 @@ extends Node
 ## 확정 버튼 입력을 구독해 게임오버 / 유도 성공을 정한다. 비행기·HUD 참조는 그룹으로 찾는다.
 ## 엔티티는 게임 규칙을 모르고 사실만 노출 — 해석(판정)은 여기 한 곳에 모인다.
 
-## 확정 버튼을 누른 뒤 실제 성공 처리(HUD 표시)까지의 유예 시간.
-## 마샬러의 엔진정지 포즈가 잠깐 보인 뒤 성공 HUD가 뜨도록 하는 연출용 지연.
+## 확정 버튼 → 성공 처리(HUD) 사이 유예. 마샬러 엔진정지 포즈를 잠깐 보여주는 연출용 지연.
 const SHUTDOWN_CONFIRM_DELAY := 1.0
 
 var _aircraft: Aircraft
@@ -15,18 +14,15 @@ var _success_hud: Control
 var _is_game_over: bool = false
 var _is_success: bool = false
 
-## 비행기가 주차존에 완전히 들어와 확정 버튼(스페이스)만 누르면 되는 상태.
-## GameManager가 매 프레임 비행기에 물어 갱신, HUD가 읽어서 액션 목록을 확정 아이콘 하나로 바꾼다.
+## 비행기가 주차존에 완전히 들어와 확정 버튼(스페이스)만 누르면 되는 상태. HUD가 읽어 표시를 바꾼다.
 var is_awaiting_shutdown_confirm: bool = false
 
-## 확정 버튼을 누른 직후부터 실제 성공 처리 전까지의 짧은 유예 구간.
-## 마샬러 스프라이트가 이 구간에서만 엔진정지 포즈를 보여준다.
+## 확정 직후 ~ 성공 처리 전의 짧은 구간. 마샬러 스프라이트가 이 구간에만 엔진정지 포즈를 보여준다.
 var is_confirming_shutdown: bool = false
 
 var _confirm_delay := Countdown.new()
 
-## 확정 버튼이 눌린 순간 호출. 즉시 성공 처리하지 않고 SHUTDOWN_CONFIRM_DELAY 만큼
-## 기다렸다가 trigger_success()를 실행한다.
+## 확정 버튼이 눌린 순간 호출. SHUTDOWN_CONFIRM_DELAY 후 trigger_success()를 실행한다.
 func begin_shutdown_confirm() -> void:
 	if _is_success or _is_game_over or is_confirming_shutdown:
 		return

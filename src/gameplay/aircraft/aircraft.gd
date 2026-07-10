@@ -25,9 +25,7 @@ var _turn := 0.0
 var _delay := Countdown.new()
 
 func _ready() -> void:
-	# 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 	_marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
-	# 충돌 사실은 그대로 위로 알린다. 게임 규칙(게임오버/성공)은 GameManager가 해석한다.
 	_collision.hazard_hit.connect(hazard_hit.emit)
 
 func _process(delta: float) -> void:

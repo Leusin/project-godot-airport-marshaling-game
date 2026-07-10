@@ -1,15 +1,10 @@
 class_name AircraftCollision
 extends RefCounted
-## 비행기 히트박스(Area3D) 겹침 판정 컴포넌트. Node를 상속하지 않고 Aircraft가 소유한다
-## (FSM·Movement·VisionCone과 같은 헬퍼 패턴). Area3D 노드는 씬에 남아있고(물리 겹침은
-## 노드가 필요), 이 컴포넌트는 그 노드만 보고 판정 결과만 돌려준다.
-## 게임 흐름(게임오버/성공 확정)과 입력 연결은 소유자인 Aircraft가 처리한다.
-##
-## 모든 콜리전 도형을 Y로 길게(tall) 만들어 세로는 항상 겹치므로, 실질적으로 XZ 평면 판정 =
-## 기존 탑다운 방식과 동일하고 도형의 Y 정렬 튜닝이 필요 없다.
-## - hazard 레이어(장애물·마샬러) 진입 → hazard_hit 방출 (Aircraft가 게임오버로 연결)
-## - parking 레이어: 겹치는 동안 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses)
-##   is_fully_parked()가 true. 성공 확정은 이 상태에서만 유효하다.
+## 비행기 히트박스(Area3D) 겹침 판정 컴포넌트. Aircraft가 소유하는 헬퍼(FSM·Movement·VisionCone과 동일 패턴)로,
+## 씬의 Area3D 노드만 보고 판정 결과만 돌려준다. 게임 흐름/입력 연결은 소유자 Aircraft가 처리한다.
+## 콜리전 도형을 Y로 길게 만들어 세로는 항상 겹치므로 실질적으로 XZ 평면 판정 (Y 정렬 튜닝 불필요).
+## - hazard 레이어(장애물·마샬러) 진입 → hazard_hit 방출
+## - parking 레이어: 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses) is_fully_parked()=true
 
 ## 콜리전 레이어 번호 (1=aircraft, 2=hazard, 3=parking).
 const LAYER_HAZARD := 2
