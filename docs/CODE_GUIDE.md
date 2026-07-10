@@ -7,14 +7,15 @@
 | # | 파일 | 흐름 단계 |
 |---|---|---|
 | 1 | `core/main_game/Main.tscn` | 씬 골격 (계층/그룹/Process Mode) |
-| 2 | `gameplay/input/move_input.gd` | 이동 입력 |
-| 3 | `gameplay/input/signal_input.gd` | 수신호 입력 |
-| 4 | `gameplay/aircraft/aircraft_vision_cone.gd` | 시야 판정 |
-| 5 | **`gameplay/aircraft/aircraft_fsm.gd`** | **신호 해석 (게임의 두뇌)** |
-| 6 | `gameplay/aircraft/aircraft.gd` | 설정·명령 (이동은 `aircraft_control.gd`) |
-| 7 | `gameplay/aircraft/aircraft_collision.gd` | 충돌/도착 판정 |
-| 8 | `core/main_game/game_manager.gd` | 게임오버/성공 |
-| 9 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |
+| 2 | `gameplay/hand_signal.gd` | 수신호 도메인 (종류 enum + 판별) |
+| 3 | `gameplay/input/movement_input.gd` · `signal_input.gd` | 입력 (이동·수신호) |
+| 4 | `gameplay/marshaller/player_controller.gd` | 입력을 Pawn으로 라우팅 (possess) |
+| 5 | `gameplay/aircraft/aircraft_vision_cone.gd` | 시야 판정 |
+| 6 | **`gameplay/aircraft/aircraft_fsm.gd`** | **신호 해석 (게임의 두뇌)** |
+| 7 | `gameplay/aircraft/aircraft.gd` | Pawn: 신호 받아 FSM·이동 헬퍼 구동 |
+| 8 | `gameplay/aircraft/aircraft_collision.gd` | 충돌/도착 사실 감지 (Area3D) |
+| 9 | `core/main_game/game_manager.gd` | 판정 (게임오버/성공) |
+| 10 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |
 
 
 ## 실행
@@ -25,6 +26,7 @@
 ## 관련 문서
 
 - [ARCHITECTURE](ARCHITECTURE.md) - 씬 구조와 설계
+- [CONVENTIONS](CONVENTIONS.md) - 설계 원칙·코딩 컨벤션
 - [TESTING](TESTING.md) - 테스트 하네스와 실행 방법
 - [DEVLOG](DEVLOG.md) - 변경 이력과 설계 이유
 - [scene_diagram.svg](attachment/scene_diagram.svg) - 씬 계층 다이어그램

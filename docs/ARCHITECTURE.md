@@ -111,4 +111,5 @@ MainGame                         Process Mode = Always
 
 ## 더 볼 것
 
+- 설계 원칙·코딩 컨벤션 → [CONVENTIONS.md](CONVENTIONS.md)
 - 테스트 하네스와 실행 방법 → [TESTING.md](TESTING.md)
