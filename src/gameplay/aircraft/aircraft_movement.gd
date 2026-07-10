@@ -35,4 +35,4 @@ func update(
 			deg_to_rad(turn_speed_degrees * turn * delta)
 		)
 
-	body.position += -body.global_transform.basis.z * _current_speed * delta
+	body.position += body.global_transform.basis.z * _current_speed * delta

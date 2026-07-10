@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://bg46yneanlcpr"]
+
+[ext_resource type="Script" uid="uid://c4l15eqy18gw8" path="res://src/gameplay/aircraft/aircraft.gd" id="1_aircraft"]
+[ext_resource type="PackedScene" uid="uid://ben5300eu6gcm" path="res://assets/models/aircraft.glb" id="2_model"]
+[ext_resource type="Script" uid="uid://i0r324d37cma" path="res://src/gameplay/aircraft/aircraft_vision.gd" id="3_4eu2l"]
+[ext_resource type="Shader" uid="uid://cq2uomx6ltekx" path="res://src/shaders/aircraft_vision.gdshader" id="3_n1efi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aircraft_fuselage"]
+size = Vector3(0.5, 0.5, 3.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aircraft_wings"]
+size = Vector3(3.5, 0.1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n1efi"]
+render_priority = 0
+shader = ExtResource("3_n1efi")
+shader_parameter/radius = 10.0
+shader_parameter/half_angle = 35.0
+shader_parameter/vision_color = Color(0, 1, 0, 0.3)
+
+[sub_resource type="QuadMesh" id="QuadMesh_4eu2l"]
+material = SubResource("ShaderMaterial_n1efi")
+size = Vector2(20, 20)
+orientation = 1
+
+[node name="Aircraft" type="Node3D" unique_id=2116049397 groups=["aircraft"]]
+script = ExtResource("1_aircraft")
+
+[node name="AircraftModel" parent="." unique_id=2091121011 instance=ExtResource("2_model")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 0, 0, 0)
+
+[node name="AircraftHitbox" type="Area3D" parent="." unique_id=858021540]
+collision_mask = 6
+
+[node name="Fuselage" type="CollisionShape3D" parent="AircraftHitbox" unique_id=648410104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
+shape = SubResource("BoxShape3D_aircraft_fuselage")
+
+[node name="Wings" type="CollisionShape3D" parent="AircraftHitbox" unique_id=290127003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045752585, -0.22799814)
+shape = SubResource("BoxShape3D_aircraft_wings")
+
+[node name="AircraftVision" type="MeshInstance3D" parent="." unique_id=201074549]
+mesh = SubResource("QuadMesh_4eu2l")
+script = ExtResource("3_4eu2l")

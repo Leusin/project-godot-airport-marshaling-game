@@ -12,6 +12,10 @@ const MOVEMENT_INPUT := &"movement_input"
 const MARSHALLER := &"marshaller"
 const AIRCRAFT := &"aircraft"
 
+# SPAWN (레벨별 스폰 지점 마커 — GameManager가 여기에 엔티티를 인스턴싱한다)
+const MARSHALLER_SPAWN := &"marshaller_spawn"
+const AIRCRAFT_SPAWN := &"aircraft_spawn"
+
 # HUD LAYER
 const GAME_OVER_HUD := &"game_over_hud"
 const SUCCESS_HUD := &"success_hud"

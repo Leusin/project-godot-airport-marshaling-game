@@ -17,6 +17,10 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-11 [결정] 엔티티를 씬으로 추출 + GameManager 스폰/배선 + 비행기 지각 대상 주입 — 인라인 Marshaller/Aircraft/Obstacle을 각각 `.tscn`으로 분리하고, GameManager가 레벨 스폰 마커(그룹 `marshaller_spawn`/`aircraft_spawn`) 위치에 인스턴싱. 비행기가 `require_single(MARSHALLER)`로 peer를 전역 조회하던 것을 GameManager가 `set_perception_target(marshaller)`로 주입하도록 바꿔 엔티티 간 횡적 커플링·크래시 위험 제거(대상 없으면 대기). 스폰 마커는 레벨 데이터라 레벨별로 다르게 둘 수 있음. 초기화 순서: GameManager가 마샬러를 먼저 스폰해야 다른 노드의 그룹 조회가 성립.
+
+- 2026-07-11 [결정] 콜리전 폴리싱 — 마샬러 물리 블로킹 + 비행기 복합 히트박스. 마샬러를 Node3D→CharacterBody3D(`move_and_slide`), 장애물에 StaticBody3D + 신규 solid 레이어(bit4)를 줘 관통 방지(hazard Area3D 감지는 유지). 비행기 단일 박스 히트박스를 동체+날개 복합 형상으로 교체해 모델에 맞춤, `AircraftCollision._world_aabb`는 다중 셰입 AABB 병합으로 완전 주차 판정 유지. 시야는 shader 기반 `AircraftVision`(판정+시각화 통합)으로 교체, 미사용 `aircraft_vision_cone`/`vision_cone_debug_visual` 제거.
+
 - 2026-07-09 [결정] 게임 판정 소유권을 Aircraft → GameManager로 이관 — 엔티티가 게임 규칙을 배달하던 구조(Aircraft가 `_game_manager`/`_signal_input`을 들고 충돌·입력을 GameManager로 연결)를 뒤집음. `AircraftCollision`은 RefCounted 사실 제공자(`hazard_hit` 시그널 / `is_fully_parked()`), `Aircraft`는 그 사실만 재노출(게임/입력 의존 제거), `GameManager`(판정자)가 비행기 사실 + 확정 입력을 구독해 게임오버/성공을 정한다. 방향: `Aircraft→GameManager`(엔티티가 판정자 호출) → `GameManager→Aircraft`(판정자가 엔티티 구독). 물리적 사실("hit"·"parked")과 게임 해석("game over"·"success")을 분리하니 규칙이 한 곳에 모임. Aircraft에 `aircraft` 그룹 재부여. 35/35 통과.
 
 - 2026-07-09 [결정] 이동/FSM을 씬 자식 Node → RefCounted 헬퍼로 전환 — MarshallerMovement/AircraftMovement/AircraftFSM을 씬 노드에서 떼어내 소유 엔티티(Marshaller/Aircraft)가 코드로 들고 `_process`/`_physics_process`에서 직접 구동. FSM은 `update(in_view, 받은신호, speed, delta)` 후 `forward()`/`turn()`으로 이동 의도를 노출하고, Aircraft가 command_delay 뒤 AircraftMovement.update로 적용. 조회도 일부 그룹→부모참조(`get_parent_node_3d`)로. 교훈: HESITATING 진입 시 `_hesitate.start()` 누락 + `_last_move_signal` 무조건 대입으로 멈칫이 깨졌던 것을 테스트로 잡음 — RefCounted 전환 시 노드 수명주기(_ready)에 기대던 초기화가 사라지니 주의. 문서(ARCHITECTURE/scene_diagram)도 새 구조로 갱신.
@@ -56,6 +60,8 @@ Prototype Complete
 - 2026-06-28 [에러] GDScript class_name과 const 별칭 이름 충돌 → 파서 에러. 해결: class_name 제거하고 preload const로만 참조. 교훈: MCP 헤드리스 재실행 구조라 전역 클래스 캐시 갱신이 불안정, 작은 유틸은 class_name 없이 preload로.
 
 ## 세션 로그
+
+- 2026-07-11 콜리전 폴리싱 + 엔티티 씬화/스폰 리팩터 — 마샬러 물리 블로킹(CharacterBody3D + 장애물 StaticBody3D, solid 레이어), 비행기 복합 히트박스(동체+날개). Marshaller/Aircraft/Obstacle을 `.tscn`으로 추출하고 GameManager가 스폰 마커에 인스턴싱. 비행기의 마샬러 참조를 전역 조회 → GameManager 주입(`set_perception_target`)으로. 시야를 shader `AircraftVision`으로 교체(미사용 cone/debug 제거). main 폴더 실물 실행 확인(오류 없음).
 
 - 2026-07-08 입력 별도 엔티티화 + 이벤트 기반 전환 — MoveInput/SignalInput을 Marshaller 자식 → Systems/Input로 분리, `_unhandled_input`으로 상태 갱신(move_direction/hand_signal + hand_signal_changed 시그널). 엔진정지 확정을 폴링 → shutdown_confirmed 시그널로(AircraftCollision 구독). MarshallerControl은 MoveInput을 그룹(move_input) 조회. signal_input 이벤트 테스트 추가 (45/45). Godot 실물 실행 확인.
 

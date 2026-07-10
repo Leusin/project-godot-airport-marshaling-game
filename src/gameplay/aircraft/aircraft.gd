@@ -2,21 +2,31 @@ class_name Aircraft
 extends Node3D
 
 # 속도
+@export_group("Movement")
 @export var max_speed: float = 3.0
 @export var acceleration: float = 2.0
 @export var deceleration: float = 8.0
 @export var turn_speed_degrees: float = 25.0
 @export var command_delay := 0.6
 
+#시야
+@export_group("Vision")
+@export var view_radius: float = 8.0
+@export var half_angle_degrees: float = 35.0
+
 ## hazard(장애물·마샬러) 충돌 순간 방출. "게임오버"인지의 해석은 GameManager의 몫.
 signal hazard_hit
 
+var _see_marshaller: bool
+
 @onready var _fsm := AircraftFSM.new()
 @onready var _movement:= AircraftMovement.new()
-@onready var _vision_cone: Node = $VisionCone
 @onready var _collision := AircraftCollision.new($AircraftHitbox)
+@onready var _vision: AircraftVision = $AircraftVision
 
-var _marshaller: Node3D
+## 지각 대상(수신호 소스): global_position + hand_signal 을 가진 무언가. GameManager가 주입한다.
+## 엔티티가 스스로 peer를 찾지 않으며, 없으면 대기한다.
+var _target: Node3D
 
 var _pending_forward := 0.0
 var _pending_turn := 0.0
@@ -25,12 +35,23 @@ var _turn := 0.0
 var _delay := Countdown.new()
 
 func _ready() -> void:
-	_marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
 	_collision.hazard_hit.connect(hazard_hit.emit)
+	_vision.setup(view_radius, half_angle_degrees)
+
+## GameManager가 스폰 직후 지각 대상을 주입한다 (엔티티는 배선을 스스로 하지 않는다).
+func set_perception_target(target: Node3D) -> void:
+	_target = target
 
 func _process(delta: float) -> void:
+	if _target == null:
+		return  # 볼 대상이 없으면 명령을 받지 않고 대기한다.
+	var seen := _vision.contains(_target.global_position)
+	if seen != _see_marshaller:
+		_see_marshaller = seen
+		_vision.set_seen(seen)
+	
 	_fsm.update(
-		_sees_marshaller(),
+		_see_marshaller,
 		_received_signal(),
 		_movement.get_speed(),
 		delta)
@@ -61,15 +82,10 @@ func _physics_process(delta: float) -> void:
 		delta
 	)
 
-## 비행기가 어느 주차존에든 완전히 들어와 있는지 (사실만 노출, 판정은 GameManager).
 func is_fully_parked() -> bool:
 	return _collision.is_fully_parked()
 
-func _sees_marshaller() -> bool:
-	return _marshaller != null and _vision_cone.is_point_in_view(_marshaller.global_position)
-
-## 비행기가 지금 마샬러로부터 "받은" 수신호. 시야 밖이면 못 받으므로 NONE.
 func _received_signal() -> HandSignal.SignalType:
-	if not _sees_marshaller():
+	if not _see_marshaller:
 		return HandSignal.SignalType.NONE
-	return _marshaller.hand_signal
+	return _target.hand_signal

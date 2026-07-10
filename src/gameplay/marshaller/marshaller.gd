@@ -1,5 +1,5 @@
 class_name Marshaller
-extends Node3D
+extends CharacterBody3D
 
 signal move_intent_changed(direction: Vector3)
 signal hand_signal_changed(sig: HandSignal.SignalType)
@@ -28,5 +28,5 @@ func set_hand_signal(sig: HandSignal.SignalType) -> void:
 	hand_signal = sig
 	hand_signal_changed.emit(hand_signal)
 
-func _process(delta: float) -> void:
-	_movement.update(self, move_intent, speed, delta)
+func _physics_process(_delta: float) -> void:
+	_movement.update(self, move_intent, speed)

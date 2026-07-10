@@ -39,9 +39,19 @@ func _on_area_entered(area: Area3D) -> void:
 func _on_area_exited(area: Area3D) -> void:
 	_parking_areas.erase(area)
 
-## Area3D 첫 CollisionShape3D(BoxShape3D)의 월드 AABB. 회전은 감싸는 AABB로 반영된다.
+## Area3D의 모든 CollisionShape3D(BoxShape3D)를 합친 월드 AABB. 회전은 감싸는 AABB로 반영된다.
+## 히트박스는 복합 형상(동체+날개)이라 여러 셰입을 병합해야 날개 끝까지 포함된다.
 ## (히트박스 / 주차존만 넘어오며 둘 다 BoxShape3D — hazard는 여기 안 옴)
 func _world_aabb(area: Area3D) -> AABB:
-	var cs := area.get_node("CollisionShape3D") as CollisionShape3D
-	var box := cs.shape as BoxShape3D
-	return cs.global_transform * AABB(-box.size * 0.5, box.size)
+	var merged: AABB
+	var first := true
+	for node in area.find_children("*", "CollisionShape3D"):
+		var cs := node as CollisionShape3D
+		var box := cs.shape as BoxShape3D
+		var world := cs.global_transform * AABB(-box.size * 0.5, box.size)
+		if first:
+			merged = world
+			first = false
+		else:
+			merged = merged.merge(world)
+	return merged
