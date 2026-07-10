@@ -88,17 +88,18 @@ MainGame                         Process Mode = Always
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `Aircraft` (Pawn) | 시야로 마샬러 신호를 "받아" FSM·이동 헬퍼를 구동, 반응 지연 처리 |
+| `Aircraft` (Pawn) | 시야로 마샬러 신호를 "받아" FSM·이동 헬퍼 구동. 자기 사실(`hazard_hit`·`is_fully_parked()`)만 노출하고 게임 규칙은 모름 |
 | `AircraftFSM` | brain. 받은 신호로 IDLE/MOVING/HESITATING/STOPPING 전이 → `forward`/`turn` |
 | `AircraftMovement` | 속도 관성·회전·전진 계산 헬퍼 (`RefCounted`) |
 | `AircraftVisionCone` | 정면 70° 시야 판정 (마샬러가 보이는지 bool) |
-| `AircraftHitbox` | `AircraftCollision` 스크립트. Area3D 충돌 감지 |
+| `AircraftCollision` | 히트박스(Area3D) 겹침 판정 헬퍼 (`RefCounted`). hazard 진입/완전 주차 여부만 Aircraft에 알림 |
+| `AircraftHitbox` | 스크립트 없는 Area3D. Aircraft가 소유한 `AircraftCollision`이 이 노드를 구독 |
 
 **판정·공용**
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `GameManager` | 게임오버 / 주차 성공 / 재시작 |
+| `GameManager` | **판정자.** 비행기 사실(충돌·주차) + 확정 입력을 구독해 게임오버 / 주차 성공 / 재시작 |
 | `Obstacle`·`ParkingSpot` | 위치 마커 (Area3D, hazard/parking 레이어) |
 | `SceneQuery`·`Countdown` | 그룹 단일 조회 / 프레임 타이머 |
 

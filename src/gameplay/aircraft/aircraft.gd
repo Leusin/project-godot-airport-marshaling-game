@@ -8,9 +8,13 @@ extends Node3D
 @export var turn_speed_degrees: float = 25.0
 @export var command_delay := 0.6
 
+## hazard(장애물·마샬러) 충돌 순간 방출. "게임오버"인지의 해석은 GameManager의 몫.
+signal hazard_hit
+
 @onready var _fsm := AircraftFSM.new()
 @onready var _movement:= AircraftMovement.new()
 @onready var _vision_cone: Node = $VisionCone
+@onready var _collision := AircraftCollision.new($AircraftHitbox)
 
 var _marshaller: Node3D
 
@@ -23,6 +27,8 @@ var _delay := Countdown.new()
 func _ready() -> void:
 	# 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 	_marshaller = SceneQuery.require_single(GameGroups.MARSHALLER)
+	# 충돌 사실은 그대로 위로 알린다. 게임 규칙(게임오버/성공)은 GameManager가 해석한다.
+	_collision.hazard_hit.connect(hazard_hit.emit)
 
 func _process(delta: float) -> void:
 	_fsm.update(
@@ -56,6 +62,10 @@ func _physics_process(delta: float) -> void:
 		turn_speed_degrees,
 		delta
 	)
+
+## 비행기가 어느 주차존에든 완전히 들어와 있는지 (사실만 노출, 판정은 GameManager).
+func is_fully_parked() -> bool:
+	return _collision.is_fully_parked()
 
 func _sees_marshaller() -> bool:
 	return _marshaller != null and _vision_cone.is_point_in_view(_marshaller.global_position)

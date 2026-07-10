@@ -1,58 +1,51 @@
-extends Area3D
-## 비행기 충돌/도착 감지. Godot Area3D 겹침으로 판정한다
+class_name AircraftCollision
+extends RefCounted
+## 비행기 히트박스(Area3D) 겹침 판정 컴포넌트. Node를 상속하지 않고 Aircraft가 소유한다
+## (FSM·Movement·VisionCone과 같은 헬퍼 패턴). Area3D 노드는 씬에 남아있고(물리 겹침은
+## 노드가 필요), 이 컴포넌트는 그 노드만 보고 판정 결과만 돌려준다.
+## 게임 흐름(게임오버/성공 확정)과 입력 연결은 소유자인 Aircraft가 처리한다.
+##
 ## 모든 콜리전 도형을 Y로 길게(tall) 만들어 세로는 항상 겹치므로, 실질적으로 XZ 평면 판정 =
 ## 기존 탑다운 방식과 동일하고 도형의 Y 정렬 튜닝이 필요 없다.
-## - hazard 레이어(장애물·마샬러) 진입 → 게임오버 (area_entered)
-## - parking 레이어: 겹치는 동안 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses) 확정 대기
-## shutdown_confirmed(스페이스) 이벤트는 확정 대기 상태에서만 성공 유예를 시작한다.
+## - hazard 레이어(장애물·마샬러) 진입 → hazard_hit 방출 (Aircraft가 게임오버로 연결)
+## - parking 레이어: 겹치는 동안 비행기 AABB가 주차존 AABB에 완전히 포함되면(AABB.encloses)
+##   is_fully_parked()가 true. 성공 확정은 이 상태에서만 유효하다.
 
 ## 콜리전 레이어 번호 (1=aircraft, 2=hazard, 3=parking).
 const LAYER_HAZARD := 2
 const LAYER_PARKING := 3
 
-var _game_manager: Node
-var _signal_input: Node
-var _parking_areas: Array[Area3D] = []  # 현재 겹치는 주차 Area3D들
-var _is_parked := false
+## hazard(장애물·마샬러) 진입 순간 방출. Aircraft가 게임오버로 연결한다.
+signal hazard_hit
 
-func _ready() -> void:
-	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
-	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
-	area_entered.connect(_on_area_entered)
-	area_exited.connect(_on_area_exited)
-	# 엔진정지 확정은 폴링이 아니라 이벤트로 받는다 (물리프레임 just_pressed 유실/중복 방지).
-	if _signal_input != null:
-		_signal_input.shutdown_confirmed.connect(_on_shutdown_confirmed)
-	# GameManager가 없으면 판정 통지할 곳이 없으므로 물리 처리를 끈다 (경고는 require_single이 출력).
-	set_physics_process(_game_manager != null)
+var _hitbox: Area3D
+var _parking_areas: Array[Area3D] = []  # 현재 겹치는 주차 Area3D들
+
+func _init(hitbox: Area3D) -> void:
+	_hitbox = hitbox
+	hitbox.area_entered.connect(_on_area_entered)
+	hitbox.area_exited.connect(_on_area_exited)
+
+## 비행기가 어느 주차존에든 완전히 들어와 있으면 true. 매 프레임 폴링해도 되도록 상태를
+## 캐시하지 않고 현재 트랜스폼으로 즉석 계산한다 (물리/입력 프레임 어디서 불러도 일관).
+func is_fully_parked() -> bool:
+	var self_aabb := _world_aabb(_hitbox)
+	for area in _parking_areas:
+		if _world_aabb(area).encloses(self_aabb):
+			return true
+	return false
 
 func _on_area_entered(area: Area3D) -> void:
 	if area.get_collision_layer_value(LAYER_HAZARD):
-		if _game_manager != null:
-			_game_manager.trigger_game_over()
+		hazard_hit.emit()
 	elif area.get_collision_layer_value(LAYER_PARKING) and area not in _parking_areas:
 		_parking_areas.append(area)
 
 func _on_area_exited(area: Area3D) -> void:
 	_parking_areas.erase(area)
 
-func _physics_process(_delta: float) -> void:
-	var self_aabb := _world_aabb(self)
-	var parked := false
-	for area in _parking_areas:
-		if _world_aabb(area).encloses(self_aabb):
-			parked = true
-			break
-	_is_parked = parked
-	_game_manager.set_awaiting_shutdown_confirm(parked)
-
-## 확정 버튼 이벤트. 비행기가 주차존에 완전히 들어온 상태에서만 성공 유예를 시작한다.
-func _on_shutdown_confirmed() -> void:
-	if _is_parked:
-		_game_manager.begin_shutdown_confirm()
-
 ## Area3D 첫 CollisionShape3D(BoxShape3D)의 월드 AABB. 회전은 감싸는 AABB로 반영된다.
-## (비행기 self / 주차존만 넘어오며 둘 다 BoxShape3D — hazard는 여기 안 옴)
+## (히트박스 / 주차존만 넘어오며 둘 다 BoxShape3D — hazard는 여기 안 옴)
 func _world_aabb(area: Area3D) -> AABB:
 	var cs := area.get_node("CollisionShape3D") as CollisionShape3D
 	var box := cs.shape as BoxShape3D

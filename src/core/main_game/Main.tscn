@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://n11nmhgtt4kr" path="res://src/gameplay/input/signal_input.gd" id="6_signal_input_script"]
 [ext_resource type="Script" uid="uid://8i0s2p1e8024" path="res://src/ui/signal_indicator_hud.gd" id="8_signal_indicator_hud_script"]
 [ext_resource type="Script" uid="uid://di3tsave8npl0" path="res://src/core/main_game/game_manager.gd" id="9_game_manager_script"]
-[ext_resource type="Script" uid="uid://b2pqii3wkmkva" path="res://src/gameplay/aircraft/aircraft_collision.gd" id="10_aircraft_collision_script"]
 [ext_resource type="Script" uid="uid://dx55253tt3l5c" path="res://src/ui/game_over_hud.gd" id="11_game_over_hud_script"]
 [ext_resource type="Script" uid="uid://cjwjea1frgrbg" path="res://src/ui/success_hud.gd" id="12_success_hud_script"]
 [ext_resource type="Script" uid="uid://bydki8riqxqrl" path="res://src/debug/debug_hud.gd" id="13_debug_hud_script"]
@@ -137,7 +136,7 @@ collision_mask = 0
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World/EntityRoot/Marshaller/MarshallerArea" unique_id=1917392513]
 shape = SubResource("CylinderShape3D_marshaller")
 
-[node name="Aircraft" type="Node3D" parent="World/EntityRoot" unique_id=766735430]
+[node name="Aircraft" type="Node3D" parent="World/EntityRoot" unique_id=766735430 groups=["aircraft"]]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.3, -5)
 script = ExtResource("5_aircraft_script")
 
@@ -152,7 +151,6 @@ script = ExtResource("4_vision_cone_visual_script")
 
 [node name="AircraftHitbox" type="Area3D" parent="World/EntityRoot/Aircraft" unique_id=765361237]
 collision_mask = 6
-script = ExtResource("10_aircraft_collision_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World/EntityRoot/Aircraft/AircraftHitbox" unique_id=186456094]
 shape = SubResource("BoxShape3D_aircraft")
