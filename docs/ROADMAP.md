@@ -24,7 +24,7 @@
 
 - 지금은 비행기 AABB가 주차존 AABB에 **완전 포함**(`AABB.encloses`)돼야 확정 대기.
 - 이걸 "면적의 일정 비율(예: 70%) 이상 겹침"으로 완화해 애매하게 걸쳐도 확정은 가능하게 한다.
-  판정 위치: [aircraft_collision.gd](../src/gameplay/aircraft/aircraft_collision.gd) `_physics_process`.
+  판정 위치: [aircraft_collision.gd](../src/gameplay/aircraft/aircraft_collision.gd) `is_fully_parked()`.
 
 ### 채점 두 축 (확정 순간 스냅샷)
 

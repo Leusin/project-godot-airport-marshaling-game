@@ -12,31 +12,29 @@
 ```text
 마샬러 — 플레이어가 조종
   키 입력 → MovementInput / SignalInput → PlayerController → Marshaller (Pawn)
-                                           possess·라우팅      ├ move_intent → 이동
-                                                               └ hand_signal → 스프라이트
+										   possess·라우팅      ├ move_intent → 이동
+															   └ hand_signal → 스프라이트
 
 비행기 — AI가 조종
   Marshaller.hand_signal ──(비행기가 시야로 관찰)──→ Aircraft (Pawn)
-                                   AircraftFSM(brain)이 판단 → forward/turn
-                                   → command_delay(반응 지연) → 비행기 이동
+								   AircraftFSM(brain)이 판단 → forward/turn
+								   → command_delay(반응 지연) → 비행기 이동
 ```
 
-- **조종자**가 명령을 만든다: 마샬러는 `PlayerController`(플레이어 입력), 비행기는 `AircraftFSM`(자동 판단).
-- **Pawn**(`Marshaller`/`Aircraft`)은 입력을 전혀 모른다 → 조종자만 갈아끼우면 사람↔AI 교체 가능.
-- **헬퍼**(이동 계산 등 순수 로직)는 씬 노드가 아니라 `RefCounted`로, Pawn이 코드로 들고 매 프레임 호출한다.
+조종자는 마샬러=`PlayerController`(플레이어 입력), 비행기=`AircraftFSM`(자동 판단). 입력 무지·헬퍼 소유·AI 교체 등 설계 규칙은 [CONVENTIONS.md](CONVENTIONS.md) #6 참고.
 
 ## 폴더 구조
 
 ```text
 src/
   core/
-    main_game/   메인 씬 + 게임 진행 (Main.tscn, game_manager.gd)
-    utils/       공용 스크립트 (scene_query, countdown)
+	main_game/   메인 씬 + 게임 진행 (Main.tscn, game_manager.gd)
+	utils/       공용 스크립트 (scene_query, countdown)
   gameplay/
-    hand_signal.gd   수신호 도메인 (종류 enum + 판별)
-    input/           입력 (이동키·수신호 → 값, 엔티티 비의존)
-    marshaller/      마샬러 (Pawn·이동·스프라이트·컨트롤러)
-    aircraft/        비행기 (Pawn·FSM·이동·시야·충돌)
+	hand_signal.gd   수신호 도메인 (종류 enum + 판별)
+	input/           입력 (이동키·수신호 → 값, 엔티티 비의존)
+	marshaller/      마샬러 (Pawn·이동·스프라이트·컨트롤러)
+	aircraft/        비행기 (Pawn·FSM·이동·시야·충돌)
   ui/          HUD (수신호 표시·게임오버·성공)
   debug/       디버그 도구 (시야 시각화·FPS HUD)
 tests/         단위 테스트 (경량 자체 하네스)
