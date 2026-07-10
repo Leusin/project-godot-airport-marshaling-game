@@ -62,7 +62,7 @@ MainGame                         Process Mode = Always
 
 - 마샬러·비행기·장애물은 각각 별도 씬(`marshaller`/`aircraft`/`obstacle`.tscn). `GameManager`가 스폰 마커(그룹 `marshaller_spawn`/`aircraft_spawn`) 위치에 인스턴싱한다. 스폰 마커는 레벨 데이터라 레벨별로 다르게 둘 수 있다.
 - 이동·FSM 등 헬퍼는 소유 엔티티가 코드로 들고 있다: `Marshaller`→`MarshallerMovement`, `Aircraft`→`AircraftFSM`·`AircraftMovement`.
-- 충돌은 두 층. **게임 판정** — `Obstacle`/`ParkingSpot`/`Marshaller`가 자식 `Area3D`(hazard/parking 레이어)를 갖고 `AircraftHitbox`가 감지. **물리 블로킹** — 마샬러(`CharacterBody3D`)가 장애물(`StaticBody3D`, solid 레이어)에 막힌다.
+- 충돌은 두 축이 **한 노드에 겹쳐** 있다. **hazard**(부딪히면 게임오버)는 물리 바디로 — 장애물=`StaticBody3D`, 마샬러=`CharacterBody3D`가 hazard 레이어를 달고 `AircraftHitbox`(Area3D)가 `body_entered`로 감지. **물리 블로킹**은 같은 바디의 solid 레이어로 — 마샬러가 장애물에 막힌다. **주차존**만 `Area3D`.
 
 ## 컴포넌트
 
@@ -99,14 +99,14 @@ MainGame                         Process Mode = Always
 | 컴포넌트 | 역할 |
 |---|---|
 | `GameManager` | **판정자 + 스포너.** 레벨 스폰 마커에 엔티티를 인스턴싱·배선하고, 비행기 사실(충돌·주차) + 확정 입력을 구독해 게임오버 / 주차 성공 / 재시작 |
-| `Obstacle`·`ParkingSpot` | 씬/마커. Obstacle = hazard Area3D + solid StaticBody3D(물리 블로킹), ParkingSpot = parking Area3D |
+| `Obstacle`·`ParkingSpot` | Obstacle = `StaticBody3D` 한 노드(hazard+solid: 감지되며 마샬러를 막음), ParkingSpot = parking `Area3D` |
 | `SceneQuery`·`Countdown` | 그룹 단일 조회 / 프레임 타이머 |
 
 ## 동작 규칙 (헷갈리기 쉬운 부분)
 
 - **NONE(무신호) ≠ STOP(정지 명령).** 키를 떼면 NONE.
 - **비행기 반응**: 무신호는 잠깐 멈칫(계속 가다) 후 정지, STOP·시야 밖은 즉시 정지. 모든 명령은 `command_delay`만큼 지연돼 반영된다.
-- **충돌 두 층.** 게임 판정은 `Area3D`(hazard/parking), 물리 블로킹은 `CharacterBody3D`↔`StaticBody3D`(solid 레이어, bit4). 주차 성공은 비행기 복합 히트박스(동체+날개)의 월드 AABB가 주차존 AABB에 **완전히 들어온**(`AABB.encloses`) 뒤 확정 버튼을 눌러야 한다.
+- **충돌.** hazard(장애물·마샬러)는 물리 바디에 hazard 레이어를 달아 `AircraftHitbox`가 `body_entered`로 감지하고, 물리 블로킹은 같은 바디의 solid 레이어(bit4). 주차존만 `Area3D`. 주차 성공은 비행기 복합 히트박스(동체+날개)의 월드 AABB가 주차존 AABB에 **완전히 들어온**(`AABB.encloses`) 뒤 확정 버튼을 눌러야 한다.
 
 ## 더 볼 것
 

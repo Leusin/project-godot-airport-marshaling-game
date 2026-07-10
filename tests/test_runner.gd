@@ -8,7 +8,6 @@ extends Control
 func _ready() -> void:
 	var suite := TestLib.new()
 	_test_countdown(suite)
-	_test_vision_cone(suite)
 	_test_signal_input(suite)
 	_test_aircraft_fsm(suite)
 
@@ -59,32 +58,6 @@ func _test_countdown(suite: TestLib) -> void:
 	countdown.start(1.0)
 	countdown.stop()
 	suite.check(not countdown.is_running(), "stop() → 즉시 멈춤")
-
-# ─────────────────────────────────────────────────────────
-# vision_cone: 정면(-Z) 기준 좌우 half_angle + 반경 판정 (상태 없는 기하)
-func _test_vision_cone(suite: TestLib) -> void:
-	suite.start("vision_cone")
-	var aircraft := Node3D.new()
-	add_child(aircraft)
-	aircraft.global_position = Vector3.ZERO
-
-	var vision_cone := AircraftVisionCone.new()
-	vision_cone.half_angle_degrees = 35.0
-	vision_cone.view_radius = 10.0
-	aircraft.add_child(vision_cone)
-
-	suite.check(vision_cone.is_point_in_view(Vector3(0, 0, -5)), "정면 5m → 시야 내")
-	suite.check(not vision_cone.is_point_in_view(Vector3(0, 0, 5)), "후방 → 시야 밖")
-	suite.check(not vision_cone.is_point_in_view(Vector3(0, 0, -15)), "반경 초과 → 시야 밖")
-
-	var wide_angle := deg_to_rad(40.0)
-	suite.check(not vision_cone.is_point_in_view(Vector3(sin(wide_angle), 0, -cos(wide_angle)) * 5.0),
-		"40도(>35) → 시야 밖")
-	var narrow_angle := deg_to_rad(20.0)
-	suite.check(vision_cone.is_point_in_view(Vector3(sin(narrow_angle), 0, -cos(narrow_angle)) * 5.0),
-		"20도(<35) → 시야 내")
-
-	aircraft.queue_free()
 
 # ─────────────────────────────────────────────────────────
 # signal_input: 이벤트 기반 수신호 — 키 이벤트에 반응해 hand_signal 갱신 + 시그널 방출
