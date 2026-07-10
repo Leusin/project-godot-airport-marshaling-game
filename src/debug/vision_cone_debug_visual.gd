@@ -7,7 +7,6 @@ const VISUAL_HEIGHT := 0.05
 
 @onready var vision_cone: Node = get_parent().get_node("VisionCone")
 
-# 마샬러는 계층 경로가 아니라 그룹으로 찾는다 (씬 트리 위치에 독립적).
 var marshaller: Node3D
 
 var _material := StandardMaterial3D.new()

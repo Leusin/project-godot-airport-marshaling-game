@@ -1,9 +1,7 @@
 extends Sprite3D
-## 마샬러 2.5D 빌보드 스프라이트. 현재 수신호에 맞춰 텍스처를 바꿔 낀다.
-## 판정에는 관여하지 않고 Pawn(Marshaller)이 받은 수신호 / GameManager의 현재 값을 그대로 시각화한다.
-## 입력(SignalInput)을 직접 보지 않고, Controller가 Pawn에 넣어준 hand_signal을 참조한다.
-## 확정 버튼(스페이스)을 누른 직후의 짧은 유예 구간에만, 평소 신호와 무관하게
-## 엔진 정지(확정) 포즈로 덮어쓴다 (누르기 전 대기 중에는 평소 신호 포즈 유지).
+## 마샬러 2.5D 빌보드 스프라이트. 판정에 관여하지 않고 Pawn의 hand_signal에 맞춰 텍스처를 바꿔 낀다
+## (입력을 직접 보지 않고 Controller가 넣어준 값을 참조).
+## 확정 직후 유예 구간(is_confirming_shutdown)에만 평소 신호와 무관하게 엔진정지 포즈로 덮어쓴다.
 
 const ICON_PATHS := {
 	HandSignal.SignalType.NONE: "res://assets/sprites/marshaller/signal_none.png",

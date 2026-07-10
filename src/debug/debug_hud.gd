@@ -15,7 +15,6 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_version = str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
 
-	# 릴리스 빌드에서는 디버그 오버레이를 숨기고 비활성화한다.
 	if not OS.is_debug_build():
 		visible = false
 		set_process(false)

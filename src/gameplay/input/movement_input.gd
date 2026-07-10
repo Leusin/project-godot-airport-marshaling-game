@@ -1,8 +1,7 @@
 extends Node
-## 이동 입력 전담(디바이스 계층). 방향키/WASD 이벤트에 반응해 현재 XZ 이동 방향을
-## 상태(move_direction)로 보관하고, 바뀔 때 move_direction_changed를 방출한다.
-## 특정 엔티티에 종속되지 않는다 — PlayerController가 이 값을 possess한 Pawn으로 라우팅한다.
-## 그룹 'movement_input'으로 조회된다. (SignalInput의 hand_signal_changed와 동일 패턴)
+## 이동 입력 전담(디바이스 계층). 방향키/WASD 이벤트로 XZ 이동 방향을 move_direction에 보관하고
+## 바뀔 때 move_direction_changed를 방출한다. 특정 엔티티에 종속되지 않고 PlayerController가
+## possess한 Pawn으로 라우팅한다. 그룹 'movement_input'으로 조회 (SignalInput과 동일 패턴).
 
 signal move_direction_changed(direction: Vector3)
 

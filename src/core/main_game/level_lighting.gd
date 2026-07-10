@@ -1,7 +1,6 @@
 extends WorldEnvironment
-## 씬에 조명/환경이 전혀 없어 전체가 어둡던 문제 해결.
-## Environment의 enum 값은 .tscn에 raw int로 적지 않고 여기서 이름으로 참조해
-## (Environment.BG_COLOR 등) 오타/오류 여지를 없앤다.
+## 씬 조명/환경을 코드로 구성. Environment enum을 .tscn의 raw int 대신
+## 이름(Environment.BG_COLOR 등)으로 참조해 오타 여지를 없앤다.
 
 func _ready() -> void:
 	var env := Environment.new()

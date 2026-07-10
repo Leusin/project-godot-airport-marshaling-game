@@ -1,15 +1,8 @@
 @tool
 extends EditorScript
 
-## 프로젝트 기본 설정 일괄 적용 스크립트.
-##
-## [실행 방법]
-## 씬에 붙이지 않음. Godot 에디터에서 이 파일을 열고
-## 상단 메뉴 File > Run (단축키: Ctrl+Shift+X) 으로 실행.
-##
-## [언제 실행?]
-## 프로젝트를 새 환경에서 처음 열었을 때 한 번만 실행하면 됨.
-## project.godot에 반영되므로 이후 자동 적용.
+## 프로젝트 기본 설정 일괄 적용. 씬에 붙이지 않고 에디터에서 File > Run(Ctrl+Shift+X)으로 실행.
+## 새 환경에서 처음 한 번만 실행하면 project.godot에 반영된다.
 
 # ── 애플리케이션 / 윈도우 ────────────────────────────────────────────
 const PROJECT_SETTINGS: Dictionary = {
@@ -28,7 +21,6 @@ const PROJECT_SETTINGS: Dictionary = {
 }
 
 # ── 3D 물리 레이어 ───────────────────────────────────────────────────
-# 현재는 XZ 거리 기반 감지를 쓰지만, 추후 CollisionShape3D 활용 시 사용.
 const PHYSICS_3D_LAYERS: Dictionary = {
 	1: "Aircraft",
 	2: "Marshaller",
