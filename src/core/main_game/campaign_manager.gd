@@ -19,13 +19,13 @@ var _last_completed := false
 var is_complete := false
 
 ## 레벨별 최고 클리어 등급 (미클리어는 null). 저장 시스템이 붙으면 이 배열을 직렬화한다.
-var grades: Array = []
+var _grades: Array = []
 
 var _level_root: Node3D
 
 func _ready() -> void:
 	_level_root = SceneQuery.require_single(GameGroups.LEVEL_ROOT) as Node3D
-	grades.resize(levels.size())
+	_grades.resize(levels.size())
 
 ## 현재 레벨을 다시 로드한다.
 func restart_level() -> void:
@@ -35,7 +35,7 @@ func restart_level() -> void:
 func next_level() -> void:
 	var next := (_level_index + 1) % levels.size()
 	if next == 0:
-		grades.fill(null)
+		_grades.fill(null)
 	_request_load(next)
 
 ## 진행 HUD가 읽는 사실들.
@@ -47,13 +47,13 @@ func current_level() -> int:
 
 ## 해당 레벨의 클리어 등급. 미클리어면 null.
 func grade_of(index: int) -> Variant:
-	return grades[index]
+	return _grades[index]
 
 ## 클리어 기록. 기존 기록보다 높은 등급만 갱신한다. (Main이 GameManager.level_completed를 잇는다)
 func on_level_completed(grade: ParkingGrade.Grade) -> void:
 	_last_completed = true
-	if grades[_level_index] == null or grade > grades[_level_index]:
-		grades[_level_index] = grade
+	if _grades[_level_index] == null or grade > _grades[_level_index]:
+		_grades[_level_index] = grade
 
 func on_level_failed() -> void:
 	_last_completed = false

@@ -168,9 +168,9 @@ func _on_hazard_hit(world_position: Vector3) -> void:
 		_hit_effect_hud.show_impact(world_position)
 	_hit_stop_delay.start(HIT_STOP_DELAY)
 
+## 무적(debug_invincible) 게이트는 여기 두지 않는다 — 충돌 사실의 해석 시점(_on_hazard_hit) 한 곳에만.
+## 여기서도 걸러버리면 히트스톱 중 무적을 켰을 때 일시정지가 영영 안 풀린다.
 func trigger_game_over() -> void:
-	if debug_invincible:
-		return
 	if _is_game_over or _is_success:
 		return
 	_is_game_over = true
