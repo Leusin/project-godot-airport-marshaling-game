@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-11 [결정] 레벨 캠페인을 씬 리로드 없이 LevelRoot 교체로 + 매니저 배선은 Main 한 곳 — `CampaignManager`(레벨 목록·인덱스·교체·등급 기록)와 `GameManager`(현재 레벨 플레이: 스폰·승패 판정·HUD)를 분리하고, 서로 직접 참조하지 않게 Main 루트(`main_game.gd`)가 시그널로 배선: `level_loaded→start_level`, `level_completed/level_failed/advance_requested→on_level_completed/on_level_failed/advance`. GameManager는 "이번 판이 끝났다"만 알리고 다음 진행(재시작/다음)은 캠페인이 결정. 스폰은 마커의 transform만 읽어 EntityRoot 아래 인스턴싱(마커 자식 X) — 레벨 교체와 엔티티 수명이 분리됨. 전환 프레임 오작동 방지 2가지: 씬 교체·디스폰 시 `remove_child`로 트리에서 즉시 떼어 이전 마커/엔티티가 그룹 조회·물리에 안 걸리게, 종료 화면의 일시정지는 `start_level()`이 풀 때까지 유지. PlayerController는 `possess(pawn)`로 재스폰마다 재배선(스스로 Pawn을 찾지 않음). 재시작을 `reload_current_scene()`→레벨 재로드로 교체.
+
 - 2026-07-11 [결정] 마샬러 방향(등/정면)을 주입된 타깃으로 판정 + HUD 자가 조회 제거 — 마샬러가 항상 비행기를 바라본다는 가정에서, 비행기가 화면 위(작은 z)면 등·아래면 정면을 보이므로 스프라이트를 좌우 반전해 좌/우 수신호의 손잡이 방향을 맞춘다(머리가 블롭이라 앞/뒤 차이는 미러링뿐). 처음엔 스프라이트가 `get_first_node_in_group(AIRCRAFT)`로 비행기를 자가 조회했으나 §6 위반 → `Marshaller`가 `set_facing_target`으로 비행기를 주입받아 `is_showing_back()` 사실만 노출하고 뷰는 부모 Pawn만 읽게 고침(비행기 지각의 `set_perception_target`과 대칭). 같은 결로 `ParkingGradeHUD`/`DebugHUD`도 비행기 자가 조회를 걷어내 GameManager가 `parking_metrics()`/`current_grade()`를 중계하고 HUD는 GameManager 싱글턴만 읽게 정렬(§3/§4/§6/§7).
 
 - 2026-07-11 [결정] 주차 판정을 완전포함 → 겹침비율 + 등급(B/A/S/SS) 채점 — 확정 게이트를 `AABB.encloses`(완전포함)에서 풋프린트 XZ 겹침비율 ≥ `MIN_PARK_RATIO`(0.7)로 완화(비스듬히 들어오면 AABB가 주차존보다 커져 영영 확정 불가였던 문제 해결). 채점은 아키텍처대로 분리: `AircraftCollision`(기하 사실)이 `parking_metrics()`로 겹침비율·중심 오차·축 각도 오차를 제공, 신규 `ParkingGrade`(중립 규칙 도메인, HandSignal 패턴)가 위치·각도 오차 → 등급으로 환산, `GameManager`(판정자)가 확정 순간 등급을 스냅샷(유예 중 관성 이동 무관), `SuccessHUD`가 표시. 각도는 사각 주차존이라 180° 뒤집힘을 동일 취급(0=정렬~90=직각). 등급 임계값은 프로토타입 초기값 — 실측 튜닝 대상. 30/30 통과.
@@ -68,6 +70,10 @@ Prototype Complete
 - 2026-06-28 [에러] GDScript class_name과 const 별칭 이름 충돌 → 파서 에러. 해결: class_name 제거하고 preload const로만 참조. 교훈: MCP 헤드리스 재실행 구조라 전역 클래스 캐시 갱신이 불안정, 작은 유틸은 class_name 없이 preload로.
 
 ## 세션 로그
+
+- 2026-07-11 레벨 진행 HUD — 상단 중앙에 레벨 슬롯 로드맵(신규 `LevelProgressHUD`). 현재 레벨은 테두리 강조, 클리어한 레벨은 번호 대신 등급(B/A/S/SS) 표시. 캠페인이 `level_count`/`current_level`/`grade_of` 사실을 노출하고 HUD는 읽기만. 마지막 레벨 → 처음 순환 시 등급 기록 초기화(새 사이클).
+
+- 2026-07-11 레벨 캠페인 구조 + 레벨 5개 초안 — Main.tscn의 레벨 내용(지면·장애물·주차존·스폰 마커)을 `levels/level_01~05.tscn`으로 추출, 신규 `CampaignManager`가 LevelRoot 아래 교체 로드·등급 기록, `main_game.gd`(Main 루트)가 두 매니저를 시그널로 배선. 레벨 콘셉트: ①튜토리얼(장애물 없음) ②기존 맵 ③시야 차단 ④좁은 통로+주차존 30° ⑤종합(차폐+통로+주차존 -45°). 마지막 레벨 클리어 후엔 처음으로 순환(캠페인 완료 화면은 추후). 배치·난이도는 플레이테스트 튜닝 대상. 30/30 통과, 헤드리스 실행 오류 없음.
 
 - 2026-07-11 시야 차폐(line-of-sight) — `AircraftVision.contains(point)`를 `can_see(target)`로 교체, 반경→각도→시야선 3가드로 분리. 시야선은 비행기→대상 레이캐스트(mask=solid)로 장애물에 걸리면 못 봄. solid만 마스킹해 마샬러(hazard)·비행기 자신은 자동 제외. `CollisionLayers.bit()` 헬퍼 추가. 장애물이 시야를 막는 두 번째 역할을 얻어 레벨디자인과 시너지. 실물 차폐 동작은 플레이테스트 확인 필요.
 

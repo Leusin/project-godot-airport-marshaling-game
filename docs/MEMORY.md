@@ -21,6 +21,7 @@
 
 - [x] 시야 차폐(line-of-sight): `AircraftVision.can_see`가 반경→각도→시야선 순 판정. 비행기→대상 레이캐스트가 solid(장애물)에 걸리면 시야 밖. solid만 마스킹해 마샬러(hazard)·비행기 자신은 자동 제외(별도 exclude 불필요)
 - [x] 마샬러 앞/뒤 방향: 비행기 바라봄 가정 → 비행기가 위면 등·아래면 정면. 좌/우 수신호 손잡이 교정 목적이라 `flip_h` 미러링만으로 해결(뒷모습 아트 불필요). Pawn `is_showing_back()` 사실 노출 + `set_facing_target` 주입, 뷰가 읽어 flip
+- [ ] 레벨 로드맵을 버스 정류장식으로: 슬롯 사이 연결선 + 진행 표시 (현재 슬롯 나열로 충분해 보류)
 - [ ] 충돌 UI 효과: 비행기↔마샬러(또는 장애물) 충돌 시 화면 피드백(플래시/비네트/셰이크 등). `AircraftCollision.hazard_hit` → GameManager 게임오버 경로에 연출 훅. EffectRoot/TransitionLayer 활용
 
 ### C 다음 버전

@@ -28,7 +28,7 @@
 ```text
 src/
   core/
-	main_game/   메인 씬 + 게임 진행 (Main.tscn, game_manager.gd)
+	main_game/   메인 씬 + 게임 진행 (Main.tscn, main_game.gd, game_manager.gd, campaign_manager.gd)
 	utils/       공용 스크립트 (scene_query, countdown)
   gameplay/
 	hand_signal.gd   수신호 도메인 (종류 enum + 판별)
@@ -36,6 +36,8 @@ src/
 	marshaller/      마샬러 씬(.tscn)·Pawn·이동·스프라이트·컨트롤러
 	aircraft/        비행기 씬(.tscn)·FSM·이동·시야·충돌
 	obstacle/        장애물 씬(.tscn)
+	parking/         주차존 씬(.tscn)·등급 규칙(parking_grade.gd)
+	levels/          레벨 씬들 (지면·장애물·주차존·스폰 마커 = 레벨 데이터)
   ui/          HUD (수신호 표시·게임오버·성공)
   debug/       디버그 도구 (시야 시각화·FPS HUD)
 tests/         단위 테스트 (경량 자체 하네스)
@@ -46,21 +48,21 @@ tests/         단위 테스트 (경량 자체 하네스)
 ![씬 구조 다이어그램](attachment/scene_diagram.svg)
 
 ```text
-MainGame                         Process Mode = Always
+MainGame (main_game.gd)          Process Mode = Always. 캠페인↔게임 매니저를 시그널로 배선
 ├─ Systems                       상위 시스템
-│  ├─ GameManager                판정 + 엔티티 스폰 + 재시작
+│  ├─ GameManager                현재 레벨 플레이: 스폰·승패 판정·HUD 제어
 │  ├─ Input                      MovementInput · SignalInput
-│  └─ PlayerController           마샬러 possess
+│  ├─ PlayerController           마샬러 possess
+│  └─ CampaignManager            레벨 목록·인덱스·교체·등급 기록
 ├─ World                         Process Mode = Pausable
 │  ├─ TopDownCamera
-│  ├─ LevelRoot                  Ground · Obstacle · ParkingSpot
-│  └─ EntityRoot
-│     ├─ MarshallerSpawn(Marker3D)  ─ 런타임에 Marshaller 인스턴스
-│     └─ AircraftSpawn(Marker3D)    ─ 런타임에 Aircraft 인스턴스
+│  ├─ LevelRoot                  캠페인이 현재 레벨 씬(levels/*.tscn)을 교체 로드하는 슬롯
+│  └─ EntityRoot                 GameManager가 마샬러·비행기를 스폰하는 슬롯
 └─ HudLayer / PauseLayer / TransitionLayer / DebugLayer
 ```
 
-- 마샬러·비행기·장애물은 각각 별도 씬(`marshaller`/`aircraft`/`obstacle`.tscn). `GameManager`가 스폰 마커(그룹 `marshaller_spawn`/`aircraft_spawn`) 위치에 인스턴싱한다. 스폰 마커는 레벨 데이터라 레벨별로 다르게 둘 수 있다.
+- **레벨 씬**(levels/*.tscn) = 지면·장애물·주차존·스폰 마커(그룹 `marshaller_spawn`/`aircraft_spawn`). 스폰 마커는 위치 데이터일 뿐이고, `GameManager`가 마커의 transform만 읽어 엔티티를 **EntityRoot 아래에** 인스턴싱한다(마커 자식 X — 레벨을 교체해도 엔티티 수명은 GameManager가 관리).
+- **매니저 배선은 Main 한 곳**: `CampaignManager.level_loaded → GameManager.start_level`, `GameManager.level_completed/level_failed/advance_requested → CampaignManager.on_level_completed/on_level_failed/advance`. 두 매니저는 서로를 직접 참조하지 않는다.
 - 이동·FSM 등 헬퍼는 소유 엔티티가 코드로 들고 있다: `Marshaller`→`MarshallerMovement`, `Aircraft`→`AircraftFSM`·`AircraftMovement`.
 - 충돌은 두 축이 **한 노드에 겹쳐** 있다. **hazard**(부딪히면 게임오버)는 물리 바디로 — 장애물=`StaticBody3D`, 마샬러=`CharacterBody3D`가 hazard 레이어를 달고 `AircraftHitbox`(Area3D)가 `body_entered`로 감지. **물리 블로킹**은 같은 바디의 solid 레이어로 — 마샬러가 장애물에 막힌다. **주차존**만 `Area3D`.
 
@@ -98,7 +100,9 @@ MainGame                         Process Mode = Always
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `GameManager` | **판정자 + 스포너.** 레벨 스폰 마커에 엔티티를 인스턴싱·배선하고, 비행기 사실(충돌·주차) + 확정 입력을 구독해 게임오버 / 주차 성공 / 재시작 |
+| `MainGame` | **조립 지점.** 캠페인↔게임 매니저를 시그널로 배선하고 첫 레벨을 로드 |
+| `CampaignManager` | **캠페인 흐름.** 레벨 목록·인덱스 보유, LevelRoot 아래 레벨 교체(`restart_level`/`next_level`), 클리어 등급 기록. 판정은 모름 |
+| `GameManager` | **현재 레벨 플레이.** 스폰 마커 transform을 읽어 EntityRoot에 엔티티 인스턴싱·배선, 비행기 사실(충돌·주차) + 확정 입력을 구독해 승패 판정·HUD 제어. 결과는 `level_completed(grade)`/`level_failed` 시그널로만 알림 |
 | `Obstacle`·`ParkingSpot` | Obstacle = `StaticBody3D` 한 노드(hazard+solid: 감지되며 마샬러를 막음), ParkingSpot = parking `Area3D` |
 | `SceneQuery`·`Countdown` | 그룹 단일 조회 / 프레임 타이머 |
 
@@ -106,7 +110,7 @@ MainGame                         Process Mode = Always
 
 - **NONE(무신호) ≠ STOP(정지 명령).** 키를 떼면 NONE.
 - **비행기 반응**: 무신호는 잠깐 멈칫(계속 가다) 후 정지, STOP·시야 밖은 즉시 정지. 모든 명령은 `command_delay`만큼 지연돼 반영된다.
-- **충돌.** hazard(장애물·마샬러)는 물리 바디에 hazard 레이어를 달아 `AircraftHitbox`가 `body_entered`로 감지하고, 물리 블로킹은 같은 바디의 solid 레이어(bit4). 주차존만 `Area3D`. 주차 성공은 비행기 복합 히트박스(동체+날개)의 월드 AABB가 주차존 AABB에 **완전히 들어온**(`AABB.encloses`) 뒤 확정 버튼을 눌러야 한다.
+- **충돌.** hazard(장애물·마샬러)는 물리 바디에 hazard 레이어를 달아 `AircraftHitbox`가 `body_entered`로 감지하고, 물리 블로킹은 같은 바디의 solid 레이어(bit4). 주차존만 `Area3D`. 주차 성공은 비행기 풋프린트(XZ)가 주차존과 **겹침비율 0.7 이상**일 때 확정 버튼을 눌러야 하고, 확정 순간의 위치·각도 오차로 등급(B/A/S/SS)을 채점한다(`ParkingGrade`).
 
 ## 더 볼 것
 

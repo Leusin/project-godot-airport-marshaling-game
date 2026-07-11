@@ -5,8 +5,14 @@ extends RefCounted
 
 # SYSTEM
 const GAME_MANAGER := &"game_manager"
+const CAMPAIGN_MANAGER := &"campaign_manager"
 const SIGNAL_INPUT := &"signal_input"
 const MOVEMENT_INPUT := &"movement_input"
+const PLAYER_CONTROLLER := &"player_controller"
+
+# WORLD ROOT (캠페인이 레벨을 교체하는 슬롯 / GameManager가 엔티티를 스폰하는 슬롯)
+const LEVEL_ROOT := &"level_root"
+const ENTITY_ROOT := &"entity_root"
 
 # ENTITY
 const MARSHALLER := &"marshaller"

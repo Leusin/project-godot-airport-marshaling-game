@@ -14,8 +14,9 @@
 | 6 | **`gameplay/aircraft/aircraft_fsm.gd`** | **신호 해석 (게임의 두뇌)** |
 | 7 | `gameplay/aircraft/aircraft.gd` | Pawn: 신호 받아 FSM·이동 헬퍼 구동 |
 | 8 | `gameplay/aircraft/aircraft_collision.gd` | 충돌/도착 사실 감지 (Area3D) |
-| 9 | `core/main_game/game_manager.gd` | 판정 (게임오버/성공) |
-| 10 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |
+| 9 | `core/main_game/game_manager.gd` | 현재 레벨 플레이 (스폰·승패 판정·HUD) |
+| 10 | `core/main_game/campaign_manager.gd` · `main_game.gd` | 레벨 캠페인 진행 + 매니저 배선 |
+| 11 | `ui/` · `debug/` · `core/utils/` | 표시 · 디버그 · 공용 유틸 |
 
 
 ## 실행

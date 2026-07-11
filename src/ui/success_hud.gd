@@ -21,9 +21,9 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0.25, 0, 0.65))
 	var cx := size.x
 	var cy := size.y / 2.0
-	draw_string(ThemeDB.fallback_font, Vector2(0, cy - 40.0), "유도 성공!",
+	draw_string(ThemeDB.fallback_font, Vector2(0, cy - 40.0), "CLEAR",
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 48, Color(0.3, 1.0, 0.3))
 	draw_string(ThemeDB.fallback_font, Vector2(0, cy + 30.0), ParkingGrade.label(_grade),
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 72, Color(1.0, 0.9, 0.4))
-	draw_string(ThemeDB.fallback_font, Vector2(0, cy + 90.0), "엔터 / ESC 로 재시작",
+	draw_string(ThemeDB.fallback_font, Vector2(0, cy + 90.0), "엔터 / ESC 로 계속",
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 24, Color(0.8, 0.8, 0.8))
