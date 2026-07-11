@@ -82,8 +82,12 @@ func _physics_process(delta: float) -> void:
 		delta
 	)
 
-func is_fully_parked() -> bool:
-	return _collision.is_fully_parked()
+func is_parked_enough() -> bool:
+	return _collision.is_parked_enough()
+
+## 확정 순간 채점용 사실(위치·각도 오차 등). GameManager가 등급으로 해석한다.
+func parking_metrics() -> Dictionary:
+	return _collision.parking_metrics()
 
 func _received_signal() -> HandSignal.SignalType:
 	if not _see_marshaller:

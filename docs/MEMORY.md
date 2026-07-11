@@ -15,7 +15,7 @@
 
 ### A 필수
 
-- [ ] 주차 정확도 등급 (B/A/S/SS): 완전포함(`AABB.encloses`) 조건을 겹침 비율(예 70%)로 완화 + 확정 순간 위치·각도 오차로 채점. 판정 위치 `aircraft_collision.is_fully_parked()`, 각도는 `global_rotation.y` 직접 읽기
+- [x] 주차 정확도 등급 (B/A/S/SS): 완전포함 → 겹침비율(0.7) 게이트로 완화 + 확정 순간 위치·각도 오차로 채점. `AircraftCollision.parking_metrics()` + `ParkingGrade.evaluate()` + `SuccessHUD` 표시. 임계값은 실측 튜닝 대기
 
 ### B 폴리시
 

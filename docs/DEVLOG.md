@@ -17,6 +17,12 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-11 [결정] 주차 판정을 완전포함 → 겹침비율 + 등급(B/A/S/SS) 채점 — 확정 게이트를 `AABB.encloses`(완전포함)에서 풋프린트 XZ 겹침비율 ≥ `MIN_PARK_RATIO`(0.7)로 완화(비스듬히 들어오면 AABB가 주차존보다 커져 영영 확정 불가였던 문제 해결). 채점은 아키텍처대로 분리: `AircraftCollision`(기하 사실)이 `parking_metrics()`로 겹침비율·중심 오차·축 각도 오차를 제공, 신규 `ParkingGrade`(중립 규칙 도메인, HandSignal 패턴)가 위치·각도 오차 → 등급으로 환산, `GameManager`(판정자)가 확정 순간 등급을 스냅샷(유예 중 관성 이동 무관), `SuccessHUD`가 표시. 각도는 사각 주차존이라 180° 뒤집힘을 동일 취급(0=정렬~90=직각). 등급 임계값은 프로토타입 초기값 — 실측 튜닝 대상. 30/30 통과.
+
+- 2026-07-11 [결정] 주차 등급은 게임 HUD, 정확도 수치는 디버그로 분리 — 라이브 등급(B/A/S/SS)은 실제 게임 HUD(`ParkingGradeHUD`, 우측)가 주차 충분(확정 가능) 동안 표시하고, 원자료(overlap/pos/ang)는 `DebugHUD`(백틱 토글)에만 둠. 둘 다 판정자와 같은 규칙(`ParkingGrade`)을 프리뷰로 재계산 — 규칙은 한 소스, 표시만 여러 곳. 키매핑 인디케이터는 하드코딩 대신 `InputMap.action_get_events`로 실제 바인딩을 읽어 라벨 생성(리바인딩 자동 반영), 방향키는 화살표 글리프로 압축.
+
+- 2026-07-11 [에러] 에디터 밖에서 만든 `class_name` 스크립트가 전역 클래스 캐시에 없어 파서 에러(`Could not find type "ParkingGrade"`). MCP 헤드리스 재실행은 캐시를 자동 갱신 안 함 → `.godot/global_script_class_cache.cfg`에 항목을 알파벳 순 위치에 수동 추가해 해결. 교훈: 에디터를 거치지 않고 새 class_name 파일을 추가하면 캐시 등록이 필요.
+
 - 2026-07-11 [결정] 엔티티를 씬으로 추출 + GameManager 스폰/배선 + 비행기 지각 대상 주입 — 인라인 Marshaller/Aircraft/Obstacle을 각각 `.tscn`으로 분리하고, GameManager가 레벨 스폰 마커(그룹 `marshaller_spawn`/`aircraft_spawn`) 위치에 인스턴싱. 비행기가 `require_single(MARSHALLER)`로 peer를 전역 조회하던 것을 GameManager가 `set_perception_target(marshaller)`로 주입하도록 바꿔 엔티티 간 횡적 커플링·크래시 위험 제거(대상 없으면 대기). 스폰 마커는 레벨 데이터라 레벨별로 다르게 둘 수 있음. 초기화 순서: GameManager가 마샬러를 먼저 스폰해야 다른 노드의 그룹 조회가 성립.
 
 - 2026-07-11 [결정] 콜리전 폴리싱 — 마샬러 물리 블로킹 + 비행기 복합 히트박스. 마샬러를 Node3D→CharacterBody3D(`move_and_slide`), 장애물에 StaticBody3D + 신규 solid 레이어(bit4)를 줘 관통 방지(hazard Area3D 감지는 유지). 비행기 단일 박스 히트박스를 동체+날개 복합 형상으로 교체해 모델에 맞춤, `AircraftCollision._world_aabb`는 다중 셰입 AABB 병합으로 완전 주차 판정 유지. 시야는 shader 기반 `AircraftVision`(판정+시각화 통합)으로 교체, 미사용 `aircraft_vision_cone`/`vision_cone_debug_visual` 제거.
@@ -60,6 +66,8 @@ Prototype Complete
 - 2026-06-28 [에러] GDScript class_name과 const 별칭 이름 충돌 → 파서 에러. 해결: class_name 제거하고 preload const로만 참조. 교훈: MCP 헤드리스 재실행 구조라 전역 클래스 캐시 갱신이 불안정, 작은 유틸은 class_name 없이 preload로.
 
 ## 세션 로그
+
+- 2026-07-11 주차 등급 + 라이브 HUD + 키매핑 인디케이터 + 카메라 여백 — (1) 확정 게이트를 완전포함→겹침비율(0.7)로 완화하고 확정 순간 위치·각도 오차로 채점(신규 `ParkingGrade` 도메인, `AircraftCollision.parking_metrics`, `GameManager` 스냅샷, `SuccessHUD` 표시). (2) 라이브 등급 프리뷰를 게임 HUD(신규 `ParkingGradeHUD`, 우측)로, 튜닝용 수치(overlap/pos/ang)는 `DebugHUD`(백틱)로 분리. (3) 주차 패드에 방향 화살표(노란색). (4) `SignalIndicator`에 InputMap을 읽어 각 신호 아이콘 키캡(↑←→↓/Space) 표시 — 우상단·볼드·선택 시 함께 스케일. (5) 카메라 시선축 dolly((0,16,9)→(0,19.5,11)) 여백 +22%. 임계값·카메라·레이아웃은 실측 튜닝. 30/30 통과, 실물 실행 오류 없음.
 
 - 2026-07-11 콜리전 폴리싱 + 엔티티 씬화/스폰 리팩터 — 마샬러 물리 블로킹(CharacterBody3D + 장애물 StaticBody3D, solid 레이어), 비행기 복합 히트박스(동체+날개). Marshaller/Aircraft/Obstacle을 `.tscn`으로 추출하고 GameManager가 스폰 마커에 인스턴싱. 비행기의 마샬러 참조를 전역 조회 → GameManager 주입(`set_perception_target`)으로. 시야를 shader `AircraftVision`으로 교체(미사용 cone/debug 제거). main 폴더 실물 실행 확인(오류 없음).
 

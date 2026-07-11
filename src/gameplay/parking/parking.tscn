@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bq5wx7ywpxnqm"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_parking"]
 size = Vector3(4.5, 0.05, 4.5)
@@ -6,18 +6,38 @@ size = Vector3(4.5, 0.05, 4.5)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_parking"]
 albedo_color = Color(0.1, 0.4, 0.85, 1)
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_wohq8"]
+size = Vector2(0.3, 3.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arrow"]
+shading_mode = 0
+albedo_color = Color(1, 0.85, 0.2, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yf5fn"]
+size = Vector2(1.4, 0.3)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_parking"]
 size = Vector3(4.5, 6, 4.5)
 
-[node name="ParkingSpot" type="Node3D"]
+[node name="ParkingSpot" type="Node3D" unique_id=1618071092]
 
-[node name="ParkingMesh" type="MeshInstance3D" parent="."]
+[node name="ParkingMesh" type="MeshInstance3D" parent="." unique_id=152903964]
 mesh = SubResource("BoxMesh_parking")
 surface_material_override/0 = SubResource("StandardMaterial3D_parking")
 
-[node name="ParkingArea" type="Area3D" parent="."]
+[node name="DirectionArrow" type="MeshInstance3D" parent="." unique_id=1696345003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("PlaneMesh_wohq8")
+surface_material_override/0 = SubResource("StandardMaterial3D_arrow")
+
+[node name="DirectionArrow" type="MeshInstance3D" parent="DirectionArrow" unique_id=1449404916]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 1.8)
+mesh = SubResource("PlaneMesh_yf5fn")
+surface_material_override/0 = SubResource("StandardMaterial3D_arrow")
+
+[node name="ParkingArea" type="Area3D" parent="." unique_id=94951545]
 collision_layer = 4
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ParkingArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ParkingArea" unique_id=242350833]
 shape = SubResource("BoxShape3D_parking")

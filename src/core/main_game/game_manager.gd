@@ -18,6 +18,9 @@ var _success_hud: Control
 var _is_game_over: bool = false
 var _is_success: bool = false
 
+## 확정 버튼을 누른 순간 채점한 주차 등급 스냅샷. 유예 뒤 위치가 흔들려도 눌렀을 때 값으로 표시한다.
+var _final_grade: ParkingGrade.Grade = ParkingGrade.Grade.B
+
 ## 비행기가 주차존에 완전히 들어와 확정 버튼(스페이스)만 누르면 되는 상태. HUD가 읽어 표시를 바꾼다.
 var is_awaiting_shutdown_confirm: bool = false
 
@@ -67,14 +70,18 @@ func _spawn_at(scene: PackedScene, spawn_group: StringName) -> Node3D:
 func _process(delta: float) -> void:
 	# 비행기가 주차존에 완전히 들어왔는지 매 프레임 확인 (HUD 확정 아이콘의 근거).
 	if _aircraft != null and not (_is_game_over or _is_success):
-		is_awaiting_shutdown_confirm = _aircraft.is_fully_parked()
+		is_awaiting_shutdown_confirm = _aircraft.is_parked_enough()
 	if is_confirming_shutdown and _confirm_delay.tick(delta):
 		is_confirming_shutdown = false
 		trigger_success()
 
-## 확정 버튼(스페이스) 이벤트. 비행기가 주차존에 완전히 들어온 상태에서만 성공 유예를 시작한다.
+## 확정 버튼(스페이스) 이벤트. 비행기가 주차존에 충분히 들어온 상태에서만 성공 유예를 시작한다.
+## 누른 순간의 사실로 등급을 채점해 스냅샷한다(유예 중 관성으로 움직여도 확정 시점 값 유지).
 func _on_shutdown_confirmed() -> void:
-	if _aircraft != null and _aircraft.is_fully_parked():
+	if _aircraft != null and _aircraft.is_parked_enough():
+		var metrics := _aircraft.parking_metrics()
+		if not metrics.is_empty():
+			_final_grade = ParkingGrade.evaluate(metrics["position_error"], metrics["angle_error"])
 		begin_shutdown_confirm()
 
 func trigger_game_over() -> void:
@@ -90,7 +97,7 @@ func trigger_success() -> void:
 		return
 	_is_success = true
 	if _success_hud != null:
-		_success_hud.show_success()
+		_success_hud.show_success(_final_grade)
 	get_tree().paused = true
 
 func _input(event: InputEvent) -> void:

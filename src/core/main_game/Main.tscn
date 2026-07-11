@@ -5,14 +5,15 @@
 [ext_resource type="Script" uid="uid://8i0s2p1e8024" path="res://src/ui/signal_indicator_hud.gd" id="8_signal_indicator_hud_script"]
 [ext_resource type="Script" uid="uid://di3tsave8npl0" path="res://src/core/main_game/game_manager.gd" id="9_game_manager_script"]
 [ext_resource type="Script" uid="uid://dx55253tt3l5c" path="res://src/ui/game_over_hud.gd" id="11_game_over_hud_script"]
-[ext_resource type="Script" uid="uid://cjwjea1frgrbg" path="res://src/ui/success_hud.gd" id="12_success_hud_script"]
+[ext_resource type="Script" uid="uid://c6wgcq88r4gfo" path="res://src/ui/success_hud.gd" id="12_success_hud_script"]
 [ext_resource type="Script" uid="uid://bydki8riqxqrl" path="res://src/debug/debug_hud.gd" id="13_debug_hud_script"]
+[ext_resource type="Script" uid="uid://cse8ieooulmoa" path="res://src/ui/parking_grade_hud.gd" id="14_parking_grade_hud_script"]
 [ext_resource type="Script" uid="uid://bcao4qw1nrf5v" path="res://src/core/main_game/level_lighting.gd" id="19_level_lighting_script"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacle/obstacle.tscn" id="20_obstacle"]
 [ext_resource type="PackedScene" uid="uid://cdk1g7glhd1ni" path="res://src/gameplay/marshaller/marshaller.tscn" id="21_marshaller"]
 [ext_resource type="Script" uid="uid://bp7k3xrawm2n" path="res://src/gameplay/marshaller/player_controller.gd" id="22_player_controller_script"]
 [ext_resource type="PackedScene" uid="uid://bg46yneanlcpr" path="res://src/gameplay/aircraft/aircraft.tscn" id="23_aircraft"]
-[ext_resource type="PackedScene" path="res://src/gameplay/parking/parking.tscn" id="24_parking"]
+[ext_resource type="PackedScene" uid="uid://bq5wx7ywpxnqm" path="res://src/gameplay/parking/parking.tscn" id="24_parking"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(50, 50)
@@ -45,7 +46,7 @@ script = ExtResource("22_player_controller_script")
 process_mode = 1
 
 [node name="TopDownCamera" type="Camera3D" parent="World" unique_id=333177737]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 16, 9)
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 19.5, 11)
 current = true
 fov = 45.0
 
@@ -66,7 +67,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 [node name="Obstacle" parent="World/LevelRoot" unique_id=409521720 instance=ExtResource("20_obstacle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 0)
 
-[node name="ParkingSpot" parent="World/LevelRoot" instance=ExtResource("24_parking")]
+[node name="ParkingSpot" parent="World/LevelRoot" unique_id=440768861 instance=ExtResource("24_parking")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 3)
 
 [node name="EntityRoot" type="Node3D" parent="World" unique_id=183132466]
@@ -101,6 +102,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("8_signal_indicator_hud_script")
+
+[node name="ParkingGradeHUD" type="Control" parent="HudLayer/HudRoot" unique_id=1786519439]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("14_parking_grade_hud_script")
 
 [node name="GameOverHUD" type="Control" parent="HudLayer/HudRoot" unique_id=2091873834 groups=["game_over_hud"]]
 visible = false
