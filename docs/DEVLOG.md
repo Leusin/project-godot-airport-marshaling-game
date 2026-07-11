@@ -17,6 +17,8 @@ Prototype Complete
 
 ## 결정 · 교훈
 
+- 2026-07-11 [결정] 마샬러 방향(등/정면)을 주입된 타깃으로 판정 + HUD 자가 조회 제거 — 마샬러가 항상 비행기를 바라본다는 가정에서, 비행기가 화면 위(작은 z)면 등·아래면 정면을 보이므로 스프라이트를 좌우 반전해 좌/우 수신호의 손잡이 방향을 맞춘다(머리가 블롭이라 앞/뒤 차이는 미러링뿐). 처음엔 스프라이트가 `get_first_node_in_group(AIRCRAFT)`로 비행기를 자가 조회했으나 §6 위반 → `Marshaller`가 `set_facing_target`으로 비행기를 주입받아 `is_showing_back()` 사실만 노출하고 뷰는 부모 Pawn만 읽게 고침(비행기 지각의 `set_perception_target`과 대칭). 같은 결로 `ParkingGradeHUD`/`DebugHUD`도 비행기 자가 조회를 걷어내 GameManager가 `parking_metrics()`/`current_grade()`를 중계하고 HUD는 GameManager 싱글턴만 읽게 정렬(§3/§4/§6/§7).
+
 - 2026-07-11 [결정] 주차 판정을 완전포함 → 겹침비율 + 등급(B/A/S/SS) 채점 — 확정 게이트를 `AABB.encloses`(완전포함)에서 풋프린트 XZ 겹침비율 ≥ `MIN_PARK_RATIO`(0.7)로 완화(비스듬히 들어오면 AABB가 주차존보다 커져 영영 확정 불가였던 문제 해결). 채점은 아키텍처대로 분리: `AircraftCollision`(기하 사실)이 `parking_metrics()`로 겹침비율·중심 오차·축 각도 오차를 제공, 신규 `ParkingGrade`(중립 규칙 도메인, HandSignal 패턴)가 위치·각도 오차 → 등급으로 환산, `GameManager`(판정자)가 확정 순간 등급을 스냅샷(유예 중 관성 이동 무관), `SuccessHUD`가 표시. 각도는 사각 주차존이라 180° 뒤집힘을 동일 취급(0=정렬~90=직각). 등급 임계값은 프로토타입 초기값 — 실측 튜닝 대상. 30/30 통과.
 
 - 2026-07-11 [결정] 주차 등급은 게임 HUD, 정확도 수치는 디버그로 분리 — 라이브 등급(B/A/S/SS)은 실제 게임 HUD(`ParkingGradeHUD`, 우측)가 주차 충분(확정 가능) 동안 표시하고, 원자료(overlap/pos/ang)는 `DebugHUD`(백틱 토글)에만 둠. 둘 다 판정자와 같은 규칙(`ParkingGrade`)을 프리뷰로 재계산 — 규칙은 한 소스, 표시만 여러 곳. 키매핑 인디케이터는 하드코딩 대신 `InputMap.action_get_events`로 실제 바인딩을 읽어 라벨 생성(리바인딩 자동 반영), 방향키는 화살표 글리프로 압축.

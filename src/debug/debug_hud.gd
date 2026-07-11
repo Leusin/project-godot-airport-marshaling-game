@@ -10,10 +10,12 @@ const FONT_SIZE := 16
 const TEXT_COLOR := Color(0.9, 0.9, 0.95, 0.85)
 
 var _version := "0.0.0"
+var _game_manager: Node
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_version = str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+	_game_manager = SceneQuery.require_single(GameGroups.GAME_MANAGER)
 
 	if not OS.is_debug_build():
 		visible = false
@@ -40,14 +42,13 @@ func _draw() -> void:
 		draw_string(font, Vector2(0.0, baseline), lines[index],
 			HORIZONTAL_ALIGNMENT_RIGHT, size.x - RIGHT_MARGIN, FONT_SIZE, TEXT_COLOR)
 
-## 비행기가 주차존과 겹치는 동안의 정확도 수치(겹침·위치·각도)를 만든다. 겹침이 없으면 "PARK —".
-## 등급 자체는 실제 게임 HUD(ParkingGradeHUD)가 표시하고, 여기선 튜닝용 원자료만 보여준다.
+## 주차 정확도 원자료(겹침·위치·각도)를 GameManager에서 읽어 튜닝용으로 표시. 겹침이 없으면 "PARK —".
+## 등급 자체는 게임 HUD(ParkingGradeHUD)가 담당.
 func _parking_lines() -> PackedStringArray:
 	var lines := PackedStringArray()
-	var aircraft := get_tree().get_first_node_in_group(GameGroups.AIRCRAFT)
-	if aircraft == null or not aircraft.has_method("parking_metrics"):
+	if _game_manager == null:
 		return lines
-	var metrics: Dictionary = aircraft.parking_metrics()
+	var metrics: Dictionary = _game_manager.parking_metrics()
 	if metrics.is_empty():
 		lines.append("PARK  —")
 		return lines

@@ -29,6 +29,8 @@ func _process(_delta: float) -> void:
 	if _marshaller == null:
 		return
 
+	_update_facing()
+
 	if _game_manager != null and _game_manager.is_confirming_shutdown:
 		if texture != _shutdown_texture:
 			texture = _shutdown_texture
@@ -38,3 +40,7 @@ func _process(_delta: float) -> void:
 	var tex: Texture2D = _textures.get(current)
 	if tex != null and tex != texture:
 		texture = tex
+
+## 아트는 등 뷰 기준 — Pawn의 is_showing_back만 읽어 정면일 때만 좌우 반전(비행기 직접 참조 안 함).
+func _update_facing() -> void:
+	flip_h = not _marshaller.is_showing_back()

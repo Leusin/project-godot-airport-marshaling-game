@@ -52,11 +52,13 @@ func _ready() -> void:
 ## 레벨의 스폰 지점 마커(그룹)에 엔티티를 인스턴싱한다. 비행기·시야콘 비주얼이 _ready에서
 ## 마샬러를 그룹으로 찾으므로, 마샬러를 반드시 먼저 스폰한다.
 func _spawn_entities() -> void:
-	var marshaller := _spawn_at(marshaller_scene, GameGroups.MARSHALLER_SPAWN)
+	var marshaller := _spawn_at(marshaller_scene, GameGroups.MARSHALLER_SPAWN) as Marshaller
 	_aircraft = _spawn_at(aircraft_scene, GameGroups.AIRCRAFT_SPAWN) as Aircraft
-	# 스폰한 주체가 관계를 배선한다: 비행기의 지각 대상으로 마샬러를 주입.
+	# 스폰한 주체가 관계를 배선한다: 비행기의 지각 대상=마샬러, 마샬러의 바라볼 대상=비행기.
 	if _aircraft != null:
 		_aircraft.set_perception_target(marshaller)
+	if marshaller != null:
+		marshaller.set_facing_target(_aircraft)
 
 ## scene을 spawn_group 마커의 자식으로 붙여 마커의 트랜스폼에 배치한다. 스폰한 인스턴스를 반환.
 func _spawn_at(scene: PackedScene, spawn_group: StringName) -> Node3D:
@@ -83,6 +85,20 @@ func _on_shutdown_confirmed() -> void:
 		if not metrics.is_empty():
 			_final_grade = ParkingGrade.evaluate(metrics["position_error"], metrics["angle_error"])
 		begin_shutdown_confirm()
+
+## 주차 정확도 원자료(겹침·위치·각도). 겹치는 주차존이 없으면 빈 사전. 디버그 HUD가 읽는다.
+## (뷰가 비행기를 직접 조회하지 않도록 판정자가 사실을 중계.)
+func parking_metrics() -> Dictionary:
+	if _aircraft == null:
+		return {}
+	return _aircraft.parking_metrics()
+
+## 지금 확정하면 받을 등급(라이브 프리뷰). is_awaiting_shutdown_confirm일 때 유효, 등급 HUD가 읽는다.
+func current_grade() -> ParkingGrade.Grade:
+	var metrics := parking_metrics()
+	if metrics.is_empty():
+		return ParkingGrade.Grade.B
+	return ParkingGrade.evaluate(metrics["position_error"], metrics["angle_error"])
 
 func trigger_game_over() -> void:
 	if _is_game_over or _is_success:

@@ -10,8 +10,7 @@ const ROW_GAP := 18.0
 const ROW_BOTTOM_MARGIN := 24.0
 const CONFIRM_ICON_SIZE := 99.0
 
-# 키캡(키 라벨) 표시 — 각 아이콘 우측 상단 모서리에 튀어나오게(볼드) 그린다. 불투명.
-# 아이콘이 선택 시 커지므로 키캡도 함께 스케일(비선택은 INACTIVE_SCALE로 축소).
+# 키캡(키 라벨): 아이콘 우측 상단에 볼드로. 선택 시 아이콘과 함께 커진다(비선택은 축소).
 const KEYCAP_HEIGHT := 20.0
 const KEYCAP_FONT_SIZE := 14
 const KEYCAP_PAD_X := 6.0        # 라벨 좌우 여백
@@ -111,8 +110,7 @@ func _draw_texture(tex: Texture2D, rect: Rect2, alpha: float) -> void:
 		return
 	draw_texture_rect(tex, rect, false, Color(1.0, 1.0, 1.0, alpha))
 
-## 아이콘의 우측 상단 모서리에 삐져나오게 키캡(배경+테두리+볼드 라벨)을 그린다. 라벨이 비면 미표시.
-## 선택된 아이콘(커진 icon_rect)엔 원본 크기로, 비선택엔 INACTIVE_SCALE로 축소해 아이콘과 함께 스케일.
+## 아이콘 우측 상단에 키캡을 그린다(라벨이 비면 미표시). 비선택이면 축소해 아이콘과 함께 스케일.
 func _draw_keycap(text: String, icon_rect: Rect2, active: bool) -> void:
 	if text.is_empty():
 		return
@@ -121,7 +119,7 @@ func _draw_keycap(text: String, icon_rect: Rect2, active: bool) -> void:
 	var height := KEYCAP_HEIGHT * scale
 	var text_w := _keycap_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 	var cap_w := maxf(KEYCAP_MIN_WIDTH * scale, text_w + KEYCAP_PAD_X * scale * 2.0)
-	# 우상단 앵커: 아이콘 우측/상단 모서리에서 밖으로 KEYCAP_PROTRUDE 만큼.
+	# 우상단 앵커: 아이콘 모서리에서 밖으로 KEYCAP_PROTRUDE 만큼.
 	var anchor := Vector2(icon_rect.end.x + KEYCAP_PROTRUDE, icon_rect.position.y - KEYCAP_PROTRUDE)
 	var cap_rect := Rect2(anchor.x - cap_w, anchor.y, cap_w, height)
 	draw_rect(cap_rect, KEYCAP_BG)
@@ -131,16 +129,15 @@ func _draw_keycap(text: String, icon_rect: Rect2, active: bool) -> void:
 	draw_string(_keycap_font, Vector2(cap_rect.position.x, baseline), text,
 		HORIZONTAL_ALIGNMENT_CENTER, cap_w, font_size, KEYCAP_TEXT)
 
-## 액션에 바인딩된 첫 키의 표시 라벨. 방향키는 화살표 글리프로 압축. 물리 키코드는 현재 배열로 변환.
+## 액션에 바인딩된 첫 키의 표시 라벨. 방향키는 화살표 글리프로 압축.
+## physical_keycode가 곧 Key enum이라 그대로 문자열화(디스플레이 서버 의존 회피 → 헤드리스 안전).
 func _key_label_for(action: StringName) -> String:
 	if not InputMap.has_action(action):
 		return ""
 	for event in InputMap.action_get_events(action):
 		if event is InputEventKey:
 			var key := event as InputEventKey
-			var code := key.keycode
-			if key.physical_keycode != 0:
-				code = DisplayServer.keyboard_get_keycode_from_physical(key.physical_keycode)
+			var code := key.physical_keycode if key.physical_keycode != 0 else key.keycode
 			var label := OS.get_keycode_string(code)
 			return ARROW_GLYPHS.get(label, label)
 	return ""
