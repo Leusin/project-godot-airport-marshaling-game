@@ -69,6 +69,8 @@ Prototype Complete
 
 ## 세션 로그
 
+- 2026-07-11 시야 차폐(line-of-sight) — `AircraftVision.contains(point)`를 `can_see(target)`로 교체, 반경→각도→시야선 3가드로 분리. 시야선은 비행기→대상 레이캐스트(mask=solid)로 장애물에 걸리면 못 봄. solid만 마스킹해 마샬러(hazard)·비행기 자신은 자동 제외. `CollisionLayers.bit()` 헬퍼 추가. 장애물이 시야를 막는 두 번째 역할을 얻어 레벨디자인과 시너지. 실물 차폐 동작은 플레이테스트 확인 필요.
+
 - 2026-07-11 주차 등급 + 라이브 HUD + 키매핑 인디케이터 + 카메라 여백 — (1) 확정 게이트를 완전포함→겹침비율(0.7)로 완화하고 확정 순간 위치·각도 오차로 채점(신규 `ParkingGrade` 도메인, `AircraftCollision.parking_metrics`, `GameManager` 스냅샷, `SuccessHUD` 표시). (2) 라이브 등급 프리뷰를 게임 HUD(신규 `ParkingGradeHUD`, 우측)로, 튜닝용 수치(overlap/pos/ang)는 `DebugHUD`(백틱)로 분리. (3) 주차 패드에 방향 화살표(노란색). (4) `SignalIndicator`에 InputMap을 읽어 각 신호 아이콘 키캡(↑←→↓/Space) 표시 — 우상단·볼드·선택 시 함께 스케일. (5) 카메라 시선축 dolly((0,16,9)→(0,19.5,11)) 여백 +22%. 임계값·카메라·레이아웃은 실측 튜닝. 30/30 통과, 실물 실행 오류 없음.
 
 - 2026-07-11 콜리전 폴리싱 + 엔티티 씬화/스폰 리팩터 — 마샬러 물리 블로킹(CharacterBody3D + 장애물 StaticBody3D, solid 레이어), 비행기 복합 히트박스(동체+날개). Marshaller/Aircraft/Obstacle을 `.tscn`으로 추출하고 GameManager가 스폰 마커에 인스턴싱. 비행기의 마샬러 참조를 전역 조회 → GameManager 주입(`set_perception_target`)으로. 시야를 shader `AircraftVision`으로 교체(미사용 cone/debug 제거). main 폴더 실물 실행 확인(오류 없음).

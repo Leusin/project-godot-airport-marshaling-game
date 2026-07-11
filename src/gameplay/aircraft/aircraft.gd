@@ -45,7 +45,7 @@ func set_perception_target(target: Node3D) -> void:
 func _process(delta: float) -> void:
 	if _target == null:
 		return  # 볼 대상이 없으면 명령을 받지 않고 대기한다.
-	var seen := _vision.contains(_target.global_position)
+	var seen := _vision.can_see(_target)
 	if seen != _see_marshaller:
 		_see_marshaller = seen
 		_vision.set_seen(seen)

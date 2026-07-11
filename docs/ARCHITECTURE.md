@@ -87,10 +87,10 @@ MainGame                         Process Mode = Always
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `Aircraft` (Pawn) | GameManager가 주입한 지각 대상(마샬러)을 시야로 관찰해 신호를 "받아" FSM·이동 헬퍼 구동. 자기 사실(`hazard_hit`·`is_fully_parked()`)만 노출하고 게임 규칙은 모름 (대상 없으면 대기) |
+| `Aircraft` (Pawn) | GameManager가 주입한 지각 대상(마샬러)을 시야로 관찰해 신호를 "받아" FSM·이동 헬퍼 구동. 자기 사실(`hazard_hit`·`is_parked_enough()`)만 노출하고 게임 규칙은 모름 (대상 없으면 대기) |
 | `AircraftFSM` | brain. 받은 신호로 IDLE/MOVING/HESITATING/STOPPING 전이 → `forward`/`turn` |
 | `AircraftMovement` | 속도 관성·회전·전진 계산 헬퍼 (`RefCounted`) |
-| `AircraftVision` | 정면 시야 판정(`contains`) + shader로 시야 부채꼴 시각화 (`MeshInstance3D`) |
+| `AircraftVision` | 시야 판정 `can_see`(반경→각도→시야선 차폐 순, solid 레이캐스트로 장애물 뒤는 못 봄) + shader로 시야 부채꼴 시각화 (`MeshInstance3D`) |
 | `AircraftCollision` | 히트박스(Area3D) 겹침 판정 헬퍼 (`RefCounted`). 복합 히트박스(동체+날개) 월드 AABB를 합쳐 hazard 진입/완전 주차 여부만 Aircraft에 알림 |
 | `AircraftHitbox` | 스크립트 없는 Area3D. Aircraft가 소유한 `AircraftCollision`이 이 노드를 구독 |
 
