@@ -13,6 +13,9 @@ signal advance_requested
 ## 확정 버튼 → 성공 처리(HUD) 사이 유예. 마샬러 엔진정지 포즈를 잠깐 보여주는 연출용 지연.
 const SHUTDOWN_CONFIRM_DELAY := 1.0
 
+## 충돌 → 게임오버 HUD 사이 히트스톱. 정지화면 + 충돌 이펙트로 무슨 일이 났는지 보여주는 연출용 지연.
+const HIT_STOP_DELAY := 0.5
+
 ## 스폰할 엔티티 씬. 스폰 지점(마커)은 레벨 데이터, 어떤 엔티티를 놓을지는 여기서 정한다.
 @export var marshaller_scene: PackedScene
 @export var aircraft_scene: PackedScene
@@ -23,6 +26,7 @@ var _player_controller: Node
 var _entity_root: Node3D
 var _game_over_hud: Control
 var _success_hud: Control
+var _hit_effect_hud: Control
 var _spawned: Array[Node] = []
 
 var _is_game_over := false
@@ -40,7 +44,11 @@ var is_awaiting_shutdown_confirm := false
 ## 확정 직후 ~ 성공 처리 전의 짧은 구간. 마샬러 스프라이트가 이 구간에만 엔진정지 포즈를 보여준다.
 var is_confirming_shutdown := false
 
+## 충돌 후 히트스톱 중(정지화면 + 이펙트, 게임오버 HUD 대기).
+var _is_in_hit_stop := false
+
 var _confirm_delay := Countdown.new()
+var _hit_stop_delay := Countdown.new()
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -48,6 +56,7 @@ func _ready() -> void:
 	_player_controller = SceneQuery.require_single(GameGroups.PLAYER_CONTROLLER)
 	_game_over_hud = SceneQuery.require_single(GameGroups.GAME_OVER_HUD)
 	_success_hud = SceneQuery.require_single(GameGroups.SUCCESS_HUD)
+	_hit_effect_hud = SceneQuery.require_single(GameGroups.HIT_EFFECT_HUD)
 	_signal_input = SceneQuery.require_single(GameGroups.SIGNAL_INPUT)
 	if _signal_input != null:
 		_signal_input.shutdown_confirmed.connect(_on_shutdown_confirmed)
@@ -60,11 +69,15 @@ func start_level() -> void:
 	_is_success = false
 	is_awaiting_shutdown_confirm = false
 	is_confirming_shutdown = false
+	_is_in_hit_stop = false
+	_hit_stop_delay.stop()
 	_final_grade = ParkingGrade.Grade.B
 	if _game_over_hud != null:
 		_game_over_hud.visible = false
 	if _success_hud != null:
 		_success_hud.visible = false
+	if _hit_effect_hud != null:
+		_hit_effect_hud.hide_impact()
 	_spawn_entities()
 	get_tree().paused = false
 
@@ -85,7 +98,7 @@ func _spawn_entities() -> void:
 	# 스폰한 주체가 관계를 배선한다: 지각 대상·바라볼 대상·possess.
 	if _aircraft != null:
 		_aircraft.set_perception_target(marshaller)
-		_aircraft.hazard_hit.connect(trigger_game_over)
+		_aircraft.hazard_hit.connect(_on_hazard_hit)
 	if marshaller != null:
 		marshaller.set_facing_target(_aircraft)
 		if _player_controller != null:
@@ -109,6 +122,10 @@ func _process(delta: float) -> void:
 	if is_confirming_shutdown and _confirm_delay.tick(delta):
 		is_confirming_shutdown = false
 		trigger_success()
+	# 히트스톱이 끝나면 게임오버 확정 (정지화면 + 이펙트를 보여준 뒤 HUD).
+	if _is_in_hit_stop and _hit_stop_delay.tick(delta):
+		_is_in_hit_stop = false
+		trigger_game_over()
 
 ## 확정 버튼(스페이스) 이벤트. 비행기가 주차존에 충분히 들어온 상태에서만 성공 유예를 시작한다.
 ## 누른 순간의 사실로 등급을 채점해 스냅샷한다(유예 중 관성으로 움직여도 확정 시점 값 유지).
@@ -139,6 +156,17 @@ func current_grade() -> ParkingGrade.Grade:
 	if metrics.is_empty():
 		return ParkingGrade.Grade.B
 	return ParkingGrade.evaluate(metrics["position_error"], metrics["angle_error"])
+
+## 충돌 순간: 즉시 게임오버 HUD 대신 히트스톱 — 씬을 정지시키고 충돌 지점에 이펙트를 띄운 뒤,
+## HIT_STOP_DELAY 후 trigger_game_over()로 확정한다 (무슨 일이 났는지 보여주는 연출).
+func _on_hazard_hit(world_position: Vector3) -> void:
+	if debug_invincible or _is_game_over or _is_success or _is_in_hit_stop:
+		return
+	_is_in_hit_stop = true
+	get_tree().paused = true
+	if _hit_effect_hud != null:
+		_hit_effect_hud.show_impact(world_position)
+	_hit_stop_delay.start(HIT_STOP_DELAY)
 
 func trigger_game_over() -> void:
 	if debug_invincible:

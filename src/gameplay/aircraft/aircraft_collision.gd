@@ -10,8 +10,8 @@ extends RefCounted
 ## AABB가 주차존보다 커져 영영 확정이 안 되므로, "대부분 들어옴"으로 완화한다. 정밀도는 등급이 채점.
 const MIN_PARK_RATIO := 0.7
 
-## hazard(장애물·마샬러) 진입 순간 방출. Aircraft가 게임오버로 연결한다.
-signal hazard_hit
+## hazard(장애물·마샬러) 진입 순간 충돌 상대의 위치와 함께 방출. Aircraft가 재노출한다.
+signal hazard_hit(position: Vector3)
 
 var _hitbox: Area3D
 var _parking_areas: Array[Area3D] = []  # 현재 겹치는 주차 Area3D들
@@ -73,8 +73,11 @@ func _footprint_ratio(a: AABB, b: AABB) -> float:
 	return (inter.size.x * inter.size.z) / self_area
 
 ## 감지되는 바디는 전부 hazard 레이어(장애물·마샬러)이므로 진입 = 충돌.
-func _on_body_entered(_body: Node3D) -> void:
-	hazard_hit.emit()
+## 충돌 지점은 비행기 히트박스 중심 ↔ 상대 원점의 중간점으로 근사한다(상대 원점만 쓰면
+## 발밑 중심이라 접촉 위치와 어긋나 보임).
+func _on_body_entered(body: Node3D) -> void:
+	var self_center := _world_aabb(_hitbox).get_center()
+	hazard_hit.emit((self_center + body.global_position) * 0.5)
 
 ## Area는 주차존만 넘어온다.
 func _on_area_entered(area: Area3D) -> void:

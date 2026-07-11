@@ -71,6 +71,8 @@ Prototype Complete
 
 ## 세션 로그
 
+- 2026-07-11 충돌 히트스톱 + 충돌 지점 이펙트 — 충돌 즉시 게임오버 HUD가 떠서 상황이 안 보이던 것을, 씬 정지(히트스톱 0.5초) + 충돌 지점 이펙트 표시 후 HUD로 바꿈. `hazard_hit` 시그널에 충돌 위치(Vector3)를 실어 사실 체인(AircraftCollision→Aircraft→GameManager)으로 전달, 신규 `HitEffectHUD`가 월드→화면 투영해 표시. 이펙트 이미지는 `assets/sprites/effects/impact.png`(없으면 임시 스파크 도형).
+
 - 2026-07-11 디버그 치트(F1/F2) — 신규 `DebugCheats`(디버그 빌드 전용): F1=다음 레벨 스킵(캠페인 next_level 위임), F2=무적 토글(GameManager.debug_invincible — trigger_game_over 게이트로 hazard 충돌 무시). 디버그 HUD 좌측 상단에 치트 키 안내 표시(켜진 치트는 주황 강조).
 
 - 2026-07-11 캠페인 완료 화면 + 로비 복귀 — 마지막 레벨 클리어 후 확인 입력 시 순환 대신 완료 화면(신규 `CampaignCompleteHUD`, 레벨별 등급 요약)으로 전환, 한 번 더 확인하면 `campaign_finished` 시그널 → Main이 로비로 복귀(씬 내비게이션도 조립 지점 Main 담당). 진행 입력은 기존 advance 경로 재사용(별도 입력 핸들러 없음). 게임 루프가 로비→캠페인→완료→로비로 완결.

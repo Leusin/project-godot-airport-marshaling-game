@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://cd05dyidukyp5" path="res://src/ui/level_progress_hud.gd" id="32_level_progress_hud_script"]
 [ext_resource type="Script" uid="uid://bkiyit7f8882w" path="res://src/ui/campaign_complete_hud.gd" id="33_campaign_complete_hud_script"]
 [ext_resource type="Script" uid="uid://kmu680eryf0s" path="res://src/debug/debug_cheats.gd" id="34_debug_cheats_script"]
+[ext_resource type="Script" uid="uid://dmlngrm5y511w" path="res://src/ui/hit_effect_hud.gd" id="35_hit_effect_hud_script"]
 
 [node name="MainGame" type="Node" unique_id=366331269]
 process_mode = 3
@@ -113,6 +114,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("32_level_progress_hud_script")
+
+[node name="HitEffectHUD" type="Control" parent="HudLayer/HudRoot" unique_id=1545390098 groups=["hit_effect_hud"]]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("35_hit_effect_hud_script")
 
 [node name="GameOverHUD" type="Control" parent="HudLayer/HudRoot" unique_id=2091873834 groups=["game_over_hud"]]
 visible = false

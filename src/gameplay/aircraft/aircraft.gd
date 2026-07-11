@@ -14,8 +14,8 @@ extends Node3D
 @export var view_radius: float = 8.0
 @export var half_angle_degrees: float = 35.0
 
-## hazard(장애물·마샬러) 충돌 순간 방출. "게임오버"인지의 해석은 GameManager의 몫.
-signal hazard_hit
+## hazard(장애물·마샬러) 충돌 순간 충돌 지점과 함께 방출. "게임오버"인지의 해석은 GameManager의 몫.
+signal hazard_hit(position: Vector3)
 
 var _see_marshaller: bool
 

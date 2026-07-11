@@ -25,3 +25,4 @@ const AIRCRAFT_SPAWN := &"aircraft_spawn"
 # HUD LAYER
 const GAME_OVER_HUD := &"game_over_hud"
 const SUCCESS_HUD := &"success_hud"
+const HIT_EFFECT_HUD := &"hit_effect_hud"
