@@ -30,13 +30,11 @@ func _draw() -> void:
 	var cx := size.x
 	var cy := size.y / 2.0
 	var font := ThemeDB.fallback_font
-	draw_string(font, Vector2(0, cy - 60.0), "AIRPORT MARSHALLER",
+	draw_string(font, Vector2(0, cy - 60.0), "AIRPORT MARSHALLER SIMULATOR",
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 56, TITLE_COLOR)
-	draw_string(font, Vector2(0, cy - 16.0), "수신호로 비행기를 주차 지점까지 유도하세요",
-		HORIZONTAL_ALIGNMENT_CENTER, cx, 20, SUBTITLE_COLOR)
-	draw_string(font, Vector2(0, cy + 70.0), "엔터 — 시작",
+	draw_string(font, Vector2(0, cy + 70.0), "시작: Enter",
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 28, START_COLOR)
-	draw_string(font, Vector2(0, cy + 105.0), "ESC — 종료",
+	draw_string(font, Vector2(0, cy + 105.0), "종료: ESC",
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 20, QUIT_COLOR)
 	draw_string(font, Vector2(0, size.y - 24.0), "v" + _version,
 		HORIZONTAL_ALIGNMENT_CENTER, cx, 14, VERSION_COLOR)

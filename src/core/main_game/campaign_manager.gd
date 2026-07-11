@@ -6,11 +6,17 @@ extends Node
 ## 레벨 씬 교체가 끝났을 때 방출. Main이 GameManager.start_level로 잇는다.
 signal level_loaded
 
+## 완료 화면에서 확인 입력까지 끝나 캠페인이 완전히 종료됐을 때 방출. 다음 흐름(로비 복귀)은 Main이 정한다.
+signal campaign_finished
+
 ## 캠페인 레벨 순서. 각 항목은 스폰 마커·주차존·장애물을 포함한 레벨 씬.
 @export var levels: Array[PackedScene] = []
 
 var _level_index := 0
 var _last_completed := false
+
+## 전 레벨 클리어 후 완료 화면이 떠 있는 상태. 완료 HUD가 읽어 표시한다.
+var is_complete := false
 
 ## 레벨별 최고 클리어 등급 (미클리어는 null). 저장 시스템이 붙으면 이 배열을 직렬화한다.
 var grades: Array = []
@@ -53,8 +59,15 @@ func on_level_failed() -> void:
 	_last_completed = false
 
 ## 종료 화면 확인 입력 뒤의 진행 결정: 클리어면 다음 레벨, 실패면 재시작.
+## 마지막 레벨을 클리어했으면 완료 화면으로 전환하고, 완료 화면에서 한 번 더 확인하면 캠페인 종료.
 func advance() -> void:
+	if is_complete:
+		campaign_finished.emit()
+		return
 	if _last_completed:
+		if _level_index == levels.size() - 1:
+			is_complete = true
+			return
 		next_level()
 	else:
 		restart_level()

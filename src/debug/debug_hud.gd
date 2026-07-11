@@ -4,10 +4,12 @@ extends Control
 ## 개발 빌드에서는 ` (백틱) 키로 껐다 켤 수 있고, 릴리스 빌드에서는 아예 숨긴다.
 
 const RIGHT_MARGIN := 12.0
+const LEFT_MARGIN := 12.0
 const TOP_MARGIN := 24.0
 const LINE_HEIGHT := 20.0
 const FONT_SIZE := 16
 const TEXT_COLOR := Color(0.9, 0.9, 0.95, 0.85)
+const CHEAT_ON_COLOR := Color(1.0, 0.6, 0.3, 0.95)
 
 var _version := "0.0.0"
 var _game_manager: Node
@@ -41,6 +43,19 @@ func _draw() -> void:
 		var baseline := TOP_MARGIN + index * LINE_HEIGHT
 		draw_string(font, Vector2(0.0, baseline), lines[index],
 			HORIZONTAL_ALIGNMENT_RIGHT, size.x - RIGHT_MARGIN, FONT_SIZE, TEXT_COLOR)
+
+	# 좌측 상단: 디버그 치트 키 안내 (켜진 치트는 색으로 강조).
+	var invincible: bool = _game_manager != null and _game_manager.debug_invincible
+	var cheats := [
+		["` 디버그 표시 토글", false],
+		["F1 다음 레벨", false],
+		["F2 무적: %s" % ("ON" if invincible else "OFF"), invincible],
+	]
+	for index in cheats.size():
+		var baseline := TOP_MARGIN + index * LINE_HEIGHT
+		draw_string(font, Vector2(LEFT_MARGIN, baseline), cheats[index][0],
+			HORIZONTAL_ALIGNMENT_LEFT, size.x, FONT_SIZE,
+			CHEAT_ON_COLOR if cheats[index][1] else TEXT_COLOR)
 
 ## 주차 정확도 원자료(겹침·위치·각도)를 GameManager에서 읽어 튜닝용으로 표시. 겹침이 없으면 "PARK —".
 ## 등급 자체는 게임 HUD(ParkingGradeHUD)가 담당.

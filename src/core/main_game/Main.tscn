@@ -12,14 +12,16 @@
 [ext_resource type="PackedScene" uid="uid://cdk1g7glhd1ni" path="res://src/gameplay/marshaller/marshaller.tscn" id="21_marshaller"]
 [ext_resource type="Script" uid="uid://bp7k3xrawm2n" path="res://src/gameplay/marshaller/player_controller.gd" id="22_player_controller_script"]
 [ext_resource type="PackedScene" uid="uid://bg46yneanlcpr" path="res://src/gameplay/aircraft/aircraft.tscn" id="23_aircraft"]
-[ext_resource type="Script" path="res://src/core/main_game/main_game.gd" id="25_main_game_script"]
-[ext_resource type="Script" path="res://src/core/main_game/campaign_manager.gd" id="26_campaign_manager_script"]
+[ext_resource type="Script" uid="uid://vwnt88hwu6yh" path="res://src/core/main_game/main_game.gd" id="25_main_game_script"]
+[ext_resource type="Script" uid="uid://belp6e41ga346" path="res://src/core/main_game/campaign_manager.gd" id="26_campaign_manager_script"]
 [ext_resource type="PackedScene" path="res://src/gameplay/levels/level_01.tscn" id="27_level_01"]
 [ext_resource type="PackedScene" path="res://src/gameplay/levels/level_02.tscn" id="28_level_02"]
 [ext_resource type="PackedScene" path="res://src/gameplay/levels/level_03.tscn" id="29_level_03"]
 [ext_resource type="PackedScene" path="res://src/gameplay/levels/level_04.tscn" id="30_level_04"]
 [ext_resource type="PackedScene" path="res://src/gameplay/levels/level_05.tscn" id="31_level_05"]
-[ext_resource type="Script" path="res://src/ui/level_progress_hud.gd" id="32_level_progress_hud_script"]
+[ext_resource type="Script" uid="uid://cd05dyidukyp5" path="res://src/ui/level_progress_hud.gd" id="32_level_progress_hud_script"]
+[ext_resource type="Script" uid="uid://bkiyit7f8882w" path="res://src/ui/campaign_complete_hud.gd" id="33_campaign_complete_hud_script"]
+[ext_resource type="Script" uid="uid://kmu680eryf0s" path="res://src/debug/debug_cheats.gd" id="34_debug_cheats_script"]
 
 [node name="MainGame" type="Node" unique_id=366331269]
 process_mode = 3
@@ -43,7 +45,7 @@ script = ExtResource("6_signal_input_script")
 [node name="PlayerController" type="Node" parent="Systems" unique_id=800287118 groups=["player_controller"]]
 script = ExtResource("22_player_controller_script")
 
-[node name="CampaignManager" type="Node" parent="Systems" groups=["campaign_manager"]]
+[node name="CampaignManager" type="Node" parent="Systems" unique_id=287884390 groups=["campaign_manager"]]
 script = ExtResource("26_campaign_manager_script")
 levels = Array[PackedScene]([ExtResource("27_level_01"), ExtResource("28_level_02"), ExtResource("29_level_03"), ExtResource("30_level_04"), ExtResource("31_level_05")])
 
@@ -102,7 +104,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_parking_grade_hud_script")
 
-[node name="LevelProgressHUD" type="Control" parent="HudLayer/HudRoot"]
+[node name="LevelProgressHUD" type="Control" parent="HudLayer/HudRoot" unique_id=871640705]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -133,6 +135,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("12_success_hud_script")
+
+[node name="CampaignCompleteHUD" type="Control" parent="HudLayer/HudRoot" unique_id=95862563]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("33_campaign_complete_hud_script")
 
 [node name="PauseLayer" type="CanvasLayer" parent="." unique_id=769809098]
 process_mode = 3
@@ -173,3 +185,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("13_debug_hud_script")
+
+[node name="DebugCheats" type="Node" parent="DebugLayer" unique_id=1205313080]
+script = ExtResource("34_debug_cheats_script")

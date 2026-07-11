@@ -71,6 +71,10 @@ Prototype Complete
 
 ## 세션 로그
 
+- 2026-07-11 디버그 치트(F1/F2) — 신규 `DebugCheats`(디버그 빌드 전용): F1=다음 레벨 스킵(캠페인 next_level 위임), F2=무적 토글(GameManager.debug_invincible — trigger_game_over 게이트로 hazard 충돌 무시). 디버그 HUD 좌측 상단에 치트 키 안내 표시(켜진 치트는 주황 강조).
+
+- 2026-07-11 캠페인 완료 화면 + 로비 복귀 — 마지막 레벨 클리어 후 확인 입력 시 순환 대신 완료 화면(신규 `CampaignCompleteHUD`, 레벨별 등급 요약)으로 전환, 한 번 더 확인하면 `campaign_finished` 시그널 → Main이 로비로 복귀(씬 내비게이션도 조립 지점 Main 담당). 진행 입력은 기존 advance 경로 재사용(별도 입력 핸들러 없음). 게임 루프가 로비→캠페인→완료→로비로 완결.
+
 - 2026-07-11 메인 로비 씬 — 신규 `lobby.tscn`(타이틀·시작 안내·버전 표시)을 메인 씬으로 지정, 엔터 → Main.tscn 전환·ESC → 종료. 캠페인 진입점이자 추후 레벨 선택·설정 자리. 인게임 → 로비 복귀는 추후.
 
 - 2026-07-11 레벨 진행 HUD — 상단 중앙에 레벨 슬롯 로드맵(신규 `LevelProgressHUD`). 현재 레벨은 테두리 강조, 클리어한 레벨은 번호 대신 등급(B/A/S/SS) 표시. 캠페인이 `level_count`/`current_level`/`grade_of` 사실을 노출하고 HUD는 읽기만. 마지막 레벨 → 처음 순환 시 등급 기록 초기화(새 사이클).

@@ -28,6 +28,9 @@ var _spawned: Array[Node] = []
 var _is_game_over := false
 var _is_success := false
 
+## 디버그 무적: 켜져 있으면 hazard 충돌을 게임오버로 해석하지 않는다. DebugCheats가 토글, 디버그 HUD가 표시.
+var debug_invincible := false
+
 ## 확정 버튼을 누른 순간 채점한 주차 등급 스냅샷. 유예 뒤 위치가 흔들려도 눌렀을 때 값으로 판정한다.
 var _final_grade: ParkingGrade.Grade = ParkingGrade.Grade.B
 
@@ -138,6 +141,8 @@ func current_grade() -> ParkingGrade.Grade:
 	return ParkingGrade.evaluate(metrics["position_error"], metrics["angle_error"])
 
 func trigger_game_over() -> void:
+	if debug_invincible:
+		return
 	if _is_game_over or _is_success:
 		return
 	_is_game_over = true
