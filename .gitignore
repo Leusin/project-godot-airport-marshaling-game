@@ -17,3 +17,6 @@ mono_crash.*.json
 
 # Blender 백업 파일
 *.blend1
+
+# 빌드 결과물
+build/
